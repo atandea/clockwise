@@ -23,14 +23,13 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install and build
+      - name: Install
         run: |
           npm install
           npm run postinstall
-          npm run build
 
       - name: Publish releases
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" | Out-File -FilePath $env:GITHUB_ENV 
         run: |
           npm run dist
