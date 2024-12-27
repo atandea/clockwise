@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [windows-latest]
 
     steps:
       - name: Checkout git repo
@@ -27,7 +27,7 @@ jobs:
         run: |
           npm install
           npm run postinstall
-          npm run build
+          npm run build:win
 
       - name: Publish releases
         env:
