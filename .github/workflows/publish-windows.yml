@@ -26,7 +26,7 @@ jobs:
       - name: Install
         run: |
           npm install
-          npm run build:win
+          npm run build:win -- --publish always
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
