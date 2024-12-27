@@ -31,5 +31,5 @@ jobs:
 
       - name: Publish releases
         run: |
-          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" | Out-File -FilePath $env:GITHUB_ENV 
+          echo "GH_TOKEN=${{ secrets.GITHUB_TOKEN }}" | Out-File -FilePath $env:GITHUB_ENV 
           npm exec electron-builder -- --publish always
