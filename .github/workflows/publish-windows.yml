@@ -26,12 +26,6 @@ jobs:
       - name: Install
         run: |
           npm install
-          npm run build:win
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish releases
-        run: |
-          npm exec electron-builder -- --publish always
+          npm run build:win -- --publish always
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
