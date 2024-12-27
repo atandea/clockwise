@@ -31,5 +31,4 @@ jobs:
       - name: Publish releases
         run: |
           echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" | Out-File -FilePath $env:GITHUB_ENV 
-        run: |
           npm run dist
