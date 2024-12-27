@@ -41,5 +41,3 @@ npmRebuild: false
 publish:
   provider: generic
   url: https://example.com/auto-updates
-electronDownload:
-  mirror: https://github.com/electron/electron/releases/tag/
