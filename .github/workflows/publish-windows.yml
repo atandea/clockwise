@@ -26,6 +26,7 @@ jobs:
       - name: Install
         run: |
           npm install
+          npm run build:win
 
       - name: Publish releases
         run: |
