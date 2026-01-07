@@ -2,6 +2,10 @@
 /dist
 /node_modules
 /build
+/client
+
+# pkg sidecar binary
+clockwise-server-*
 
 # Logs
 logs

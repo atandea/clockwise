@@ -36,8 +36,20 @@ async function bootstrap() {
 
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Private-Network', 'true');
+    // Ensure OPTIONS requests (preflights) get the header and a 204 status
+    if (req.method === 'OPTIONS') {
+      res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+      res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Access-Control-Allow-Private-Network');
+      return res.sendStatus(204);
+    }
     next();
   });
-  await app.listen(process.env.PORT ?? 4100);
+  // Trust proxy for accurate IP detection
+  const adapter = app.getHttpAdapter().getInstance();
+  if (typeof adapter.set === 'function') {
+    adapter.set('trust proxy', true);
+  }
+  await app.listen(process.env.PORT ?? 4100, '0.0.0.0');
 }
 bootstrap();

@@ -2,7 +2,7 @@ import { Injectable, MessageEvent } from '@nestjs/common';
 import { Timer } from './timer';
 import { FileStorageService } from 'src/files/file.service';
 import { randomUUID } from 'node:crypto';
-import { interval, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, interval, map, Observable, Subject } from 'rxjs';
 import { TimerEvent } from './timer-event';
 import { TimerInstance } from './timer-instance';
 
@@ -10,7 +10,8 @@ import { TimerInstance } from './timer-instance';
 export class TimerService {
   constructor(private readonly fileStorageService: FileStorageService) { }
 
-  private activeTimerSubject = new Subject<any>();
+  private ephemeralTimers = new Map<string, Timer>();
+  private activeTimerSubject = new BehaviorSubject<any>({ status: 'idle', remainingSeconds: 0 });
   private activeTimerInstance: TimerInstance | null = null;
   private overtime = 0;
   private activeSubscription: any;
@@ -75,6 +76,44 @@ export class TimerService {
     if (this.activeTimerInstance) {
       this.activeTimerInstance.status = 'stopped';
       this.overtime = 0;
+      if (this.activeSubscription) {
+        this.activeSubscription.unsubscribe();
+        this.activeSubscription = undefined;
+      }
+      // Emit stopped status
+      this.activeTimerSubject.next({
+        status: 'stopped',
+        timerId: this.activeTimerInstance.id,
+        remainingSeconds: 0
+      });
+    }
+  }
+
+  pauseActiveTimer() {
+    if (this.activeTimerInstance && this.activeTimerInstance.status === 'running') {
+      this.activeTimerInstance.status = 'paused';
+      if (this.activeSubscription) {
+        this.activeSubscription.unsubscribe();
+        this.activeSubscription = undefined;
+      }
+      this.activeTimerSubject.next({
+        status: 'paused',
+        timerId: this.activeTimerInstance.id,
+        name: this.activeTimerInstance.name,
+        remainingSeconds: this.activeTimerInstance.remainingSeconds,
+        totalSeconds: this.activeTimerInstance.duration,
+        progressPercent: this.activeTimerInstance.progressPercent
+      });
+    }
+  }
+
+  resumeActiveTimer() {
+    if (this.activeTimerInstance && this.activeTimerInstance.status === 'paused') {
+      this.activeTimerInstance.status = 'running';
+      this.activeSubscription = this.countdown$.subscribe({
+        next: (event) => this.activeTimerSubject.next(event),
+        error: (err) => this.activeTimerSubject.error(err)
+      });
     }
   }
 
@@ -87,6 +126,13 @@ export class TimerService {
   }
 
   getTimerInfo(timerId: string): Timer | undefined {
+    return this.getTimerById(timerId);
+  }
+
+  getTimerById(timerId: string): Timer | undefined {
+    if (this.ephemeralTimers.has(timerId)) {
+      return this.ephemeralTimers.get(timerId);
+    }
     const timers = this.fileStorageService.readData();
     return timers.find(timer => timer.id === timerId);
   }
@@ -120,26 +166,48 @@ export class TimerService {
   }
 
 
-  createTimer(timer: Timer): Timer {
-    console.log('Creating timer:', timer);
+  createTimer(timer: Timer, temporary: boolean = false): Timer {
+    console.log('Creating timer:', timer, 'temporary:', temporary);
     timer.id = randomUUID();
     timer.createdAt = new Date();
+
+    if (temporary) {
+      this.ephemeralTimers.set(timer.id, timer);
+      return timer;
+    }
+
     const timers = this.fileStorageService.readData();
     timers.push(timer);
     this.fileStorageService.writeData(timers);
     return timer;
   }
 
+  deleteTimer(id: string) {
+    if (this.ephemeralTimers.has(id)) {
+      this.ephemeralTimers.delete(id);
+      return;
+    }
+    const timers = this.fileStorageService.readData();
+    const updatedTimers = timers.filter((timer: any) => timer.id !== id);
+    this.fileStorageService.writeData(updatedTimers);
+  }
+
 
   getTimers(): Timer[] {
-    return this.fileStorageService.readData().map((timer: any) => {
+    const timers = this.fileStorageService.readData().map((timer: any) => {
       return {
         id: timer.id,
         name: timer.name,
         duration: timer.duration,
         unit: timer.unit,
-        createdAt: timer.createdAt
-      };
+        createdAt: timer.createdAt,
+      } as Timer;
+    });
+
+    return timers.sort((a, b) => {
+      const aSecs = this.convertToSeconds(a.duration, a.unit);
+      const bSecs = this.convertToSeconds(b.duration, b.unit);
+      return aSecs - bSecs;
     });
   }
 }

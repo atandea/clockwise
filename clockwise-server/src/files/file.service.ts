@@ -3,7 +3,11 @@ import { readFileSync, writeFileSync, existsSync } from 'fs';
 
 @Injectable()
 export class FileStorageService {
-    private readonly filePath = './data/data.json';
+    private readonly filePath: string;
+
+    constructor() {
+        this.filePath = process.env.APP_DATA_FILE || './data/data.json';
+    }
 
     public readData(): any[] {
         if (!existsSync(this.filePath)) return [];
@@ -11,11 +15,11 @@ export class FileStorageService {
     }
 
     public writeData(data: any[]): void {
+        const dir = require('path').dirname(this.filePath);
+        if (!existsSync(dir)) {
+            require('fs').mkdirSync(dir, { recursive: true });
+        }
         if (!existsSync(this.filePath)) {
-            const dir = this.filePath.substring(0, this.filePath.lastIndexOf('/'));
-            if (!existsSync(dir)) {
-                require('fs').mkdirSync(dir, { recursive: true });
-            }
             writeFileSync(this.filePath, JSON.stringify([], null, 2));
         }
         writeFileSync(this.filePath, JSON.stringify(data, null, 2));

@@ -1,0 +1,51 @@
+pipeline {
+    agent {
+        label 'debian && linux && docker'
+    }
+
+    environment {
+        PATH = "/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        RUSTUP_HOME = "/usr/local/rustup"
+        CARGO_HOME = "/usr/local/cargo"
+    }
+
+    stages {
+        stage('Debug Tools') {
+            steps {
+                sh 'printenv && which cargo && cargo --version && which node && node --version'
+            }
+        }
+        stage('Build Everything') {
+            steps {
+                dir('/home/jenkins/agent/workspace/clockwise-local') {
+                    sh '''
+                        set -ex
+                        
+                        echo '--- Building Server & Dashboard ---'
+                        (cd clockwise-server && npm ci && npm run build)
+                        (cd clockwise-dashboard && npm ci && npm run build)
+                        
+                        echo '--- Preparing Sidecar ---'
+                        mkdir -p clockwise-server/client
+                        cp -r clockwise-dashboard/build/* clockwise-server/client/
+                        mkdir -p clockwise-dashboard/src-tauri/bin
+                        
+                        echo '--- Building Server Sidecar Binary ---'
+                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node24-linux-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-unknown-linux-gnu)
+                        
+                        echo '--- Building Tauri App ---'
+                        (cd clockwise-dashboard && npm run tauri build -- --bundles deb)
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            dir('/home/jenkins/agent/workspace/clockwise-local') {
+                archiveArtifacts artifacts: 'clockwise-dashboard/src-tauri/target/release/bundle/deb/*.deb, clockwise-dashboard/src-tauri/target/release/bundle/appimage/*.AppImage', allowEmptyArchive: true
+            }
+        }
+    }
+}

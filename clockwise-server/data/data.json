@@ -1,5 +1,19 @@
 [
   {
+    "name": "5 min",
+    "duration": 5,
+    "unit": "minutes",
+    "id": "a792feab-9786-4631-9d00-b46193f3c863",
+    "createdAt": "2025-08-13T17:50:35.088Z"
+  },
+  {
+    "name": "10 min",
+    "duration": 10,
+    "unit": "minutes",
+    "id": "ce91d625-b09b-4d72-95fc-be5d01d4df11",
+    "createdAt": "2025-08-13T17:50:35.088Z"
+  },
+  {
     "name": "15 min",
     "duration": 15,
     "unit": "minutes",
@@ -7,17 +21,10 @@
     "createdAt": "2025-08-13T17:50:23.323Z"
   },
   {
-    "name": "10 min",
-    "duration": 10,
+    "name": "30 min",
+    "duration": 30,
     "unit": "minutes",
     "id": "0dc346a3-89b4-477c-9d29-f1be0122c602",
     "createdAt": "2025-08-13T17:50:30.168Z"
-  },
-  {
-    "name": "30 seconds",
-    "duration": 30,
-    "unit": "seconds",
-    "id": "4107a7f2-13e2-4db8-b4bc-e81b3b494cd9",
-    "createdAt": "2025-08-13T17:50:35.088Z"
   }
 ]
