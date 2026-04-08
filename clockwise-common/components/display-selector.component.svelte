@@ -1,7 +1,8 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { invoke } from "@tauri-apps/api/core";
-    import { fetchWithPin, getApiBaseUrl } from "../lib/api";
+    import { fetchWithPin, getApiBaseUrl, timerWindowOpen } from "../lib/api";
+    import { get } from "svelte/store";
 
     interface MonitorInfo {
         name: string;
@@ -14,7 +15,8 @@
 
     let monitors = $state<MonitorInfo[]>([]);
     let selectedMonitor = $state<string>("");
-    let timerWindowOpen = $state(false);
+    let isWindowOpen = $state(false);
+    const unsubscribeOpen = timerWindowOpen.subscribe(v => isWindowOpen = v);
     let loading = $state(true);
     let launchOnStartup = $state(false);
     let pollInterval: ReturnType<typeof setInterval> | null = null;
@@ -43,7 +45,7 @@
                 
                 // Automatically launch if required and not open and monitors exist.
                 // We do it here since it runs when dashboard loads and connects to the server
-                if (launchOnStartup && !timerWindowOpen) {
+                if (launchOnStartup && !isWindowOpen) {
                     await toggleFullscreenWindow();
                 }
             } else if (monitors.length > 0) {
@@ -85,18 +87,18 @@
 
     async function checkWindowState() {
         try {
-            timerWindowOpen =
-                await invoke<boolean>("is_timer_window_open");
+            const isOpen = await invoke<boolean>("is_timer_window_open");
+            timerWindowOpen.set(isOpen);
         } catch {
             // ignore
         }
     }
 
     async function toggleFullscreenWindow() {
-        if (timerWindowOpen) {
+        if (isWindowOpen) {
             try {
                 await invoke("close_timer_window");
-                timerWindowOpen = false;
+                timerWindowOpen.set(false);
             } catch (err) {
                 console.error("Failed to close timer window:", err);
             }
@@ -105,7 +107,7 @@
                 await invoke("open_timer_window", {
                     monitorName: selectedMonitor || null,
                 });
-                timerWindowOpen = true;
+                timerWindowOpen.set(true);
             } catch (err) {
                 console.error("Failed to open timer window:", err);
             }
@@ -122,8 +124,8 @@
 
     onMount(async () => {
         await loadMonitors();
-        await loadPreference();
         await checkWindowState();
+        await loadPreference();
         loading = false;
 
         // Poll timer window state every 2s to catch external closes
@@ -131,6 +133,7 @@
     });
 
     onDestroy(() => {
+        unsubscribeOpen();
         if (pollInterval) {
             clearInterval(pollInterval);
             pollInterval = null;
@@ -210,15 +213,15 @@
         <!-- Launch / Close fullscreen button -->
         <button
             class="flex items-center gap-2 h-8 rounded px-3 text-sm font-medium transition-colors whitespace-nowrap"
-            class:bg-green-600={!timerWindowOpen}
-            class:hover:bg-green-500={!timerWindowOpen}
-            class:text-white={!timerWindowOpen}
-            class:bg-red-600={timerWindowOpen}
-            class:hover:bg-red-500={timerWindowOpen}
+            class:bg-green-600={!isWindowOpen}
+            class:hover:bg-green-500={!isWindowOpen}
+            class:text-white={!isWindowOpen}
+            class:bg-red-600={isWindowOpen}
+            class:hover:bg-red-500={isWindowOpen}
             onclick={toggleFullscreenWindow}
             disabled={monitors.length === 0}
         >
-            {#if timerWindowOpen}
+            {#if isWindowOpen}
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
@@ -245,4 +248,15 @@
             {/if}
         </button>
     </div>
+{:else}
+    <div class="h-[50px] w-full rounded bg-gray-800/40 border border-gray-700/30 animate-pulse relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+    </div>
 {/if}
+
+<style>
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+</style>

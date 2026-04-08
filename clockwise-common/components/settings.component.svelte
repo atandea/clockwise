@@ -103,158 +103,227 @@
     }
 </script>
 
-<div
-    class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden"
->
-    <section
-        class="flex-1 flex flex-col p-3 lg:p-4 overflow-y-auto min-h-0"
-    >
-    <header
-        class="shrink-0 mb-4 flex h-12 items-center justify-between rounded-lg bg-gray-800/40 border border-gray-700/30 px-4 shadow-sm"
-    >
-        <div class="flex items-center gap-4">
-            <h1
-                class="text-[11px] font-bold text-gray-200 uppercase tracking-widest"
-            >
-                Settings
-            </h1>
-        </div>
-        <span class="flex items-center gap-2">
-            <a
-                href="/"
-                class="ml-2 rounded px-2 py-1 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white"
-            >
-                Back
-            </a>
-        </span>
-    </header>
-    <div class="w-full grid gap-6 lg:grid-cols-[1.6fr_0.95fr]">
-        <section class="rounded-[2rem] border border-gray-700 bg-[#0b0f1a]/95 p-6 shadow-2xl shadow-black/20">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div class="space-y-2">
-                    <p class="text-xs uppercase tracking-[0.3em] text-indigo-300/80">Settings</p>
-                    <h2 class="text-3xl font-semibold text-white">Local network access</h2>
-                </div>
-                <p class="max-w-xl text-sm leading-6 text-gray-400">
-                    Open the dashboard from another computer or phone on the same network using the link below.
-                </p>
-            </div>
-
-            <div class="mt-6 space-y-5">
-                <div class="rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-5 shadow-inner">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="min-w-0 space-y-2">
-                            <p class="text-sm text-gray-400">PIN security</p>
-                            <p class="text-xs text-gray-500 max-w-[280px]">Require a PIN for network devices to access the dashboard. Recommended for public networks.</p>
-                        </div>
-                        <button
-                            class="relative flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 {pinEnabled ? 'bg-indigo-600' : 'bg-gray-700'}"
-                            on:click={togglePin}
-                            aria-label="Toggle PIN security"
-                        >
-                            <span class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {pinEnabled ? 'translate-x-6' : 'translate-x-1'} shadow-sm"></span>
-                        </button>
-                    </div>
-                </div>
-
-                <div 
-                    class="rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-5 shadow-inner transition-opacity duration-300 {pinEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}"
+<div class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden">
+    <section class="flex-1 flex flex-col p-3 lg:p-4 overflow-y-auto min-h-0">
+        <header
+            class="shrink-0 mb-4 flex h-12 items-center justify-between rounded-lg bg-gray-800/40 border border-gray-700/30 px-4 shadow-sm"
+        >
+            <div class="flex items-center gap-4">
+                <h1
+                    class="text-[11px] font-bold text-gray-200 uppercase tracking-widest"
                 >
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="min-w-0 space-y-2">
-                            <p class="text-sm text-gray-400">Server PIN</p>
-                            <code class="inline-flex rounded-2xl bg-slate-950/90 px-3 py-2 text-xs font-medium text-yellow-300">
-                                {serverPin}
-                            </code>
-                        </div>
-                        <button
-                            class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-700"
-                            on:click={() => copyText(serverPin, "Server PIN")}
-                            disabled={!pinEnabled || !serverPin || serverPin.startsWith("(")}
-                            aria-label="Copy Server PIN"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-                                <path d="M8 4a2 2 0 00-2 2v9h8V6a2 2 0 00-2-2H8z" />
-                                <path d="M5 6a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H6a1 1 0 01-1-1V6z" />
-                            </svg>
-                            Copy PIN
-                        </button>
-                    </div>
-                </div>
-
-                <div class="rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-5 shadow-inner">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div class="min-w-0 space-y-2">
-                            <p class="text-sm text-gray-400">Local dashboard URL</p>
-                            {#if localAccessUrl}
-                                <a
-                                    href={localAccessUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    class="block max-w-full rounded-2xl bg-slate-950/90 px-3 py-2 text-xs font-medium text-yellow-300 transition hover:text-yellow-200 break-all"
-                                >
-                                    {localAccessUrl}
-                                </a>
-                            {:else}
-                                <code class="inline-flex rounded-2xl bg-slate-950/90 px-3 py-2 text-xs font-medium text-yellow-300">
-                                    (not available)
-                                </code>
-                            {/if}
-                        </div>
-                        <button
-                            class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-700"
-                            on:click={() => copyText(localAccessUrl, "Local dashboard URL")}
-                            disabled={!localAccessUrl}
-                            aria-label="Copy local dashboard URL"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-                                <path d="M8 4a2 2 0 00-2 2v9h8V6a2 2 0 00-2-2H8z" />
-                                <path d="M5 6a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H6a1 1 0 01-1-1V6z" />
-                            </svg>
-                            Copy URL
-                        </button>
-                    </div>
-                </div>
-
-                {#if toast}
-                    <div class="rounded-2xl bg-emerald-700/20 p-4 text-sm text-emerald-100 ring-1 ring-emerald-500/30">
-                        {toast}
-                    </div>
-                {/if}
+                    Settings
+                </h1>
             </div>
-        </section>
+            <span class="flex items-center gap-2">
+                <a
+                    href="/"
+                    class="ml-2 rounded px-2 py-1 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white"
+                >
+                    Back
+                </a>
+            </span>
+        </header>
+        <div class="w-full grid gap-6 lg:grid-cols-[1.6fr_0.95fr]">
+            <section
+                class="rounded-[2rem] border border-gray-700 bg-[#0b0f1a]/95 p-6 shadow-2xl shadow-black/20"
+            >
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="mt-2 text-xl font-semibold text-white">
+                            Local network access
+                        </h3>
+                    </div>
+                    <p class="text-sm leading-6 text-gray-400">
+                        Open the dashboard from another computer or phone on the
+                        same network using the link below.
+                    </p>
 
-        <aside class="rounded-[2rem] border border-gray-700 bg-[#0b0f1a]/95 p-6 shadow-2xl shadow-black/20">
-            <div class="space-y-4">
-                <div>
-                    <p class="text-xs uppercase tracking-[0.3em] text-indigo-300/80">About</p>
-                    <h3 class="mt-2 text-xl font-semibold text-white">Version information</h3>
-                </div>
-                <p class="text-sm leading-6 text-gray-400">
-                    See the current dashboard build and framework versions for this installation.
-                </p>
-
-                <div class="space-y-3 rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-4">
-                    {#each aboutItems as item}
-                        <div class="flex items-center justify-between gap-4 rounded-2xl bg-slate-950/90 px-4 py-3">
-                            <p class="text-sm text-gray-300">{item.label}</p>
-                            {#if item.href}
-                                <a 
-                                    href={item.href} 
-                                    target="_blank" 
-                                    rel="noreferrer"
-                                    class="text-sm font-semibold text-indigo-100 hover:text-indigo-400 border-b border-indigo-500/30 hover:border-indigo-400 transition-all"
-                                >
-                                    {item.value}
-                                </a>
-                            {:else}
-                                <p class="text-sm font-semibold text-slate-100">{item.value}</p>
-                            {/if}
+                    <div
+                        class="space-y-3 rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-4"
+                    >
+                        <!-- PIN security toggle -->
+                        <div
+                            class="flex items-center justify-between gap-4 rounded-2xl bg-slate-950/90 px-4 py-3"
+                        >
+                            <div class="min-w-0">
+                                <p class="text-sm text-gray-300">
+                                    PIN security
+                                </p>
+                                <p class="text-xs text-gray-500 mt-0.5">
+                                    Require a PIN for network access
+                                </p>
+                            </div>
+                            <button
+                                class="relative flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 {pinEnabled
+                                    ? 'bg-indigo-600'
+                                    : 'bg-gray-700'}"
+                                on:click={togglePin}
+                                aria-label="Toggle PIN security"
+                            >
+                                <span
+                                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {pinEnabled
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'} shadow-sm"
+                                ></span>
+                            </button>
                         </div>
-                    {/each}
+
+                        <!-- Local dashboard URL -->
+                        <div
+                            class="flex items-center justify-between gap-4 rounded-2xl bg-slate-950/90 px-4 py-3"
+                        >
+                            <p class="text-sm text-gray-300">Local URL</p>
+                            <div class="flex items-center gap-2">
+                                {#if localAccessUrl}
+                                    <a
+                                        href={localAccessUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        class="text-sm font-semibold text-indigo-100 hover:text-indigo-400 border-b border-indigo-500/30 hover:border-indigo-400 transition-all"
+                                    >
+                                        {localAccessUrl}
+                                    </a>
+                                {:else}
+                                    <p
+                                        class="text-sm font-semibold text-slate-100"
+                                    >
+                                        (not available)
+                                    </p>
+                                {/if}
+                                <button
+                                    class="inline-flex items-center justify-center rounded-lg bg-indigo-600/80 p-1.5 text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-700/50"
+                                    on:click={() =>
+                                        copyText(
+                                            localAccessUrl,
+                                            "Local dashboard URL",
+                                        )}
+                                    disabled={!localAccessUrl}
+                                    aria-label="Copy local dashboard URL"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 32 32"
+                                        ><path
+                                            fill="currentColor"
+                                            d="M7 7h3v3h12V7h3v11h2V7a2.006 2.006 0 0 0-2-2h-3V4a2.006 2.006 0 0 0-2-2h-8a2.006 2.006 0 0 0-2 2v1H7a2.006 2.006 0 0 0-2 2v21a2.006 2.006 0 0 0 2 2h9v-2H7zm5-3h8v4h-8zm18 20h-8.172l2.586-2.586L23 20l-5 5l5 5l1.414-1.414L21.828 26H30zM12 13h-2v2h2zm10 0h-8v2h8zm-10 5h-2v2h2zm-2 7h2v-2h-2zm4-5h4v-2h-4z"
+                                        /></svg
+                                    >
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Server PIN -->
+                        <div
+                            class="flex items-center justify-between gap-4 rounded-2xl bg-slate-950/90 px-4 py-3 transition-opacity duration-300 {pinEnabled
+                                ? 'opacity-100'
+                                : 'opacity-30 pointer-events-none'}"
+                        >
+                            <p class="text-sm text-gray-300">Server PIN</p>
+                            <div class="flex items-center gap-2">
+                                <p class="text-sm font-semibold">
+                                    {serverPin}
+                                </p>
+                                <button
+                                    class="inline-flex items-center justify-center rounded-lg bg-indigo-600/80 p-1.5 text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-700/50"
+                                    on:click={() =>
+                                        copyText(serverPin, "Server PIN")}
+                                    disabled={!pinEnabled ||
+                                        !serverPin ||
+                                        serverPin.startsWith("(")}
+                                    aria-label="Copy Server PIN"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 32 32"
+                                        ><path
+                                            fill="currentColor"
+                                            d="M7 7h3v3h12V7h3v11h2V7a2.006 2.006 0 0 0-2-2h-3V4a2.006 2.006 0 0 0-2-2h-8a2.006 2.006 0 0 0-2 2v1H7a2.006 2.006 0 0 0-2 2v21a2.006 2.006 0 0 0 2 2h9v-2H7zm5-3h8v4h-8zm18 20h-8.172l2.586-2.586L23 20l-5 5l5 5l1.414-1.414L21.828 26H30zM12 13h-2v2h2zm10 0h-8v2h8zm-10 5h-2v2h2zm-2 7h2v-2h-2zm4-5h4v-2h-4z"
+                                        /></svg
+                                    >
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </aside>
-    </div>
+            </section>
+
+            <aside
+                class="rounded-[2rem] border border-gray-700 bg-[#0b0f1a]/95 p-6 shadow-2xl shadow-black/20"
+            >
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="mt-2 text-xl font-semibold text-white">
+                            About
+                        </h3>
+                    </div>
+                    <p class="text-sm leading-6 text-gray-400">
+                        See the current dashboard build and framework versions
+                        for this installation.
+                    </p>
+
+                    <div
+                        class="space-y-3 rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-4"
+                    >
+                        {#each aboutItems as item}
+                            <div
+                                class="flex items-center justify-between gap-4 rounded-2xl bg-slate-950/90 px-4 py-3"
+                            >
+                                <p class="text-sm text-gray-300">
+                                    {item.label}
+                                </p>
+                                {#if item.href}
+                                    <a
+                                        href={item.href}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        class="text-sm font-semibold text-indigo-100 hover:text-indigo-400 border-b border-indigo-500/30 hover:border-indigo-400 transition-all"
+                                    >
+                                        {item.value}
+                                    </a>
+                                {:else}
+                                    <p
+                                        class="text-sm font-semibold text-slate-100"
+                                    >
+                                        {item.value}
+                                    </p>
+                                {/if}
+                            </div>
+                        {/each}
+                    </div>
+                </div>
+            </aside>
+        </div>
     </section>
+
+    {#if toast}
+        <div class="fixed bottom-10 left-1/2 z-50 animate-toast">
+            <div
+                class="rounded-2xl bg-emerald-500/95 text-white px-6 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md ring-1 ring-white/20 whitespace-nowrap"
+            >
+                {toast}
+            </div>
+        </div>
+    {/if}
 </div>
+
+<style>
+    @keyframes toast-in {
+        from {
+            opacity: 0;
+            transform: translate(-50%, 1rem);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+
+    .animate-toast {
+        animation: toast-in 0.3s ease-out forwards;
+    }
+</style>
