@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - platform: 'ubuntu-latest'
-            args: '--bundles appimage'
+            args: '--bundles deb'
             sidecar_target: 'node24-linux-x64'
             sidecar_ext: ''
             sidecar_triple: 'x86_64-unknown-linux-gnu'
