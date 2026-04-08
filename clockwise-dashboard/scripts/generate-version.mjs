@@ -42,6 +42,7 @@ export const aboutItems = [
   { label: "SvelteKit", value: versionInfo.svelteKit },
   { label: "Tauri API", value: versionInfo.tauriApi },
   { label: "Build date", value: versionInfo.buildDate },
+  { label: "GitHub", value: "https://github.com/atandea/clockwise", href: "https://github.com/atandea/clockwise" },
 ] as const;
 `;
 

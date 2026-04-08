@@ -188,7 +188,18 @@
                     {#each aboutItems as item}
                         <div class="flex items-center justify-between gap-4 rounded-2xl bg-slate-950/90 px-4 py-3">
                             <p class="text-sm text-gray-300">{item.label}</p>
-                            <p class="text-sm font-semibold text-slate-100">{item.value}</p>
+                            {#if item.href}
+                                <a 
+                                    href={item.href} 
+                                    target="_blank" 
+                                    rel="noreferrer"
+                                    class="text-sm font-semibold text-indigo-100 hover:text-indigo-400 border-b border-indigo-500/30 hover:border-indigo-400 transition-all"
+                                >
+                                    {item.value}
+                                </a>
+                            {:else}
+                                <p class="text-sm font-semibold text-slate-100">{item.value}</p>
+                            {/if}
                         </div>
                     {/each}
                 </div>
