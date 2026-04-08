@@ -9,6 +9,37 @@
     let serverPin = "";
     let toast = "";
     let pin = "";
+    let pinEnabled = true;
+
+    async function fetchStatus() {
+        try {
+            const res = await fetch(`${apiBase}/security/status`);
+            if (res.ok) {
+                const data = await res.json();
+                pinEnabled = data.pinEnabled;
+            }
+        } catch (err) {
+            console.error("Failed to fetch security status:", err);
+        }
+    }
+
+    async function togglePin() {
+        try {
+            const res = await fetch(`${apiBase}/security/toggle`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ enabled: !pinEnabled }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                pinEnabled = data.pinEnabled;
+                toast = `PIN security ${pinEnabled ? "enabled" : "disabled"}`;
+                setTimeout(() => (toast = ""), 1800);
+            }
+        } catch (err) {
+            console.error("Failed to toggle PIN security:", err);
+        }
+    }
 
     async function fetchServerPin() {
         try {
@@ -56,6 +87,7 @@
     onMount(() => {
         fetchLocalIp();
         pin = getPin() || "";
+        fetchStatus();
         fetchServerPin();
     });
 
@@ -112,6 +144,24 @@
                 <div class="rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-5 shadow-inner">
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div class="min-w-0 space-y-2">
+                            <p class="text-sm text-gray-400">PIN security</p>
+                            <p class="text-xs text-gray-500 max-w-[280px]">Require a PIN for network devices to access the dashboard. Recommended for public networks.</p>
+                        </div>
+                        <button
+                            class="relative flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 {pinEnabled ? 'bg-indigo-600' : 'bg-gray-700'}"
+                            on:click={togglePin}
+                            aria-label="Toggle PIN security"
+                        >
+                            <span class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {pinEnabled ? 'translate-x-6' : 'translate-x-1'} shadow-sm"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div 
+                    class="rounded-[1.5rem] border border-gray-700/80 bg-gray-900/80 p-5 shadow-inner transition-opacity duration-300 {pinEnabled ? 'opacity-100' : 'opacity-40 pointer-events-none'}"
+                >
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="min-w-0 space-y-2">
                             <p class="text-sm text-gray-400">Server PIN</p>
                             <code class="inline-flex rounded-2xl bg-slate-950/90 px-3 py-2 text-xs font-medium text-yellow-300">
                                 {serverPin}
@@ -120,7 +170,7 @@
                         <button
                             class="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-700"
                             on:click={() => copyText(serverPin, "Server PIN")}
-                            disabled={!serverPin || serverPin.startsWith("(")}
+                            disabled={!pinEnabled || !serverPin || serverPin.startsWith("(")}
                             aria-label="Copy Server PIN"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">

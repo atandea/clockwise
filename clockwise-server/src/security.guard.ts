@@ -10,7 +10,7 @@ export class SecurityGuard implements CanActivate {
     const ip = request.ip;
     
     // Allow localhost access without PIN
-    if (this.securityService.isLocal(ip)) {
+    if (this.securityService.isLocal(ip) || !this.securityService.isPinEnabled()) {
       return true;
     }
 

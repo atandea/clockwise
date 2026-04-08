@@ -4,9 +4,19 @@ import { Injectable, Logger } from '@nestjs/common';
 export class SecurityService {
   private readonly logger = new Logger(SecurityService.name);
   private pin: string;
+  private pinEnabled: boolean = true;
 
   constructor() {
     this.generatePin();
+  }
+
+  isPinEnabled(): boolean {
+    return this.pinEnabled;
+  }
+
+  setPinEnabled(enabled: boolean) {
+    this.pinEnabled = enabled;
+    this.logger.log(`Security PIN ${enabled ? 'ENABLED' : 'DISABLED'}`);
   }
 
   private generatePin() {

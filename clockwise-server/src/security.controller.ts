@@ -10,9 +10,19 @@ export class SecurityController {
   getStatus(@Ip() ip: string) {
     const local = this.securityService.isLocal(ip);
     return {
-      requiresPin: !local,
+      requiresPin: !local && this.securityService.isPinEnabled(),
+      pinEnabled: this.securityService.isPinEnabled(),
       local: local
     };
+  }
+
+  @Post('toggle')
+  togglePin(@Body('enabled') enabled: boolean, @Ip() ip: string) {
+    if (!this.securityService.isLocal(ip)) {
+      throw new ForbiddenException('PIN security can only be toggled from the host machine.');
+    }
+    this.securityService.setPinEnabled(enabled);
+    return { pinEnabled: this.securityService.isPinEnabled() };
   }
 
   @Get('pin')
