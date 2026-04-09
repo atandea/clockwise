@@ -19,6 +19,7 @@
     const unsubscribeOpen = timerWindowOpen.subscribe(v => isWindowOpen = v);
     let loading = $state(true);
     let launchOnStartup = $state(false);
+    let toast = $state("");
     let pollInterval: ReturnType<typeof setInterval> | null = null;
 
     async function loadMonitors() {
@@ -46,7 +47,13 @@
                 // Automatically launch if required and not open and monitors exist.
                 // We do it here since it runs when dashboard loads and connects to the server
                 if (launchOnStartup && !isWindowOpen) {
-                    await toggleFullscreenWindow();
+                    // Check if explicitly preferred monitor is missing
+                    if (pref && !monitors.some(m => m.name === pref)) {
+                        toast = "Auto fullscreen is not possible when selected screen is missing";
+                        setTimeout(() => toast = "", 5000);
+                    } else {
+                        await toggleFullscreenWindow();
+                    }
                 }
             } else if (monitors.length > 0) {
                 selectedMonitor = monitors[0].name;
@@ -110,6 +117,8 @@
                 timerWindowOpen.set(true);
             } catch (err) {
                 console.error("Failed to open timer window:", err);
+                toast = String(err);
+                setTimeout(() => toast = "", 5000);
             }
         }
     }
@@ -248,6 +257,16 @@
             {/if}
         </button>
     </div>
+
+    {#if toast}
+        <div class="fixed bottom-10 left-1/2 z-[100] animate-toast pointer-events-none">
+            <div
+                class="rounded-2xl bg-red-500/90 text-white px-6 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md ring-1 ring-white/20 whitespace-nowrap pointer-events-auto"
+            >
+                {toast}
+            </div>
+        </div>
+    {/if}
 {:else}
     <div class="h-[50px] w-full rounded bg-gray-800/40 border border-gray-700/30 animate-pulse relative overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
@@ -258,5 +277,20 @@
     @keyframes shimmer {
         0% { transform: translateX(-100%); }
         100% { transform: translateX(100%); }
+    }
+
+    @keyframes toast-in {
+        from {
+            opacity: 0;
+            transform: translate(-50%, 1rem);
+        }
+        to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+        }
+    }
+
+    .animate-toast {
+        animation: toast-in 0.3s ease-out forwards;
     }
 </style>

@@ -69,26 +69,26 @@ fn open_timer_window(app: tauri::AppHandle, monitor_name: Option<String>) -> Res
         );
     }
 
-    let target = if let Some(ref name) = monitor_name {
-        monitors.iter().find(|m| m.name().map(|n| n == name).unwrap_or(false))
+    let selected = if let Some(ref name) = monitor_name {
+        monitors
+            .iter()
+            .find(|m| m.name().map(|n| n == name).unwrap_or(false))
+            .ok_or_else(|| format!("Monitor '{}' not found", name))?
     } else {
-        None
+        monitors.first().ok_or_else(|| "No monitors found".to_string())?
     };
 
-    let selected = target.or_else(|| monitors.first());
-
-    let (x, y, w, h) = if let Some(monitor) = selected {
-        let pos = monitor.position();
-        let size = monitor.size();
-        log::info!(
-            "Selected monitor: {:?}, positioning at ({}, {}), size {}x{}",
-            monitor.name(), pos.x, pos.y, size.width, size.height
-        );
-        (pos.x, pos.y, size.width, size.height)
-    } else {
-        log::warn!("No monitors found, using defaults");
-        (0, 0, 1920, 1080)
-    };
+    let pos = selected.position();
+    let size = selected.size();
+    log::info!(
+        "Selected monitor: {:?}, positioning at ({}, {}), size {}x{}",
+        selected.name(),
+        pos.x,
+        pos.y,
+        size.width,
+        size.height
+    );
+    let (x, y) = (pos.x, pos.y);
 
     // Create window at a small size first — position will be set explicitly after
     let window = tauri::WebviewWindowBuilder::new(

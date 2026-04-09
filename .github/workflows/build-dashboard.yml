@@ -106,5 +106,5 @@ jobs:
         with:
           name: clockwise-dashboard-${{ matrix.platform }}
           path: |
-            clockwise-dashboard/src-tauri/target/release/bundle/appimage/*.AppImage
+            clockwise-dashboard/src-tauri/target/release/bundle/deb/*.deb
           if-no-files-found: warn
