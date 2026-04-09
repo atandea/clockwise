@@ -1,6 +1,7 @@
 import { writable, type Readable } from "svelte/store";
 
 export const timerWindowOpen = writable<boolean>(false);
+export const autoLaunchAttempted = writable<boolean>(false);
 
 export interface TimerEventData {
   status: "running" | "paused" | "stopped" | "overtime" | "idle" | "error" | "connecting";

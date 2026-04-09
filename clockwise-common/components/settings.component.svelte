@@ -16,6 +16,14 @@
     let pin = $state("");
     let pinEnabled = $state(true);
     let autoLaunch = $state(false);
+    let isTauri = $state(false);
+    let monitors = $state<any[]>([]);
+    let preferredMonitor = $state("");
+    let isMonitorOnline = $derived(
+        preferredMonitor
+            ? monitors.some((m) => m.name === preferredMonitor)
+            : false,
+    );
 
     async function fetchSettings() {
         try {
@@ -23,6 +31,7 @@
             if (res.ok) {
                 const data = await res.json();
                 autoLaunch = !!data.launch_fullscreen_on_startup;
+                preferredMonitor = data.preferred_monitor || "";
             }
         } catch (err) {
             console.error("Failed to fetch settings:", err);
@@ -79,6 +88,41 @@
         }
     }
 
+    async function fetchMonitors() {
+        if (
+            typeof window === "undefined" ||
+            !("__TAURI_INTERNALS__" in window)
+        ) {
+            return;
+        }
+
+        try {
+            const { invoke } = await import("@tauri-apps/api/core");
+            const res = await invoke<any[]>("get_monitors");
+            monitors = res;
+        } catch (err) {
+            console.error("Failed to fetch monitors:", err);
+        }
+    }
+
+    async function updatePreferredMonitor(monitorName: string) {
+        preferredMonitor = monitorName;
+        try {
+            const res = await fetchWithPin(`${apiBase}/settings`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    preferred_monitor: monitorName,
+                }),
+            });
+            if (res.ok) {
+                showToast(`Auto-fullscreen display updated`);
+            }
+        } catch (err) {
+            console.error("Failed to update preferred monitor:", err);
+        }
+    }
+
     async function fetchServerPin() {
         try {
             const headers: Record<string, string> = {};
@@ -128,11 +172,16 @@
     }
 
     onMount(() => {
+        isTauri =
+            typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
         fetchLocalIp();
         pin = getPin() || "";
         fetchStatus();
         fetchSettings();
         fetchServerPin();
+        if (isTauri) {
+            fetchMonitors();
+        }
     });
 
     async function copyText(value: string, label: string) {
@@ -146,10 +195,10 @@
 </script>
 
 <div
-    class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden font-sans"
+    class="h-screen h-[100dvh] bg-[#020617] text-white flex flex-col overflow-hidden font-sans"
 >
     <section
-        class="flex-1 flex flex-col p-4 lg:p-6 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar justify-center"
+        class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar"
     >
         <!-- Header -->
         <div
@@ -389,10 +438,11 @@
                 </div>
             </div>
 
-            <!-- Preferences Card -->
-            <div
-                class="group rounded-[1.5rem] border border-white/10 bg-gray-900/40 backdrop-blur-xl p-5 shadow-2xl transition-all hover:border-white/20 flex flex-col"
-            >
+            {#if isTauri}
+                <!-- Preferences Card -->
+                <div
+                    class="group rounded-[1.5rem] border border-white/10 bg-gray-900/40 backdrop-blur-xl p-5 shadow-2xl transition-all hover:border-white/20 flex flex-col"
+                >
                 <div class="flex items-start gap-3 mb-4">
                     <div
                         class="p-2 rounded-xl bg-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform"
@@ -451,8 +501,130 @@
                             ></span>
                         </button>
                     </div>
+
+                    <div
+                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-colors"
+                    >
+                        <div class="min-w-0">
+                            <span class="text-sm text-gray-300 block"
+                                >Selected Display</span
+                            >
+                            <span
+                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
+                                >Current Configuration</span
+                            >
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span
+                                class="text-sm font-bold {preferredMonitor
+                                    ? isMonitorOnline
+                                        ? 'text-white'
+                                        : 'text-red-400'
+                                    : 'text-gray-500'}"
+                            >
+                                {preferredMonitor || "None Selected"}
+                            </span>
+                            {#if preferredMonitor}
+                                <span
+                                    class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {isMonitorOnline
+                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                        : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                                >
+                                    {isMonitorOnline ? "Connected" : "Offline"}
+                                </span>
+                            {/if}
+                        </div>
+                    </div>
+
+                    <div
+                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                    >
+                        <div class="min-w-0">
+                            <span class="text-sm text-gray-300 block"
+                                >Available Displays</span
+                            >
+                            <span
+                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
+                                >Change Selection</span
+                            >
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button
+                                class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
+                                onclick={fetchMonitors}
+                                title="Scan for monitors"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="14"
+                                    height="14"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    ><path
+                                        d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                                    /><path d="M21 3v5h-5" /><path
+                                        d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                                    /><path d="M8 16H3v5" /></svg
+                                >
+                            </button>
+                            <div class="relative">
+                                <select
+                                    class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[240px]"
+                                    value={preferredMonitor}
+                                    onchange={(e) =>
+                                        updatePreferredMonitor(
+                                            e.currentTarget.value,
+                                        )}
+                                >
+                                    <option
+                                        value=""
+                                        disabled
+                                        selected={!preferredMonitor}
+                                        >Select a display...</option
+                                    >
+                                    {#each monitors as monitor}
+                                        <option
+                                            value={monitor.name}
+                                            class="bg-gray-900 text-white"
+                                        >
+                                            {monitor.name} ({monitor.width}×{monitor.height})
+                                        </option>
+                                    {/each}
+                                    {#if monitors.length === 0}
+                                        <option
+                                            value=""
+                                            disabled
+                                            class="bg-gray-900 text-gray-500"
+                                            >No active displays</option
+                                        >
+                                    {/if}
+                                </select>
+                                <div
+                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="14"
+                                        height="14"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.5"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        ><path d="m6 9 6 6 6-6" /></svg
+                                >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {/if}
 
             <!-- About Card -->
             <div
@@ -485,10 +657,13 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-auto">
-                    {#each aboutItems as item}
+                <div class="grid grid-cols-2 gap-2 mt-auto">
+                    {#each aboutItems as item, i}
                         <div
-                            class="flex flex-col p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                            class="flex flex-col p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
+                            4
+                                ? 'col-span-2'
+                                : ''}"
                         >
                             <span
                                 class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-0.5"

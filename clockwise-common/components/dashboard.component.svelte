@@ -10,11 +10,13 @@
 
   let {
     apiBase = getApiBaseUrl(),
-    isTauri = false,
+    isTauri: isTauriInitial = false,
   }: {
     apiBase?: string;
     isTauri?: boolean;
   } = $props();
+
+  let isTauri = $derived(isTauriInitial && typeof window !== "undefined" && "__TAURI_INTERNALS__" in window);
 
   let localIp = $state<string>("...");
   let needsPin = $state(false);
@@ -204,9 +206,11 @@
         </span>
       </header>
 
-      <div class="shrink-0 mb-3">
-        <DisplaySelector />
-      </div>
+      {#if isTauri}
+        <div class="shrink-0 mb-3">
+          <DisplaySelector />
+        </div>
+      {/if}
 
       <div
         class="flex-1 flex flex-col lg:flex-row gap-3 overflow-hidden min-h-0"

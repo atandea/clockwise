@@ -72,6 +72,45 @@ jobs:
           # Build sidecar using pkg
           npx @yao-pkg/pkg@latest . -t ${{ matrix.sidecar_target }} --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-${{ matrix.sidecar_triple }}${{ matrix.sidecar_ext }}
 
+      - name: Get Version
+        id: get_version
+        working-directory: ./clockwise-dashboard
+        run: |
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Delete existing release/tag
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            const tag = `app-v${{ steps.get_version.outputs.version }}`;
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag
+              });
+              console.log(`Deleting release ${release.id}`);
+              await github.rest.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id
+              });
+            } catch (e) {
+              console.log('No release found for tag ' + tag);
+            }
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${tag}`
+              });
+              console.log(`Deleted tag ${tag}`);
+            } catch (e) {
+              console.log('No tag found for ' + tag);
+            }
+
       - name: Build Dashboard (Tauri)
         uses: tauri-apps/tauri-action@v0
         env:

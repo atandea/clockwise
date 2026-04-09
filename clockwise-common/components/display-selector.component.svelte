@@ -1,7 +1,12 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { invoke } from "@tauri-apps/api/core";
-    import { fetchWithPin, getApiBaseUrl, timerWindowOpen } from "../lib/api";
+    import {
+        fetchWithPin,
+        getApiBaseUrl,
+        timerWindowOpen,
+        autoLaunchAttempted,
+    } from "../lib/api";
     import { get } from "svelte/store";
 
     interface MonitorInfo {
@@ -44,12 +49,16 @@
                 // Automatically launch if required and not open and monitors exist.
                 // We do it here since it runs when dashboard loads and connects to the server
                 const launchOnStartup = !!settings.launch_fullscreen_on_startup;
-                if (launchOnStartup && !isWindowOpen) {
+                if (
+                    launchOnStartup &&
+                    !isWindowOpen &&
+                    !get(autoLaunchAttempted)
+                ) {
+                    autoLaunchAttempted.set(true);
                     // Check if explicitly preferred monitor is missing
-                    if (pref && !monitors.some(m => m.name === pref)) {
-                        toast = "Auto fullscreen is not possible when selected screen is missing";
-                        setTimeout(() => toast = "", 5000);
-                    } else {
+                    if (pref && monitors.some((m) => m.name === pref)) {
+                        await toggleFullscreenWindow();
+                    } else if (!pref) {
                         await toggleFullscreenWindow();
                     }
                 }
