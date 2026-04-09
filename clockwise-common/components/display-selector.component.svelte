@@ -18,7 +18,6 @@
     let isWindowOpen = $state(false);
     const unsubscribeOpen = timerWindowOpen.subscribe(v => isWindowOpen = v);
     let loading = $state(true);
-    let launchOnStartup = $state(false);
     let toast = $state("");
     let pollInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -36,8 +35,6 @@
             if (response.ok) {
                 const settings = await response.json();
                 const pref = settings.preferred_monitor;
-                launchOnStartup = !!settings.launch_fullscreen_on_startup;
-
                 if (pref && monitors.some((m) => m.name === pref)) {
                     selectedMonitor = pref;
                 } else if (monitors.length > 0) {
@@ -46,6 +43,7 @@
                 
                 // Automatically launch if required and not open and monitors exist.
                 // We do it here since it runs when dashboard loads and connects to the server
+                const launchOnStartup = !!settings.launch_fullscreen_on_startup;
                 if (launchOnStartup && !isWindowOpen) {
                     // Check if explicitly preferred monitor is missing
                     if (pref && !monitors.some(m => m.name === pref)) {
@@ -64,19 +62,6 @@
         }
     }
 
-    async function handleLaunchOnStartupChange(e: Event) {
-        const target = e.target as HTMLInputElement;
-        launchOnStartup = target.checked;
-        try {
-            await fetchWithPin(`${getApiBaseUrl()}/settings`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ launch_fullscreen_on_startup: launchOnStartup }),
-            });
-        } catch (err) {
-            console.error("Failed to save launch setting:", err);
-        }
-    }
 
     async function handleMonitorChange(e: Event) {
         const target = e.target as HTMLSelectElement;
@@ -201,20 +186,6 @@
                 />
             </svg>
         </button>
-
-        <!-- Divider -->
-        <div class="w-px h-6 bg-gray-700/50 mx-1"></div>
-
-        <!-- Launch on startup checkbox -->
-        <label class="flex items-center gap-2 cursor-pointer">
-            <input 
-                type="checkbox" 
-                checked={launchOnStartup} 
-                onchange={handleLaunchOnStartupChange} 
-                class="form-checkbox h-4 w-4 rounded bg-gray-900 border-gray-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-gray-800 transition duration-150 ease-in-out cursor-pointer"
-            >
-            <span class="text-sm text-gray-300 select-none whitespace-nowrap">Auto-launch</span>
-        </label>
 
         <!-- Divider -->
         <div class="w-px h-6 bg-gray-700/50 mx-1"></div>
