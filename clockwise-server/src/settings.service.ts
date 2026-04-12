@@ -5,6 +5,8 @@ import * as path from 'path';
 export interface DashboardSettings {
     preferred_monitor?: string;
     launch_fullscreen_on_startup?: boolean;
+    pin_lock_enabled?: boolean;
+    pin_lock_at_startup?: boolean;
     [key: string]: any;
 }
 
@@ -17,11 +19,15 @@ export class SettingsService {
         this.settingsPath = path.join(path.dirname(dataPath), 'settings.json');
     }
 
+    private cache: DashboardSettings | null = null;
+
     public getSettings(): DashboardSettings {
+        if (this.cache) return this.cache;
         if (!existsSync(this.settingsPath)) return {};
         try {
             const content = readFileSync(this.settingsPath, 'utf8');
-            return JSON.parse(content);
+            this.cache = JSON.parse(content);
+            return this.cache || {};
         } catch (err) {
             return {};
         }
@@ -30,6 +36,7 @@ export class SettingsService {
     public updateSettings(updates: Partial<DashboardSettings>): DashboardSettings {
         const current = this.getSettings();
         const merged = { ...current, ...updates };
+        this.cache = merged;
 
         const dir = path.dirname(this.settingsPath);
         if (!existsSync(dir)) {

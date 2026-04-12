@@ -1,9 +1,9 @@
 export const versionInfo = {
   "appVersion": "0.1.0",
   "nodeEngine": "24",
-  "svelteKit": "2.57.0",
+  "svelteKit": "2.57.1",
   "tauriApi": "2.10.1",
-  "buildDate": "Apr 9, 2026, 5:21:15 PM UTC"
+  "buildDate": "Apr 12, 2026, 10:15:42 AM UTC"
 } as const;
 
 export const aboutItems = [

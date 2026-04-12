@@ -13,42 +13,42 @@ export interface TimerEventData {
 }
 
 export function getApiBaseUrl(): string {
-    if (typeof window === "undefined") {
-        return "http://localhost:4100";
-    }
-    const host = window.location.hostname;
-    if (host === "tauri.localhost") {
-        return "http://localhost:4100";
-    }
-    return `http://${host}:4100`;
+  if (typeof window === "undefined") {
+    return "http://localhost:4100";
+  }
+  const host = window.location.hostname;
+  if (host === "tauri.localhost") {
+    return "http://localhost:4100";
+  }
+  return `http://${host}:4100`;
 }
 
 export function getCleanHostname(): string {
-    if (typeof window === "undefined") {
-        return "localhost";
-    }
-    const host = window.location.hostname;
-    return host === "tauri.localhost" ? "localhost" : host;
+  if (typeof window === "undefined") {
+    return "localhost";
+  }
+  const host = window.location.hostname;
+  return host === "tauri.localhost" ? "localhost" : host;
 }
 
 export function getPin(): string | null {
-    if (typeof window === "undefined") return null;
-    return sessionStorage.getItem("clockwise_pin");
+  if (typeof window === "undefined") return null;
+  return sessionStorage.getItem("clockwise_pin");
 }
 
 export function setPin(pin: string) {
-    if (typeof window !== "undefined") {
-        sessionStorage.setItem("clockwise_pin", pin);
-    }
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("clockwise_pin", pin);
+  }
 }
 
 export async function fetchWithPin(url: string, options: RequestInit = {}): Promise<Response> {
-    const pin = getPin();
-    const headers = new Headers(options.headers || {});
-    if (pin) {
-        headers.set("Authorization", `PIN ${pin}`);
-    }
-    return fetch(url, { ...options, headers });
+  const pin = getPin();
+  const headers = new Headers(options.headers || {});
+  if (pin) {
+    headers.set("Authorization", `PIN ${pin}`);
+  }
+  return fetch(url, { ...options, headers });
 }
 
 // SHARED SSE STORE
@@ -68,7 +68,7 @@ let _useCount = 0;
 export const timerEvents: Readable<TimerEventData> = {
   subscribe: (run: (value: TimerEventData) => void) => {
     if (typeof window === "undefined") {
-        return _timerEvents.subscribe(run);
+      return _timerEvents.subscribe(run);
     }
 
     if (_useCount === 0) {
@@ -76,7 +76,7 @@ export const timerEvents: Readable<TimerEventData> = {
       const pin = getPin();
       const url = new URL(`${apiBase}/timers/subscribe`, window.location.origin);
       if (pin) url.searchParams.set("pin", pin);
-      
+
       _eventSource = new EventSource(url.toString());
       _eventSource.addEventListener("timer-tick", (e) => {
         try {
@@ -91,10 +91,10 @@ export const timerEvents: Readable<TimerEventData> = {
         _timerEvents.update((s: TimerEventData) => ({ ...s, status: "error" }));
       };
     }
-    
+
     _useCount++;
     const unsubscribe = _timerEvents.subscribe(run);
-    
+
     return () => {
       unsubscribe();
       _useCount--;

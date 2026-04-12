@@ -15,6 +15,9 @@ import { SettingsService } from './settings.service';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'client'),
       exclude: ['/timers*', '/discovery*', '/security*', '/settings*'],
+      serveStaticOptions: {
+        maxAge: '1d',
+      },
     }),
   ],
   controllers: [TimerController, DiscoveryController, SecurityController, SettingsController],

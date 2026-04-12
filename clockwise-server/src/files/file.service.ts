@@ -9,18 +9,25 @@ export class FileStorageService {
         this.filePath = process.env.APP_DATA_FILE || './data/data.json';
     }
 
+    private cache: any[] | null = null;
+
     public readData(): any[] {
+        if (this.cache) return this.cache;
         if (!existsSync(this.filePath)) return [];
-        return JSON.parse(readFileSync(this.filePath, 'utf8'));
+        try {
+            const content = readFileSync(this.filePath, 'utf8');
+            this.cache = JSON.parse(content);
+            return this.cache || [];
+        } catch (e) {
+            return [];
+        }
     }
 
     public writeData(data: any[]): void {
+        this.cache = data;
         const dir = require('path').dirname(this.filePath);
         if (!existsSync(dir)) {
             require('fs').mkdirSync(dir, { recursive: true });
-        }
-        if (!existsSync(this.filePath)) {
-            writeFileSync(this.filePath, JSON.stringify([], null, 2));
         }
         writeFileSync(this.filePath, JSON.stringify(data, null, 2));
     }

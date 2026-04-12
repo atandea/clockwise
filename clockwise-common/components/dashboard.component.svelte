@@ -16,7 +16,11 @@
     isTauri?: boolean;
   } = $props();
 
-  let isTauri = $derived(isTauriInitial && typeof window !== "undefined" && "__TAURI_INTERNALS__" in window);
+  let isTauri = $derived(
+    isTauriInitial &&
+      typeof window !== "undefined" &&
+      "__TAURI_INTERNALS__" in window,
+  );
 
   let localIp = $state<string>("...");
   let needsPin = $state(false);
@@ -107,25 +111,40 @@
     }
   }
 
-  onMount(() => {
-    fetchLocalIp();
+  let pollInterval = $state<any>(null);
 
-    const pollInterval = setInterval(async () => {
-      const securityReady = await checkSecurityStatus();
-      if (!securityReady) {
+  const startPolling = () => {
+    if (pollInterval) return;
+    pollInterval = setInterval(async () => {
+      // Stop polling if we need a PIN - let PinScreen handling its own success
+      if (needsPin) {
+        clearInterval(pollInterval);
+        pollInterval = null;
         return;
       }
 
       const ready = await checkServerHealth();
       if (ready) {
         clearInterval(pollInterval);
+        pollInterval = null;
       }
     }, 1500);
+  };
 
+  onMount(() => {
+    fetchLocalIp();
+
+    // Initial sequence
     (async () => {
       const securityReady = await checkSecurityStatus();
       if (securityReady) {
-        await checkServerHealth();
+        const ready = await checkServerHealth();
+        if (!ready) {
+          startPolling();
+        }
+      } else {
+        // We need a PIN, so we don't start polling yet.
+        // Polling will be started (if needed) once PIN is entered.
       }
     })();
 
@@ -133,11 +152,19 @@
       if (serverStatus === "starting") {
         serverStatus = "error";
         errorMessage = "Server timeout (30s)";
-        clearInterval(pollInterval);
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
       }
     }, 30000);
 
-    return () => clearInterval(pollInterval);
+    return () => {
+      if (pollInterval) {
+        clearInterval(pollInterval);
+        pollInterval = null;
+      }
+    };
   });
 </script>
 
@@ -147,7 +174,9 @@
     onSuccess={(p) => {
       setPin(p);
       needsPin = false;
-      checkServerHealth();
+      checkServerHealth().then((ready) => {
+        if (!ready) startPolling();
+      });
     }}
   />
 {/if}

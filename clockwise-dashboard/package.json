@@ -17,7 +17,8 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "tauri": "npx tauri"
+    "tauri": "npx tauri",
+    "dev:prod": "npm run build && npx tauri dev --release --config '{\"build\": {\"devUrl\": null}}'"
   },
   "license": "MIT",
   "dependencies": {

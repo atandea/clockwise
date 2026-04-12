@@ -15,6 +15,7 @@
     let toast = $state("");
     let pin = $state("");
     let pinEnabled = $state(true);
+    let pinLockAtStartup = $state(true);
     let autoLaunch = $state(false);
     let isTauri = $state(false);
     let monitors = $state<any[]>([]);
@@ -44,6 +45,7 @@
             if (res.ok) {
                 const data = await res.json();
                 pinEnabled = data.pinEnabled;
+                pinLockAtStartup = data.pinLockAtStartup;
             }
         } catch (err) {
             console.error("Failed to fetch security status:", err);
@@ -271,15 +273,11 @@
 
                 <div class="space-y-3">
                     <div
-                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 group/row hover:border-white/10 transition-colors"
+                        class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 group/row hover:border-white/10 transition-colors"
                     >
                         <div class="min-w-0">
                             <span class="text-sm text-gray-300 block"
                                 >Local URL</span
-                            >
-                            <span
-                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
-                                >Dashboard Address</span
                             >
                         </div>
                         <div class="flex items-center gap-3">
@@ -360,15 +358,11 @@
 
                 <div class="space-y-3">
                     <div
-                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                        class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                     >
                         <div class="min-w-0">
                             <span class="text-sm text-gray-300 block"
                                 >PIN Lock</span
-                            >
-                            <span
-                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
-                                >Recommended</span
                             >
                         </div>
                         <button
@@ -387,17 +381,13 @@
                     </div>
 
                     <div
-                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-all {pinEnabled
+                        class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-all {pinEnabled
                             ? 'opacity-100'
                             : 'opacity-30 pointer-events-none'}"
                     >
                         <div class="min-w-0">
                             <span class="text-sm text-gray-300 block"
                                 >Server PIN</span
-                            >
-                            <span
-                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
-                                >Current Code</span
                             >
                         </div>
                         <div class="flex items-center gap-3">
@@ -443,168 +433,111 @@
                 <div
                     class="group rounded-[1.5rem] border border-white/10 bg-gray-900/40 backdrop-blur-xl p-5 shadow-2xl transition-all hover:border-white/20 flex flex-col"
                 >
-                <div class="flex items-start gap-3 mb-4">
-                    <div
-                        class="p-2 rounded-xl bg-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            ><path
-                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-                            /><polyline
-                                points="3.27 6.96 12 12.01 20.73 6.96"
-                            /><line x1="12" y1="22.08" x2="12" y2="12" /></svg
+                    <div class="flex items-start gap-3 mb-4">
+                        <div
+                            class="p-2 rounded-xl bg-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform"
                         >
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-white">
-                            Preferences
-                        </h3>
-                        <p class="text-sm text-gray-400">
-                            Manage application behavior
-                        </p>
-                    </div>
-                </div>
-
-                <div class="space-y-3">
-                    <div
-                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
-                    >
-                        <div class="min-w-0">
-                            <span class="text-sm text-gray-300 block"
-                                >Auto-launch Fullscreen</span
-                            >
-                            <span
-                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
-                                >Launch on Startup</span
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                ><path
+                                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                                /><polyline
+                                    points="3.27 6.96 12 12.01 20.73 6.96"
+                                /><line
+                                    x1="12"
+                                    y1="22.08"
+                                    x2="12"
+                                    y2="12"
+                                /></svg
                             >
                         </div>
-                        <button
-                            class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {autoLaunch
-                                ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                                : 'bg-gray-800'}"
-                            onclick={toggleAutoLaunch}
-                            aria-label="Toggle Auto-launch"
-                        >
-                            <span
-                                class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {autoLaunch
-                                    ? 'translate-x-6'
-                                    : 'translate-x-1'} shadow-sm"
-                            ></span>
-                        </button>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">
+                                Preferences
+                            </h3>
+                            <p class="text-sm text-gray-400">
+                                Manage application behavior
+                            </p>
+                        </div>
                     </div>
 
-                    <div
-                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-colors"
-                    >
-                        <div class="min-w-0">
-                            <span class="text-sm text-gray-300 block"
-                                >Selected Display</span
-                            >
-                            <span
-                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
-                                >Current Configuration</span
-                            >
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span
-                                class="text-sm font-bold {preferredMonitor
-                                    ? isMonitorOnline
-                                        ? 'text-white'
-                                        : 'text-red-400'
-                                    : 'text-gray-500'}"
-                            >
-                                {preferredMonitor || "None Selected"}
-                            </span>
-                            {#if preferredMonitor}
-                                <span
-                                    class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {isMonitorOnline
-                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                        : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                    <div class="space-y-3">
+                        <div
+                            class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                        >
+                            <div class="min-w-0">
+                                <span class="text-sm text-gray-300 block"
+                                    >Auto-launch Fullscreen</span
                                 >
-                                    {isMonitorOnline ? "Connected" : "Offline"}
-                                </span>
-                            {/if}
-                        </div>
-                    </div>
-
-                    <div
-                        class="flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
-                    >
-                        <div class="min-w-0">
-                            <span class="text-sm text-gray-300 block"
-                                >Available Displays</span
-                            >
-                            <span
-                                class="text-[10px] text-gray-500 uppercase tracking-widest font-bold"
-                                >Change Selection</span
-                            >
-                        </div>
-                        <div class="flex items-center gap-2">
+                            </div>
                             <button
-                                class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
-                                onclick={fetchMonitors}
-                                title="Scan for monitors"
+                                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {autoLaunch
+                                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                                    : 'bg-gray-800'}"
+                                onclick={toggleAutoLaunch}
+                                aria-label="Toggle Auto-launch"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2.5"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    ><path
-                                        d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
-                                    /><path d="M21 3v5h-5" /><path
-                                        d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
-                                    /><path d="M8 16H3v5" /></svg
-                                >
+                                <span
+                                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {autoLaunch
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'} shadow-sm"
+                                ></span>
                             </button>
-                            <div class="relative">
-                                <select
-                                    class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[240px]"
-                                    value={preferredMonitor}
-                                    onchange={(e) =>
-                                        updatePreferredMonitor(
-                                            e.currentTarget.value,
-                                        )}
+                        </div>
+
+                        <div
+                            class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-colors"
+                        >
+                            <div class="min-w-0">
+                                <span class="text-sm text-gray-300 block"
+                                    >Selected Display</span
                                 >
-                                    <option
-                                        value=""
-                                        disabled
-                                        selected={!preferredMonitor}
-                                        >Select a display...</option
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span
+                                    class="text-sm font-bold {preferredMonitor
+                                        ? isMonitorOnline
+                                            ? 'text-white'
+                                            : 'text-red-400'
+                                        : 'text-gray-500'}"
+                                >
+                                    {preferredMonitor || "None Selected"}
+                                </span>
+                                {#if preferredMonitor}
+                                    <span
+                                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {isMonitorOnline
+                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                            : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
                                     >
-                                    {#each monitors as monitor}
-                                        <option
-                                            value={monitor.name}
-                                            class="bg-gray-900 text-white"
-                                        >
-                                            {monitor.name} ({monitor.width}×{monitor.height})
-                                        </option>
-                                    {/each}
-                                    {#if monitors.length === 0}
-                                        <option
-                                            value=""
-                                            disabled
-                                            class="bg-gray-900 text-gray-500"
-                                            >No active displays</option
-                                        >
-                                    {/if}
-                                </select>
-                                <div
-                                    class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                        {isMonitorOnline
+                                            ? "Connected"
+                                            : "Offline"}
+                                    </span>
+                                {/if}
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                        >
+                            <div class="min-w-0">
+                                <span class="text-sm text-gray-300 block"
+                                    >Available Displays</span
+                                >
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
+                                    onclick={fetchMonitors}
+                                    title="Scan for monitors"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -616,14 +549,66 @@
                                         stroke-width="2.5"
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
-                                        ><path d="m6 9 6 6 6-6" /></svg
-                                >
+                                        ><path
+                                            d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                                        /><path d="M21 3v5h-5" /><path
+                                            d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                                        /><path d="M8 16H3v5" /></svg
+                                    >
+                                </button>
+                                <div class="relative">
+                                    <select
+                                        class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[240px]"
+                                        value={preferredMonitor}
+                                        onchange={(e) =>
+                                            updatePreferredMonitor(
+                                                e.currentTarget.value,
+                                            )}
+                                    >
+                                        <option
+                                            value=""
+                                            disabled
+                                            selected={!preferredMonitor}
+                                            >Select a display...</option
+                                        >
+                                        {#each monitors as monitor}
+                                            <option
+                                                value={monitor.name}
+                                                class="bg-gray-900 text-white"
+                                            >
+                                                {monitor.name} ({monitor.width}×{monitor.height})
+                                            </option>
+                                        {/each}
+                                        {#if monitors.length === 0}
+                                            <option
+                                                value=""
+                                                disabled
+                                                class="bg-gray-900 text-gray-500"
+                                                >No active displays</option
+                                            >
+                                        {/if}
+                                    </select>
+                                    <div
+                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2.5"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            ><path d="m6 9 6 6 6-6" /></svg
+                                        >
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
             {/if}
 
             <!-- About Card -->

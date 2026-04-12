@@ -12,6 +12,7 @@ export class SecurityController {
     return {
       requiresPin: !local && this.securityService.isPinEnabled(),
       pinEnabled: this.securityService.isPinEnabled(),
+      pinLockAtStartup: this.securityService.getPinLockAtStartup(),
       local: local
     };
   }

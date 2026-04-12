@@ -82,7 +82,7 @@
                     value={pinInput}
                     oninput={handleInput}
                     placeholder="0000"
-                    class="block w-full rounded-lg border border-gray-700 bg-gray-800/50 py-4 text-center text-4xl font-black tracking-[1em] text-white outline-none ring-blue-500/50 transition-all placeholder:opacity-20 focus:border-blue-500 focus:ring-4"
+                    class="block w-full rounded-lg border border-gray-700 bg-gray-800/50 py-4 text-center text-4xl font-black font-mono tracking-[0.75em] pl-[0.75em] text-white outline-none ring-blue-500/50 transition-all placeholder:opacity-20 focus:border-blue-500 focus:ring-4"
                     disabled={loading}
                 />
             </div>
