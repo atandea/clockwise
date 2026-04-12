@@ -39,6 +39,19 @@ pipeline {
                 }
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+                dir('/home/jenkins/agent/workspace/clockwise-local') {
+                    sh '''
+                        echo '--- Running Clippy for Rust analysis ---'
+                        (cd clockwise-dashboard/src-tauri && cargo clippy --message-format=json > clippy-report.json || true)
+                    '''
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'sonar-scanner'
+                    }
+                }
+            }
+        }
     }
 
     post {
