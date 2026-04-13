@@ -204,6 +204,53 @@ pub fn run() {
             server_process: Mutex::new(None),
         })
         .setup(|app| {
+            // Setup Tray Icon
+            let quit_i = tauri::menu::MenuItem::with_id(app, "quit", "Quit Clockwise", true, None::<&str>).unwrap();
+            let show_i = tauri::menu::MenuItem::with_id(app, "show", "Show Dashboard", true, None::<&str>).unwrap();
+            
+            let tray_menu = tauri::menu::MenuBuilder::new(app)
+                .item(&show_i)
+                .separator()
+                .item(&quit_i)
+                .build()
+                .unwrap();
+
+            let _tray = tauri::tray::TrayIconBuilder::with_id("main-tray")
+                .icon(app.default_window_icon().unwrap().clone())
+                .menu(&tray_menu)
+                .show_menu_on_left_click(false)
+                .on_tray_icon_event(|tray, event| {
+                    if let tauri::tray::TrayIconEvent::Click {
+                        button: tauri::tray::MouseButton::Left,
+                        ..
+                    } = event
+                    {
+                        let app = tray.app_handle();
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                        }
+                    }
+                })
+                .on_menu_event(|app, event| {
+                    match event.id.as_ref() {
+                        "quit" => {
+                            // Clean up and exit
+                            let state = app.state::<AppState>();
+                            cleanup_processes(state.inner());
+                            app.exit(0);
+                        }
+                        "show" => {
+                            if let Some(window) = app.get_webview_window("main") {
+                                let _ = window.show();
+                                let _ = window.set_focus();
+                            }
+                        }
+                        _ => {}
+                    }
+                })
+                .build(app)?;
+
             let state = app.state::<AppState>();
             
             // Resolve app data dir
@@ -237,15 +284,13 @@ pub fn run() {
             Ok(())
         })
         .on_window_event(|window, event| {
-            if let tauri::WindowEvent::CloseRequested { .. } = event {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 if window.label() == "main" {
-                    // Clean up child processes and close timer window when main window closes
-                    let state = window.state::<AppState>();
-                    cleanup_processes(state.inner());
-                    // Also close timer-view window
-                    if let Some(timer_win) = window.app_handle().get_webview_window("timer-view") {
-                        let _ = timer_win.destroy();
-                    }
+                    // Prevent closing and hide to tray instead
+                    api.prevent_close();
+                    let _ = window.hide();
+                } else if window.label() == "timer-view" {
+                    // Just let timer-view close normally (it can be reopened)
                 }
             }
         })
