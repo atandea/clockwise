@@ -32,7 +32,9 @@
 
   async function checkSecurityStatus() {
     try {
-      const res = await fetch(`${apiBase}/security/status`);
+      const res = await fetch(`${apiBase}/security/status`, {
+        signal: AbortSignal.timeout(5000),
+      });
       if (!res.ok) {
         return false;
       }
@@ -43,8 +45,12 @@
       needsPin = data.requiresPin && !pin;
 
       // local devices can fetch the pin from the server; used by settings context
-      if (data.local) {
-        await fetchPin();
+      if (data.local && needsPin) {
+        const fetchedPin = await fetchPin();
+        if (fetchedPin) {
+          setPin(fetchedPin);
+          needsPin = false;
+        }
       }
 
       return !needsPin;
@@ -56,7 +62,9 @@
 
   async function fetchPin(): Promise<string | null> {
     try {
-      const res = await fetch(`${apiBase}/security/pin`);
+      const res = await fetch(`${apiBase}/security/pin`, {
+        signal: AbortSignal.timeout(5000),
+      });
       if (res.ok) {
         const data = await res.json();
         return data.pin;
@@ -87,12 +95,12 @@
         return false;
       }
 
-      serverStatus = "error";
+      serverStatus = "starting"; // Keep in starting mode while polling
       statusMessage = `Server responding with ${res.status}`;
       return false;
     } catch (err) {
       console.warn("Health check failed:", err);
-      serverStatus = "error";
+      serverStatus = "starting"; // Keep in starting mode while polling
       statusMessage = "Waiting for server to respond...";
       return false;
     }
@@ -117,17 +125,23 @@
   const startPolling = () => {
     if (pollInterval) return;
     pollInterval = setInterval(async () => {
-      // Stop polling if we need a PIN - let PinScreen handling its own success
+      // If we already know we need a PIN, stop polling here (PinScreen handles it)
       if (needsPin) {
         clearInterval(pollInterval);
         pollInterval = null;
         return;
       }
 
+      // Check server health/reachability
       const ready = await checkServerHealth();
       if (ready) {
-        clearInterval(pollInterval);
-        pollInterval = null;
+        // Server is up! Now check security status.
+        const securityReady = await checkSecurityStatus();
+        if (securityReady) {
+          // All good!
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
       }
     }, 1500);
   };
@@ -135,18 +149,9 @@
   onMount(() => {
     fetchLocalIp();
 
-    // Initial sequence
+    // Start reaching out to the server
     (async () => {
-      const securityReady = await checkSecurityStatus();
-      if (securityReady) {
-        const ready = await checkServerHealth();
-        if (!ready) {
-          startPolling();
-        }
-      } else {
-        // We need a PIN, so we don't start polling yet.
-        // Polling will be started (if needed) once PIN is entered.
-      }
+      startPolling();
     })();
 
     setTimeout(() => {
