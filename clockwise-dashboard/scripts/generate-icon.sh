@@ -20,6 +20,9 @@ convert "$ICON_PATH" -resize 1024x1024\! "$TEMP_ICON"
 echo "Generating Tauri icons..."
 npx tauri icon "$TEMP_ICON"
 
+echo "Generating browser favicon..."
+convert "$TEMP_ICON" -resize 256x256 "static/favicon.png"
+
 echo "Cleaning up temporary and mobile icons..."
 rm "$TEMP_ICON"
 
