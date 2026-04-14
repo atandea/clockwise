@@ -5,6 +5,7 @@
   import ActiveTimer from "./active-timer.component.svelte";
   import DisplaySelector from "./display-selector.component.svelte";
   import PinScreen from "./pin-screen.component.svelte";
+  import Loading from "./loading.component.svelte";
   import { onMount } from "svelte";
   import { getApiBaseUrl, fetchWithPin, getPin, setPin } from "../lib/api";
 
@@ -184,15 +185,7 @@
 <div class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden">
   <section class="flex-1 flex flex-col p-3 lg:p-4 overflow-hidden min-h-0">
     {#if serverStatus === "starting"}
-      <div class="flex-1 flex flex-col items-center justify-center">
-        <div
-          class="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-gray-600 border-t-green-500"
-        ></div>
-        <p class="text-gray-400 font-medium">Starting server...</p>
-        {#if statusMessage}
-          <p class="text-xs text-gray-500 mt-2">{statusMessage}</p>
-        {/if}
-      </div>
+      <Loading subtext={statusMessage} />
     {:else if serverStatus === "error"}
       <div class="flex-1 flex flex-col items-center justify-center p-4">
         <div

@@ -7,6 +7,7 @@
         fetchWithPin,
     } from "../lib/api";
     import { aboutItems } from "../lib/version";
+    import Loading from "./loading.component.svelte";
 
     let apiBase = getApiBaseUrl();
     let localIp = $state("");
@@ -17,6 +18,7 @@
     let pinEnabled = $state(true);
     let pinLockAtStartup = $state(true);
     let autoLaunch = $state(false);
+    let startAtLogin: boolean | null = $state(null);
     let isTauri = $state(false);
     let monitors = $state<any[]>([]);
     let preferredMonitor = $state("");
@@ -25,6 +27,7 @@
             ? monitors.some((m) => m.name === preferredMonitor)
             : false,
     );
+    let isLoading = $state(true);
 
     async function fetchSettings() {
         try {
@@ -87,6 +90,35 @@
             }
         } catch (err) {
             console.error("Failed to toggle auto-launch:", err);
+        }
+    }
+
+    async function toggleStartAtLogin() {
+        try {
+            const { enable, disable, isEnabled } = await import(
+                '@tauri-apps/plugin-autostart'
+            );
+            if (startAtLogin) {
+                await disable();
+            } else {
+                await enable();
+            }
+            startAtLogin = await isEnabled();
+            showToast(`Launch at startup ${startAtLogin ? 'enabled' : 'disabled'}`);
+        } catch (err) {
+            console.error('Failed to toggle autostart:', err);
+        }
+    }
+
+    async function checkAutostart() {
+        try {
+            const { isEnabled } = await import('@tauri-apps/plugin-autostart');
+            const enabled = await isEnabled();
+            startAtLogin = enabled;
+        } catch (err) {
+            // Plugin not available or call failed (non-Windows) — keep toggle hidden
+            console.debug('Autostart plugin not available:', err);
+            startAtLogin = null;
         }
     }
 
@@ -173,17 +205,23 @@
         setTimeout(() => (toast = ""), 2000);
     }
 
-    onMount(() => {
+    onMount(async () => {
         isTauri =
             typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
-        fetchLocalIp();
-        pin = getPin() || "";
-        fetchStatus();
-        fetchSettings();
-        fetchServerPin();
-        if (isTauri) {
-            fetchMonitors();
-        }
+
+        // Fetch everything in parallel
+        await Promise.all([
+            fetchLocalIp(),
+            fetchStatus(),
+            fetchSettings(),
+            fetchServerPin(),
+            ...(isTauri ? [fetchMonitors(), checkAutostart()] : []),
+        ]);
+
+        // Artificial slight delay for smooth transition
+        setTimeout(() => {
+            isLoading = false;
+        }, 300);
     });
 
     async function copyText(value: string, label: string) {
@@ -199,9 +237,12 @@
 <div
     class="h-screen h-[100dvh] bg-[#020617] text-white flex flex-col overflow-hidden font-sans"
 >
-    <section
-        class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar"
-    >
+    {#if isLoading}
+        <Loading />
+    {:else}
+        <section
+            class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar animate-in zoom-in-95 fade-in duration-500 ease-out"
+        >
         <!-- Header -->
         <div
             class="max-w-6xl mx-auto w-full mb-6 flex items-center justify-between"
@@ -273,24 +314,24 @@
 
                 <div class="space-y-3">
                     <div
-                        class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 group/row hover:border-white/10 transition-colors"
+                        class="flex min-h-[72px] h-auto flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 rounded-2xl bg-black/40 border border-white/5 group/row hover:border-white/10 transition-colors"
                     >
                         <div class="min-w-0">
-                            <span class="text-sm text-gray-300 block"
+                            <span class="text-sm text-gray-300 block mb-1 sm:mb-0"
                                 >Local URL</span
                             >
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex items-center justify-between sm:justify-end gap-2 min-w-0 w-full sm:w-auto">
                             <a
                                 href={localAccessUrl}
                                 target="_blank"
-                                class="text-sm font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-tight truncate max-w-[200px] sm:max-w-none"
+                                class="text-[13px] sm:text-sm font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-tight break-words"
                             >
                                 {localAccessUrl}
                             </a>
                             <button
                                 onclick={() => copyText(localAccessUrl, "URL")}
-                                class="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
+                                class="p-1.5 shrink-0 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
                                 aria-label="Copy URL"
                             >
                                 <svg
@@ -470,6 +511,31 @@
                     </div>
 
                     <div class="space-y-3">
+                        {#if startAtLogin !== null}
+                            <div
+                                class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                            >
+                                <div class="min-w-0">
+                                    <span class="text-sm text-gray-300 block"
+                                        >Launch at Startup</span
+                                    >
+                                </div>
+                                <button
+                                    class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {startAtLogin
+                                        ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                                        : 'bg-gray-800'}"
+                                    onclick={toggleStartAtLogin}
+                                    aria-label="Toggle Launch at Startup"
+                                >
+                                    <span
+                                        class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {startAtLogin
+                                            ? 'translate-x-6'
+                                            : 'translate-x-1'} shadow-sm"
+                                    ></span>
+                                </button>
+                            </div>
+                        {/if}
+
                         <div
                             class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                         >
@@ -642,16 +708,16 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 mt-auto">
+                <div class="grid grid-cols-2 gap-2 flex-1 auto-rows-fr">
                     {#each aboutItems as item, i}
                         <div
-                            class="flex flex-col p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
+                            class="flex flex-col justify-center p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
                             4
                                 ? 'col-span-2'
                                 : ''}"
                         >
                             <span
-                                class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-0.5"
+                                class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1"
                                 >{item.label}</span
                             >
                             {#if item.href}
@@ -674,6 +740,8 @@
             </div>
         </div>
     </section>
+
+    {/if}
 
     {#if toast}
         <div

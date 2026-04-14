@@ -1,5 +1,5 @@
 use std::sync::Mutex;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use tauri::Manager;
 use tauri_plugin_shell::ShellExt;
 use tauri_plugin_shell::process::CommandChild;
@@ -204,6 +204,13 @@ pub fn run() {
             server_process: Mutex::new(None),
         })
         .setup(|app| {
+            // Register autostart plugin
+            #[cfg(desktop)]
+            app.handle().plugin(tauri_plugin_autostart::init(
+                tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+                None,
+            ))?;
+
             // Setup Tray Icon
             let quit_i = tauri::menu::MenuItem::with_id(app, "quit", "Quit Clockwise", true, None::<&str>).unwrap();
             let show_i = tauri::menu::MenuItem::with_id(app, "show", "Show Dashboard", true, None::<&str>).unwrap();

@@ -59,7 +59,7 @@
 	<div
 		class="mb-4 font-mono transition-all duration-500"
 		class:text-[clamp(1rem,34cqw,42rem)]={Math.floor(time / 3600) === 0}
-		class:text-[clamp(1rem,22cqw,40rem)]={Math.floor(time / 3600) > 0}
+		class:text-[clamp(1rem,21cqw,40rem)]={Math.floor(time / 3600) > 0}
 		class:text-yellow-500={isWarning}
 		class:text-red-500={isCritical}
 	>
