@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@source not "../../clockwise-common";
 
 @theme {
     --font-mono: 'Chivo Mono', ui-monospace, monospace;

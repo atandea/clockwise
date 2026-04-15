@@ -34,7 +34,6 @@ export default defineConfig(async () => ({
         fs: {
             allow: [
                 path.resolve(__dirname),
-                path.resolve(__dirname, ".."),
             ],
         },
     },

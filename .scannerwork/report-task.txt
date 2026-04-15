@@ -2,5 +2,5 @@ projectKey=clockwise
 serverUrl=http://sonarqube:9000
 serverVersion=26.4.0.121862
 dashboardUrl=http://sonarqube:9000/dashboard?id=clockwise
-ceTaskId=3749d05f-aaa0-4d28-bfcb-64ae928435ef
-ceTaskUrl=http://sonarqube:9000/api/ce/task?id=3749d05f-aaa0-4d28-bfcb-64ae928435ef
+ceTaskId=15d47d7d-6e5f-4941-82eb-dc825ab0f120
+ceTaskUrl=http://sonarqube:9000/api/ce/task?id=15d47d7d-6e5f-4941-82eb-dc825ab0f120
