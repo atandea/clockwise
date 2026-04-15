@@ -14,7 +14,7 @@
 		remainingSeconds?: number;
 	}
 
-	let { apiBase = "" }: { apiBase?: string } = $props();
+	let { apiBase = "", isLoading = false }: { apiBase?: string; isLoading?: boolean } = $props();
 
 	const timers = writable<Timer[]>([]);
 	const loading = writable(true);
@@ -146,18 +146,30 @@
 		<div class="p-4 text-red-400 bg-red-900/20 border-b border-red-900/50 text-sm font-medium">{$error}</div>
 	{/if}
 
-	{#if $loading}
-		<div class="flex-1 flex flex-col items-center justify-center p-12 text-gray-400">
-			<div class="mb-4 h-6 w-6 animate-spin rounded-full border-2 border-gray-700 border-t-gray-400"></div>
-			<p>Loading timers…</p>
-		</div>
-	{:else}
-		<div class="p-4 border-b border-gray-700/50 bg-gray-900/30 flex items-center justify-between">
-			<h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Saved Timers</h3>
+	<div class="p-4 border-b border-gray-700/50 bg-gray-900/30 flex items-center justify-between">
+		<h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Saved Timers</h3>
+		{#if !isLoading && !$loading}
 			<span class="px-2 py-0.5 rounded-full bg-gray-700/50 text-[10px] font-mono text-gray-300">{$timers.length}</span>
-		</div>
+		{:else}
+			<div class="h-4 w-6 rounded bg-white/5 animate-pulse"></div>
+		{/if}
+	</div>
 
-		<div class="flex-1 overflow-y-auto custom-scrollbar">
+	<div class="flex-1 overflow-y-auto custom-scrollbar">
+		{#if isLoading || $loading}
+			<ul class="divide-y divide-gray-700/50">
+				{#each Array(5) as _}
+					<li class="flex items-center justify-between px-4 py-3">
+						<div class="h-2 w-2 rounded-full bg-gray-700 animate-pulse"></div>
+						<div class="flex-1 px-4 space-y-2">
+							<div class="h-4 w-1/2 rounded bg-white/5 animate-pulse"></div>
+							<div class="h-3 w-1/4 rounded bg-white/5 animate-pulse"></div>
+						</div>
+						<div class="h-9 w-20 rounded-lg bg-white/5 animate-pulse"></div>
+					</li>
+				{/each}
+			</ul>
+		{:else}
 			<ul class="divide-y divide-gray-700/50">
 				{#each $timers as timer (timer.id)}
 					<li class="flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors">
@@ -193,8 +205,8 @@
 					<li class="px-4 py-12 text-center text-gray-500 italic text-sm">No saved timers.</li>
 				{/if}
 			</ul>
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
 
 <style>

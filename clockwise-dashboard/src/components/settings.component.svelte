@@ -7,7 +7,6 @@
         fetchWithPin,
     } from "../lib/api";
     import { aboutItems } from "../lib/version";
-    import Loading from "./loading.component.svelte";
 
     let apiBase = getApiBaseUrl();
     let localIp = $state("");
@@ -237,25 +236,27 @@
 <div
     class="h-screen h-[100dvh] bg-[#020617] text-white flex flex-col overflow-hidden font-sans"
 >
-    {#if isLoading}
-        <Loading />
-    {:else}
-        <section
-            class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar animate-in zoom-in-95 fade-in duration-500 ease-out"
-        >
+    <section
+        class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar animate-in zoom-in-95 fade-in duration-500 ease-out"
+    >
         <!-- Header -->
         <div
             class="max-w-6xl mx-auto w-full mb-6 flex items-center justify-between"
         >
             <div>
-                <h1
-                    class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
-                >
-                    Settings
-                </h1>
-                <p class="text-gray-400 text-sm mt-1">
-                    Configure your Clockwise experience
-                </p>
+                {#if isLoading}
+                    <div class="h-8 w-32 rounded bg-white/5 animate-pulse mb-2"></div>
+                    <div class="h-4 w-48 rounded bg-white/5 animate-pulse"></div>
+                {:else}
+                    <h1
+                        class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
+                    >
+                        Settings
+                    </h1>
+                    <p class="text-gray-400 text-sm mt-1">
+                        Configure your Clockwise experience
+                    </p>
+                {/if}
             </div>
             <a
                 href="/"
@@ -322,40 +323,44 @@
                             >
                         </div>
                         <div class="flex items-center justify-between sm:justify-end gap-2 min-w-0 w-full sm:w-auto">
-                            <a
-                                href={localAccessUrl}
-                                target="_blank"
-                                class="text-[13px] sm:text-sm font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-tight break-words"
-                            >
-                                {localAccessUrl}
-                            </a>
-                            <button
-                                onclick={() => copyText(localAccessUrl, "URL")}
-                                class="p-1.5 shrink-0 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
-                                aria-label="Copy URL"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    ><rect
-                                        width="14"
-                                        height="14"
-                                        x="8"
-                                        y="8"
-                                        rx="2"
-                                        ry="2"
-                                    /><path
-                                        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-                                    /></svg
+                            {#if isLoading}
+                                <div class="h-5 w-48 rounded bg-white/5 animate-pulse"></div>
+                            {:else}
+                                <a
+                                    href={localAccessUrl}
+                                    target="_blank"
+                                    class="text-[13px] sm:text-sm font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-tight break-words"
                                 >
-                            </button>
+                                    {localAccessUrl}
+                                </a>
+                                <button
+                                    onclick={() => copyText(localAccessUrl, "URL")}
+                                    class="p-1.5 shrink-0 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
+                                    aria-label="Copy URL"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        ><rect
+                                            width="14"
+                                            height="14"
+                                            x="8"
+                                            y="8"
+                                            rx="2"
+                                            ry="2"
+                                        /><path
+                                            d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                        /></svg
+                                    >
+                                </button>
+                            {/if}
                         </div>
                     </div>
                 </div>
@@ -432,44 +437,48 @@
                             >
                         </div>
                         <div class="flex items-center gap-3">
-                            <span
-                                class="text-xl font-black font-mono tracking-[0.2em] text-white underline decoration-indigo-500/50 underline-offset-4"
-                                >{serverPin}</span
-                            >
-                            <button
-                                onclick={() => copyText(serverPin, "PIN")}
-                                class="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
-                                disabled={!pinEnabled}
-                                aria-label="Copy PIN"
-                            >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    ><rect
-                                        width="14"
-                                        height="14"
-                                        x="8"
-                                        y="8"
-                                        rx="2"
-                                        ry="2"
-                                    /><path
-                                        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
-                                    /></svg
+                            {#if isLoading}
+                                <div class="h-6 w-20 rounded bg-white/5 animate-pulse"></div>
+                            {:else}
+                                <span
+                                    class="text-xl font-black font-mono tracking-[0.2em] text-white underline decoration-indigo-500/50 underline-offset-4"
+                                    >{serverPin}</span
                                 >
-                            </button>
+                                <button
+                                    onclick={() => copyText(serverPin, "PIN")}
+                                    class="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
+                                    disabled={!pinEnabled}
+                                    aria-label="Copy PIN"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        ><rect
+                                            width="14"
+                                            height="14"
+                                            x="8"
+                                            y="8"
+                                            rx="2"
+                                            ry="2"
+                                        /><path
+                                            d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                                        /></svg
+                                    >
+                                </button>
+                            {/if}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {#if isTauri}
+            {#if isTauri || isLoading}
                 <!-- Preferences Card -->
                 <div
                     class="group rounded-[1.5rem] border border-white/10 bg-gray-900/40 backdrop-blur-xl p-5 shadow-2xl transition-all hover:border-white/20 flex flex-col"
@@ -511,151 +520,105 @@
                     </div>
 
                     <div class="space-y-3">
-                        {#if startAtLogin !== null}
+                        {#if isLoading}
+                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
+                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
+                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
+                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
+                        {:else}
+                            {#if startAtLogin !== null}
+                                <div
+                                    class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                                >
+                                    <div class="min-w-0">
+                                        <span class="text-sm text-gray-300 block"
+                                            >Launch at Startup</span
+                                        >
+                                    </div>
+                                    <button
+                                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {startAtLogin
+                                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                                            : 'bg-gray-800'}"
+                                        onclick={toggleStartAtLogin}
+                                        aria-label="Toggle Launch at Startup"
+                                    >
+                                        <span
+                                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {startAtLogin
+                                                ? 'translate-x-6'
+                                                : 'translate-x-1'} shadow-sm"
+                                        ></span>
+                                    </button>
+                                </div>
+                            {/if}
+
                             <div
                                 class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                             >
                                 <div class="min-w-0">
                                     <span class="text-sm text-gray-300 block"
-                                        >Launch at Startup</span
+                                        >Auto-launch Fullscreen</span
                                     >
                                 </div>
                                 <button
-                                    class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {startAtLogin
+                                    class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {autoLaunch
                                         ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
                                         : 'bg-gray-800'}"
-                                    onclick={toggleStartAtLogin}
-                                    aria-label="Toggle Launch at Startup"
+                                    onclick={toggleAutoLaunch}
+                                    aria-label="Toggle Auto-launch"
                                 >
                                     <span
-                                        class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {startAtLogin
+                                        class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {autoLaunch
                                             ? 'translate-x-6'
                                             : 'translate-x-1'} shadow-sm"
                                     ></span>
                                 </button>
                             </div>
-                        {/if}
 
-                        <div
-                            class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
-                        >
-                            <div class="min-w-0">
-                                <span class="text-sm text-gray-300 block"
-                                    >Auto-launch Fullscreen</span
-                                >
-                            </div>
-                            <button
-                                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {autoLaunch
-                                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                                    : 'bg-gray-800'}"
-                                onclick={toggleAutoLaunch}
-                                aria-label="Toggle Auto-launch"
+                            <div
+                                class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-colors"
                             >
-                                <span
-                                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {autoLaunch
-                                        ? 'translate-x-6'
-                                        : 'translate-x-1'} shadow-sm"
-                                ></span>
-                            </button>
-                        </div>
-
-                        <div
-                            class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-colors"
-                        >
-                            <div class="min-w-0">
-                                <span class="text-sm text-gray-300 block"
-                                    >Selected Display</span
-                                >
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span
-                                    class="text-sm font-bold {preferredMonitor
-                                        ? isMonitorOnline
-                                            ? 'text-white'
-                                            : 'text-red-400'
-                                        : 'text-gray-500'}"
-                                >
-                                    {preferredMonitor || "None Selected"}
-                                </span>
-                                {#if preferredMonitor}
+                                <div class="min-w-0">
+                                    <span class="text-sm text-gray-300 block"
+                                        >Selected Display</span
+                                    >
+                                </div>
+                                <div class="flex items-center gap-3">
                                     <span
-                                        class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {isMonitorOnline
-                                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                            : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                                        class="text-sm font-bold {preferredMonitor
+                                            ? isMonitorOnline
+                                                ? 'text-white'
+                                                : 'text-red-400'
+                                            : 'text-gray-500'}"
                                     >
-                                        {isMonitorOnline
-                                            ? "Connected"
-                                            : "Offline"}
+                                        {preferredMonitor || "None Selected"}
                                     </span>
-                                {/if}
-                            </div>
-                        </div>
-
-                        <div
-                            class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
-                        >
-                            <div class="min-w-0">
-                                <span class="text-sm text-gray-300 block"
-                                    >Available Displays</span
-                                >
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <button
-                                    class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
-                                    onclick={fetchMonitors}
-                                    title="Scan for monitors"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="14"
-                                        height="14"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.5"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        ><path
-                                            d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
-                                        /><path d="M21 3v5h-5" /><path
-                                            d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
-                                        /><path d="M8 16H3v5" /></svg
-                                    >
-                                </button>
-                                <div class="relative">
-                                    <select
-                                        class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[240px]"
-                                        value={preferredMonitor}
-                                        onchange={(e) =>
-                                            updatePreferredMonitor(
-                                                e.currentTarget.value,
-                                            )}
-                                    >
-                                        <option
-                                            value=""
-                                            disabled
-                                            selected={!preferredMonitor}
-                                            >Select a display...</option
+                                    {#if preferredMonitor}
+                                        <span
+                                            class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {isMonitorOnline
+                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
                                         >
-                                        {#each monitors as monitor}
-                                            <option
-                                                value={monitor.name}
-                                                class="bg-gray-900 text-white"
-                                            >
-                                                {monitor.name} ({monitor.width}×{monitor.height})
-                                            </option>
-                                        {/each}
-                                        {#if monitors.length === 0}
-                                            <option
-                                                value=""
-                                                disabled
-                                                class="bg-gray-900 text-gray-500"
-                                                >No active displays</option
-                                            >
-                                        {/if}
-                                    </select>
-                                    <div
-                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                            {isMonitorOnline
+                                                ? "Connected"
+                                                : "Offline"}
+                                        </span>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div
+                                class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                            >
+                                <div class="min-w-0">
+                                    <span class="text-sm text-gray-300 block"
+                                        >Available Displays</span
+                                    >
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button
+                                        class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
+                                        onclick={fetchMonitors}
+                                        title="Scan for monitors"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -667,12 +630,65 @@
                                             stroke-width="2.5"
                                             stroke-linecap="round"
                                             stroke-linejoin="round"
-                                            ><path d="m6 9 6 6 6-6" /></svg
+                                            ><path
+                                                d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                                            /><path d="M21 3v5h-5" /><path
+                                                d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                                            /><path d="M8 16H3v5" /></svg
                                         >
+                                    </button>
+                                    <div class="relative">
+                                        <select
+                                            class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[240px]"
+                                            value={preferredMonitor}
+                                            onchange={(e) =>
+                                                updatePreferredMonitor(
+                                                    e.currentTarget.value,
+                                                )}
+                                        >
+                                            <option
+                                                value=""
+                                                disabled
+                                                selected={!preferredMonitor}
+                                                >Select a display...</option
+                                            >
+                                            {#each monitors as monitor}
+                                                <option
+                                                    value={monitor.name}
+                                                    class="bg-gray-900 text-white"
+                                                >
+                                                    {monitor.name} ({monitor.width}×{monitor.height})
+                                                </option>
+                                            {/each}
+                                            {#if monitors.length === 0}
+                                                <option
+                                                    value=""
+                                                    disabled
+                                                    class="bg-gray-900 text-gray-500"
+                                                    >No active displays</option
+                                                >
+                                            {/if}
+                                        </select>
+                                        <div
+                                            class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                        >
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                stroke-width="2.5"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                ><path d="m6 9 6 6 6-6" /></svg
+                                            >
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        {/if}
                     </div>
                 </div>
             {/if}
@@ -709,46 +725,53 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 flex-1 auto-rows-fr">
-                    {#each aboutItems as item, i}
-                        <div
-                            class="flex flex-col justify-center p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
-                            4
-                                ? 'col-span-2'
-                                : ''}"
-                        >
-                            <span
-                                class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1"
-                                >{item.label}</span
+                    {#if isLoading}
+                        {#each Array(6) as _, i}
+                             <div class="p-3 rounded-xl bg-white/5 animate-pulse {i >= 4 ? 'col-span-2' : ''}">
+                                 <div class="h-2 w-16 mb-2 rounded bg-white/5"></div>
+                                 <div class="h-4 w-24 rounded bg-white/5"></div>
+                             </div>
+                        {/each}
+                    {:else}
+                        {#each aboutItems as item, i}
+                            <div
+                                class="flex flex-col justify-center p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
+                                4
+                                    ? 'col-span-2'
+                                    : ''}"
                             >
-                            {#if item.href}
-                                <a
-                                    href={item.href}
-                                    target="_blank"
-                                    class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors break-all"
-                                >
-                                    {item.value}
-                                </a>
-                            {:else}
                                 <span
-                                    class="text-sm font-semibold text-gray-200 truncate"
-                                    >{item.value}</span
+                                    class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1"
+                                    >{item.label}</span
                                 >
-                            {/if}
-                        </div>
-                    {/each}
+                                {#if item.href}
+                                    <a
+                                        href={item.href}
+                                        target="_blank"
+                                        class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors break-all"
+                                    >
+                                        {item.value}
+                                    </a>
+                                {:else}
+                                    <span
+                                        class="text-sm font-semibold text-gray-200 truncate"
+                                        >{item.value}</span
+                                    >
+                                {/if}
+                            </div>
+                        {/each}
+                    {/if}
                 </div>
             </div>
         </div>
     </section>
 
-    {/if}
-
     {#if toast}
         <div
-            class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] animate-toast pointer-events-none"
+            class="fixed bottom-10 inset-x-0 z-[100] flex justify-center pointer-events-none"
         >
             <div
-                class="rounded-2xl bg-white text-gray-900 px-6 py-3 text-sm font-bold shadow-2xl ring-1 ring-white/20 whitespace-nowrap pointer-events-auto"
+                class="rounded-2xl bg-white text-gray-900 px-6 py-3 text-sm font-bold shadow-2xl ring-1 ring-white/20 whitespace-nowrap pointer-events-auto animate-toast"
             >
                 {toast}
             </div>
@@ -760,11 +783,11 @@
     @keyframes toast-in {
         from {
             opacity: 0;
-            transform: translate(-50%, 1rem);
+            transform: translateY(1rem);
         }
         to {
             opacity: 1;
-            transform: translate(-50%, 0);
+            transform: translateY(0);
         }
     }
 

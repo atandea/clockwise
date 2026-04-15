@@ -7,10 +7,10 @@ export const versionInfo = {
 } as const;
 
 export const aboutItems = [
-  { label: "App version", value: versionInfo.appVersion },
-  { label: "Node engine", value: versionInfo.nodeEngine },
-  { label: "SvelteKit", value: versionInfo.svelteKit },
-  { label: "Tauri API", value: versionInfo.tauriApi },
-  { label: "Build date", value: versionInfo.buildDate },
+  { label: "App version", value: versionInfo.appVersion, href: undefined },
+  { label: "Node engine", value: versionInfo.nodeEngine, href: undefined },
+  { label: "SvelteKit", value: versionInfo.svelteKit, href: undefined },
+  { label: "Tauri API", value: versionInfo.tauriApi, href: undefined },
+  { label: "Build date", value: versionInfo.buildDate, href: undefined },
   { label: "GitHub", value: "https://github.com/atandea/clockwise", href: "https://github.com/atandea/clockwise" },
 ] as const;

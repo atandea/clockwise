@@ -189,9 +189,7 @@
 
 <div class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden">
   <section class="flex-1 flex flex-col p-3 lg:p-4 overflow-hidden min-h-0">
-    {#if serverStatus === "starting"}
-      <Loading subtext={statusMessage} />
-    {:else if serverStatus === "error"}
+    {#if serverStatus === "error"}
       <div class="flex-1 flex flex-col items-center justify-center p-4">
         <div
           class="rounded bg-red-900/50 p-6 text-red-200 border border-red-700/50 max-w-sm w-full shadow-2xl"
@@ -216,11 +214,11 @@
       >
         <div class="flex items-center gap-4">
           <span
-            class="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse"
+            class="h-2 w-2 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse {serverStatus === 'running' ? 'bg-green-500' : 'bg-yellow-500'}"
           ></span>
           <span
-            class="text-[11px] font-bold text-green-400 uppercase tracking-widest"
-            >Online</span
+            class="text-[11px] font-bold uppercase tracking-widest {serverStatus === 'running' ? 'text-green-400' : 'text-yellow-400'}"
+            >{serverStatus === 'running' ? 'Online' : 'Connecting'}</span
           >
         </div>
         <span class="flex items-center gap-2">
@@ -235,7 +233,7 @@
 
       {#if isTauri}
         <div class="shrink-0 mb-3">
-          <DisplaySelector />
+          <DisplaySelector isLoading={serverStatus !== "running"} />
         </div>
       {/if}
 
@@ -256,10 +254,11 @@
                 apiBaseUrl={apiBase}
                 allowFullscreen={false}
                 preview={true}
+                isLoading={serverStatus !== "running"}
               />
             </div>
 
-            <ActiveTimer {apiBase} />
+            <ActiveTimer {apiBase} isLoading={serverStatus !== "running"} />
           </div>
 
           <div
@@ -268,6 +267,7 @@
             <CustomTimer
               {apiBase}
               onTimerCreated={() => controlComponent?.fetchTimers()}
+              isLoading={serverStatus !== "running"}
             />
           </div>
         </div>
@@ -278,7 +278,7 @@
         ></div>
 
         <div class="flex-1 flex flex-col min-h-0">
-          <Control bind:this={controlComponent} {apiBase} />
+          <Control bind:this={controlComponent} {apiBase} isLoading={serverStatus !== "running"} />
         </div>
       </div>
     {/if}

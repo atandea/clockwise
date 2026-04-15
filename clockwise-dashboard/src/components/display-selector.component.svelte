@@ -8,6 +8,8 @@
         autoLaunchAttempted,
     } from "../lib/api";
     import { get } from "svelte/store";
+ 
+	let { isLoading = false }: { isLoading?: boolean } = $props();
 
     interface MonitorInfo {
         name: string;
@@ -144,7 +146,7 @@
     });
 </script>
 
-{#if !loading}
+{#if !loading && !isLoading}
     <div
         class="flex items-center gap-3 rounded bg-gray-800/60 border border-gray-700/50 p-2 px-3"
     >
@@ -159,7 +161,7 @@
                 d="M3 5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm6 14h6v1a1 1 0 01-1 1h-4a1 1 0 01-1-1v-1z"
             />
         </svg>
-
+ 
         <!-- Monitor selector -->
         <select
             class="flex-1 min-w-0 h-8 rounded bg-gray-900 border border-gray-600 px-2 text-sm text-gray-200 outline-none focus:border-blue-500 transition-colors cursor-pointer appearance-none"
@@ -175,7 +177,7 @@
                 <option value="" disabled>No displays detected</option>
             {/if}
         </select>
-
+ 
         <!-- Refresh monitors button -->
         <button
             class="p-1.5 rounded text-gray-400 hover:text-gray-200 hover:bg-white/10 transition-colors"
@@ -195,10 +197,10 @@
                 />
             </svg>
         </button>
-
+ 
         <!-- Divider -->
         <div class="w-px h-6 bg-gray-700/50 mx-1"></div>
-
+ 
         <!-- Launch / Close fullscreen button -->
         <button
             class="flex items-center gap-2 h-8 rounded px-3 text-sm font-medium transition-colors whitespace-nowrap"
@@ -237,19 +239,23 @@
             {/if}
         </button>
     </div>
-
+ 
     {#if toast}
-        <div class="fixed bottom-10 left-1/2 z-[100] animate-toast pointer-events-none">
+        <div class="fixed bottom-10 inset-x-0 z-[100] flex justify-center pointer-events-none">
             <div
-                class="rounded-2xl bg-red-500/90 text-white px-6 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md ring-1 ring-white/20 whitespace-nowrap pointer-events-auto"
+                class="rounded-2xl bg-red-500/90 text-white px-6 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md ring-1 ring-white/20 whitespace-nowrap pointer-events-auto animate-toast"
             >
                 {toast}
             </div>
         </div>
     {/if}
 {:else}
-    <div class="h-[50px] w-full rounded bg-gray-800/40 border border-gray-700/30 animate-pulse relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+    <div class="h-[50px] w-full rounded bg-gray-800/60 border border-gray-700/50 animate-pulse relative overflow-hidden flex items-center px-4">
+        <div class="h-4 w-4 rounded bg-white/10 shrink-0"></div>
+        <div class="ml-3 h-4 flex-1 rounded bg-white/10 max-w-[200px]"></div>
+        <div class="ml-auto flex gap-2">
+            <div class="h-8 w-24 rounded bg-white/10"></div>
+        </div>
     </div>
 {/if}
 
@@ -262,11 +268,11 @@
     @keyframes toast-in {
         from {
             opacity: 0;
-            transform: translate(-50%, 1rem);
+            transform: translateY(1rem);
         }
         to {
             opacity: 1;
-            transform: translate(-50%, 0);
+            transform: translateY(0);
         }
     }
 
