@@ -5,7 +5,7 @@
   import ActiveTimer from "./active-timer.component.svelte";
   import DisplaySelector from "./display-selector.component.svelte";
   import { onMount } from "svelte";
-  import { getApiBaseUrl, fetchWithPin } from "../lib/api";
+  import { getApiBaseUrl, serverStatus } from "../lib/api";
 
   let {
     apiBase = getApiBaseUrl(),
@@ -21,70 +21,24 @@
       "__TAURI_INTERNALS__" in window,
   );
 
-  let serverStatus = $state<"starting" | "running" | "error">("starting");
-  let errorMessage = $state("");
+  let status = $state<"starting" | "running" | "error">("starting");
+  let errorMessage = $state("Server synchronization timeout");
   let controlComponent = $state<any>();
 
-  async function checkServerHealth() {
-    try {
-      const res = await fetchWithPin(`${apiBase}/timers`, {
-        method: "GET",
-        signal: AbortSignal.timeout(5000),
-      });
-
-      if (res.ok) {
-        serverStatus = "running";
-        return true;
-      }
-
-      serverStatus = "starting";
-      return false;
-    } catch (err) {
-      console.warn("Health check failed:", err);
-      serverStatus = "starting";
-      return false;
-    }
-  }
-
-  let pollInterval = $state<any>(null);
-
-  const startPolling = () => {
-    if (pollInterval) return;
-    pollInterval = setInterval(async () => {
-      const ready = await checkServerHealth();
-      if (ready) {
-        clearInterval(pollInterval);
-        pollInterval = null;
-      }
-    }, 1500);
-  };
-
   onMount(() => {
-    startPolling();
-
-    setTimeout(() => {
-      if (serverStatus === "starting") {
-        serverStatus = "error";
-        errorMessage = "Server synchronization timeout (30s)";
-        if (pollInterval) {
-          clearInterval(pollInterval);
-          pollInterval = null;
-        }
-      }
-    }, 30000);
+    const unsubscribe = serverStatus.subscribe(v => {
+      status = v;
+    });
 
     return () => {
-      if (pollInterval) {
-        clearInterval(pollInterval);
-        pollInterval = null;
-      }
+      unsubscribe();
     };
   });
 </script>
 
 <div class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden">
   <section class="flex-1 flex flex-col p-3 lg:p-4 overflow-hidden min-h-0">
-    {#if serverStatus === "error"}
+    {#if status === "error"}
       <div class="flex-1 flex flex-col items-center justify-center p-4">
         <div
           class="rounded bg-red-900/50 p-6 text-red-200 border border-red-700/50 max-w-sm w-full shadow-2xl"
@@ -109,17 +63,17 @@
       >
         <div class="flex items-center gap-4">
           <span
-            class="h-2 w-2 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse {serverStatus ===
+            class="h-2 w-2 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse {status ===
             'running'
               ? 'bg-green-500'
               : 'bg-yellow-500'}"
           ></span>
           <span
-            class="text-[11px] font-bold uppercase tracking-widest {serverStatus ===
+            class="text-[11px] font-bold uppercase tracking-widest {status ===
             'running'
               ? 'text-green-400'
               : 'text-yellow-400'}"
-            >{serverStatus === "running" ? "Online" : "Connecting"}</span
+            >{status === "running" ? "Online" : "Connecting"}</span
           >
         </div>
         <span class="flex items-center gap-2">
@@ -134,7 +88,7 @@
 
       {#if isTauri}
         <div class="shrink-0 mb-3">
-          <DisplaySelector isLoading={serverStatus !== "running"} />
+          <DisplaySelector isLoading={status !== "running"} />
         </div>
       {/if}
 
@@ -155,11 +109,11 @@
                 apiBaseUrl={apiBase}
                 allowFullscreen={false}
                 preview={true}
-                isLoading={serverStatus !== "running"}
+                isLoading={status !== "running"}
               />
             </div>
 
-            <ActiveTimer {apiBase} isLoading={serverStatus !== "running"} />
+            <ActiveTimer {apiBase} isLoading={status !== "running"} />
           </div>
 
           <div
@@ -168,7 +122,7 @@
             <CustomTimer
               {apiBase}
               onTimerCreated={() => controlComponent?.fetchTimers()}
-              isLoading={serverStatus !== "running"}
+              isLoading={status !== "running"}
             />
           </div>
         </div>
@@ -182,7 +136,7 @@
           <Control
             bind:this={controlComponent}
             {apiBase}
-            isLoading={serverStatus !== "running"}
+            isLoading={status !== "running"}
           />
         </div>
       </div>
