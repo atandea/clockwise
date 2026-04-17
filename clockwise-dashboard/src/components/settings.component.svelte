@@ -5,23 +5,28 @@
         getCleanHostname,
         getPin,
         fetchWithPin,
+        appLocalIp,
+        appAuthStatus,
+        appServerPin,
+        appSettings,
     } from "../lib/api";
     import { aboutItems } from "../lib/version";
+    import { get } from "svelte/store";
 
     let apiBase = getApiBaseUrl();
-    let localIp = $state("");
-    let localAccessUrl = $state("");
-    let serverPin = $state("");
+    let localIp = $state(get(appLocalIp) || "");
+    let localAccessUrl = $derived(`http://${localIp || "localhost"}:1420`);
+    let serverPin = $state(get(appServerPin) || "");
     let toast = $state("");
-    let pin = $state("");
-    let pinEnabled = $state(true);
-    let pinLockAtStartup = $state(true);
-    let autoLaunch = $state(false);
+    let pin = $state(getPin() || "");
+    let pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+    let pinLockAtStartup = $state(get(appAuthStatus)?.pinLockAtStartup ?? true);
+    let autoLaunch = $state(get(appSettings)?.launch_fullscreen_on_startup ?? false);
     let startAtLogin: boolean | null = $state(null);
     let isTauri = $state(false);
     let monitors = $state<any[]>([]);
-    let preferredMonitor = $state("");
-    let selectedMonitorCandidate = $state("");
+    let preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+    let selectedMonitorCandidate = $state(get(appSettings)?.preferred_monitor || "");
     let isMonitorOnline = $derived(
         preferredMonitor
             ? monitors.some((m) => m.name === preferredMonitor)
@@ -30,7 +35,7 @@
     let hasDiscardedChanges = $derived(
         selectedMonitorCandidate !== preferredMonitor
     );
-    let isLoading = $state(true);
+    let isLoading = $state(!get(appAuthStatus));
 
     async function fetchSettings() {
         try {
@@ -40,6 +45,7 @@
                 autoLaunch = !!data.launch_fullscreen_on_startup;
                 preferredMonitor = data.preferred_monitor || "";
                 selectedMonitorCandidate = preferredMonitor;
+                appSettings.set(data);
             }
         } catch (err) {
             console.error("Failed to fetch settings:", err);
@@ -53,6 +59,7 @@
                 const data = await res.json();
                 pinEnabled = data.pinEnabled;
                 pinLockAtStartup = data.pinLockAtStartup;
+                appAuthStatus.set(data);
             }
         } catch (err) {
             console.error("Failed to fetch security status:", err);
@@ -180,6 +187,7 @@
             }
             const data = await res.json();
             serverPin = data.pin || "(not set)";
+            appServerPin.set(serverPin);
         } catch (err) {
             console.error("Failed to fetch server PIN:", err);
             serverPin = "(error)";
@@ -199,7 +207,7 @@
             const tauriIp = await invoke<string>("get_local_ip");
             if (tauriIp) {
                 localIp = tauriIp;
-                localAccessUrl = `http://${localIp}:1420`;
+                appLocalIp.set(localIp);
             }
         } catch (err) {
             // Fallback to hostname if Tauri is unavailable or invocation fails.
@@ -212,23 +220,22 @@
         setTimeout(() => (toast = ""), 2000);
     }
 
-    onMount(async () => {
+    onMount(() => {
         isTauri =
             typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
-        // Fetch everything in parallel
-        await Promise.all([
-            fetchLocalIp(),
-            fetchStatus(),
-            fetchSettings(),
-            fetchServerPin(),
-            ...(isTauri ? [fetchMonitors(), checkAutostart()] : []),
-        ]);
+        // Fetch data independently so UI can update progressively
+        fetchLocalIp();
+        fetchStatus();
+        fetchSettings();
+        fetchServerPin();
+        if (isTauri) {
+            fetchMonitors();
+            checkAutostart();
+        }
 
-        // Artificial slight delay for smooth transition
-        setTimeout(() => {
-            isLoading = false;
-        }, 300);
+        // Disable global loading shield, rely on component-level skeletons
+        isLoading = false;
     });
 
     async function copyText(value: string, label: string) {
@@ -252,19 +259,14 @@
             class="max-w-6xl mx-auto w-full mb-6 flex items-center justify-between"
         >
             <div>
-                {#if isLoading}
-                    <div class="h-8 w-32 rounded bg-white/5 animate-pulse mb-2"></div>
-                    <div class="h-4 w-48 rounded bg-white/5 animate-pulse"></div>
-                {:else}
-                    <h1
-                        class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
-                    >
-                        Settings
-                    </h1>
-                    <p class="text-gray-400 text-sm mt-1">
-                        Configure your Clockwise experience
-                    </p>
-                {/if}
+                <h1
+                    class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent"
+                >
+                    Settings
+                </h1>
+                <p class="text-gray-400 text-sm mt-1">
+                    Configure your Clockwise experience
+                </p>
             </div>
             <a
                 href="/"
@@ -331,7 +333,7 @@
                             >
                         </div>
                         <div class="flex items-center justify-between sm:justify-end gap-2 min-w-0 w-full sm:w-auto">
-                            {#if isLoading}
+                            {#if !localIp}
                                 <div class="h-5 w-48 rounded bg-white/5 animate-pulse"></div>
                             {:else}
                                 <a
@@ -445,7 +447,7 @@
                             >
                         </div>
                         <div class="flex items-center gap-3">
-                            {#if isLoading}
+                            {#if !serverPin}
                                 <div class="h-6 w-20 rounded bg-white/5 animate-pulse"></div>
                             {:else}
                                 <span
@@ -528,10 +530,10 @@
                     </div>
 
                     <div class="flex-1 flex flex-col gap-3">
-                        {#if isLoading}
-                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse"></div>
-                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse"></div>
-                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse"></div>
+                        {#if !monitors.length && isTauri}
+                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"></div>
+                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"></div>
+                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"></div>
                         {:else}
                             {#if startAtLogin !== null}
                                 <div
@@ -728,42 +730,33 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 flex-1 auto-rows-fr">
-                    {#if isLoading}
-                        {#each Array(6) as _, i}
-                             <div class="p-3 rounded-xl bg-white/5 animate-pulse {i >= 4 ? 'col-span-2' : ''}">
-                                 <div class="h-2 w-16 mb-2 rounded bg-white/5"></div>
-                                 <div class="h-4 w-24 rounded bg-white/5"></div>
-                             </div>
-                        {/each}
-                    {:else}
-                        {#each aboutItems as item, i}
-                            <div
-                                class="flex flex-col justify-center p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
-                                4
-                                    ? 'col-span-2'
-                                    : ''}"
+                    {#each aboutItems as item, i}
+                        <div
+                            class="flex flex-col justify-center p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors {i >=
+                            4
+                                ? 'col-span-2'
+                                : ''}"
+                        >
+                            <span
+                                class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1"
+                                >{item.label}</span
                             >
-                                <span
-                                    class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1"
-                                    >{item.label}</span
+                            {#if item.href}
+                                <a
+                                    href={item.href}
+                                    target="_blank"
+                                    class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors break-all"
                                 >
-                                {#if item.href}
-                                    <a
-                                        href={item.href}
-                                        target="_blank"
-                                        class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors break-all"
-                                    >
-                                        {item.value}
-                                    </a>
-                                {:else}
-                                    <span
-                                        class="text-sm font-semibold text-gray-200 truncate"
-                                        >{item.value}</span
-                                    >
-                                {/if}
-                            </div>
-                        {/each}
-                    {/if}
+                                    {item.value}
+                                </a>
+                            {:else}
+                                <span
+                                    class="text-sm font-semibold text-gray-200 truncate"
+                                    >{item.value}</span
+                                >
+                            {/if}
+                        </div>
+                    {/each}
                 </div>
             </div>
         </div>

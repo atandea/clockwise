@@ -3,6 +3,10 @@ import { writable, type Readable } from "svelte/store";
 export const timerWindowOpen = writable<boolean>(false);
 export const autoLaunchAttempted = writable<boolean>(false);
 export const serverStatus = writable<"starting" | "running" | "error">("starting");
+export const appLocalIp = writable<string>("");
+export const appAuthStatus = writable<AuthStatus | null>(null);
+export const appServerPin = writable<string>("");
+export const appSettings = writable<any>(null);
 
 export interface TimerEventData {
   status: "running" | "paused" | "stopped" | "overtime" | "idle" | "error" | "connecting";
@@ -65,7 +69,9 @@ export async function checkAuth(): Promise<AuthStatus | null> {
   try {
     const res = await fetchWithPin(`${apiBase}/security/status`);
     if (res.ok) {
-      return await res.json();
+      const data = await res.json();
+      appAuthStatus.set(data);
+      return data;
     }
   } catch (err) {
     console.error("Auth check failed:", err);
