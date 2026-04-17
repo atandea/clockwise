@@ -108,7 +108,7 @@ fn open_timer_window(app: tauri::AppHandle, monitor_name: Option<String>) -> Res
     // Set fullscreen after a delay so the window lands on the correct monitor
     let win = window.clone();
     std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(500));
+        std::thread::sleep(std::time::Duration::from_millis(100));
         
         #[cfg(target_os = "linux")]
         {
@@ -187,15 +187,6 @@ fn cleanup_processes(state: &AppState) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    #[cfg(target_os = "linux")]
-    {
-        // This environment variable fixes the "Could not create default EGL display: EGL_BAD_PARAMETER" error
-        // on some Linux distributions (like Arch Linux) using Wayland/Nvidia.
-        if std::env::var("WEBKIT_DISABLE_DMABUF_RENDERER").is_err() {
-            std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
-        }
-    }
-
     tauri::Builder::default()
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
@@ -212,7 +203,7 @@ pub fn run() {
             ))?;
 
             // Setup Tray Icon
-            let quit_i = tauri::menu::MenuItem::with_id(app, "quit", "Quit Clockwise", true, None::<&str>).unwrap();
+            let quit_i = tauri::menu::MenuItem::with_id(app, "quit", "Exit", true, None::<&str>).unwrap();
             let show_i = tauri::menu::MenuItem::with_id(app, "show", "Show Dashboard", true, None::<&str>).unwrap();
             
             let tray_menu = tauri::menu::MenuBuilder::new(app)

@@ -7,6 +7,7 @@ pipeline {
         PATH = "/usr/local/cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         RUSTUP_HOME = "/usr/local/rustup"
         CARGO_HOME = "/usr/local/cargo"
+        CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER = "x86_64-w64-mingw32-gcc"
     }
 
     stages {
@@ -15,26 +16,49 @@ pipeline {
                 sh 'printenv && which cargo && cargo --version && which node && node --version'
             }
         }
-        stage('Build Everything') {
+        stage('Setup & Prepare') {
             steps {
                 dir('/home/jenkins/agent/workspace/clockwise-local') {
                     sh '''
                         set -ex
-                        
-                        echo '--- Building Server & Dashboard ---'
+                        echo '--- Installing Dependencies & Building Frontend ---'
                         (cd clockwise-server && npm ci && npm run build)
                         (cd clockwise-dashboard && npm ci && npm run build)
                         
-                        echo '--- Preparing Sidecar ---'
+                        echo '--- Preparing Sidecar Directories ---'
                         mkdir -p clockwise-server/client
                         cp -r clockwise-dashboard/build/* clockwise-server/client/
                         mkdir -p clockwise-dashboard/src-tauri/bin
-                        
-                        echo '--- Building Server Sidecar Binary ---'
+                    '''
+                }
+            }
+        }
+
+        stage('Build Linux') {
+            steps {
+                dir('/home/jenkins/agent/workspace/clockwise-local') {
+                    sh '''
+                        set -ex
+                        echo '--- Building Server Sidecar Binary (Linux) ---'
                         (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node24-linux-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-unknown-linux-gnu)
                         
-                        echo '--- Building Tauri App ---'
+                        echo '--- Building Tauri App (.deb) ---'
                         (cd clockwise-dashboard && npm run tauri build -- --bundles deb)
+                    '''
+                }
+            }
+        }
+
+        stage('Build Windows') {
+            steps {
+                dir('/home/jenkins/agent/workspace/clockwise-local') {
+                    sh '''
+                        set -ex
+                        echo '--- Building Server Sidecar Binary (Windows) ---'
+                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node24-win-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-pc-windows-gnu.exe)
+                        
+                        echo '--- Building Tauri App (.exe) ---'
+                        (cd clockwise-dashboard && npm run tauri build -- --target x86_64-pc-windows-gnu)
                     '''
                 }
             }
@@ -57,7 +81,7 @@ pipeline {
     post {
         always {
             dir('/home/jenkins/agent/workspace/clockwise-local') {
-                archiveArtifacts artifacts: 'clockwise-dashboard/src-tauri/target/release/bundle/deb/*.deb, clockwise-dashboard/src-tauri/target/release/bundle/appimage/*.AppImage', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'clockwise-dashboard/src-tauri/target/release/bundle/deb/*.deb, clockwise-dashboard/src-tauri/target/release/bundle/appimage/*.AppImage, clockwise-dashboard/src-tauri/target/x86_64-pc-windows-gnu/release/bundle/nsis/*.exe', allowEmptyArchive: true
             }
         }
     }

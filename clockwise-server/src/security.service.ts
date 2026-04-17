@@ -1,3 +1,4 @@
+import { randomInt } from 'node:crypto';
 import { Injectable, Logger } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 
@@ -11,13 +12,13 @@ export class SecurityService {
   constructor(private readonly settingsService: SettingsService) {
     this.generatePin();
     const settings = this.settingsService.getSettings();
-    
+
     // This captures the state recorded at the previous startup
     this.pinLockAtStartup = settings.pin_lock_at_startup ?? (settings.pin_lock_enabled ?? true);
-    
+
     // Load current PIN security state
     this.pinEnabled = settings.pin_lock_enabled ?? true;
-    
+
     // Record current state as the 'startup' state for the NEXT run
     this.settingsService.updateSettings({ pin_lock_at_startup: this.pinEnabled });
   }
@@ -38,7 +39,7 @@ export class SecurityService {
 
   private generatePin() {
     // Generate 4-digit PIN
-    this.pin = Math.floor(1000 + Math.random() * 9000).toString();
+    this.pin = randomInt(1000, 10000).toString();
     this.logger.log(`*************************************************`);
     this.logger.log(`* SECURITY PIN GENERATED: ${this.pin}          *`);
     this.logger.log(`* This PIN is required for network access.      *`);
@@ -55,6 +56,6 @@ export class SecurityService {
 
   isLocal(ip: string | undefined): boolean {
     if (!ip) return false;
-    return ip === '127.0.0.1' || ip.startsWith('127.') || ip === '::1' || ip === '::ffff:127.0.0.1';
+    return ip === '127.0.0.1' || ip.startsWith('127.');
   }
 }

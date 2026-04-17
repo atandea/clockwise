@@ -1,2 +1,3 @@
 clockwise-dashboard/src-tauri/clippy-report.json
-.scannerwork/report-task.txt
+.scannerwork/*
+clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-pc-windows-gnu.exe

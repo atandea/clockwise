@@ -21,10 +21,14 @@
     let isTauri = $state(false);
     let monitors = $state<any[]>([]);
     let preferredMonitor = $state("");
+    let selectedMonitorCandidate = $state("");
     let isMonitorOnline = $derived(
         preferredMonitor
             ? monitors.some((m) => m.name === preferredMonitor)
             : false,
+    );
+    let hasDiscardedChanges = $derived(
+        selectedMonitorCandidate !== preferredMonitor
     );
     let isLoading = $state(true);
 
@@ -35,6 +39,7 @@
                 const data = await res.json();
                 autoLaunch = !!data.launch_fullscreen_on_startup;
                 preferredMonitor = data.preferred_monitor || "";
+                selectedMonitorCandidate = preferredMonitor;
             }
         } catch (err) {
             console.error("Failed to fetch settings:", err);
@@ -150,9 +155,12 @@
             });
             if (res.ok) {
                 showToast(`Auto-fullscreen display updated`);
+            } else {
+                showToast(`Failed to update display`);
             }
         } catch (err) {
             console.error("Failed to update preferred monitor:", err);
+            showToast(`Error: ${err}`);
         }
     }
 
@@ -278,7 +286,7 @@
         </div>
 
         <div
-            class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-5"
+            class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch"
         >
             <!-- Connection Card -->
             <div
@@ -519,16 +527,15 @@
                         </div>
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="flex-1 flex flex-col gap-3">
                         {#if isLoading}
-                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
-                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
-                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
-                            <div class="h-[72px] rounded-2xl bg-white/5 animate-pulse"></div>
+                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse"></div>
+                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse"></div>
+                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse"></div>
                         {:else}
                             {#if startAtLogin !== null}
                                 <div
-                                    class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                                    class="flex-1 flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                                 >
                                     <div class="min-w-0">
                                         <span class="text-sm text-gray-300 block"
@@ -552,7 +559,7 @@
                             {/if}
 
                             <div
-                                class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
+                                class="flex-1 flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                             >
                                 <div class="min-w-0">
                                     <span class="text-sm text-gray-300 block"
@@ -575,46 +582,33 @@
                             </div>
 
                             <div
-                                class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 transition-colors"
+                                class="flex-1 flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                             >
                                 <div class="min-w-0">
-                                    <span class="text-sm text-gray-300 block"
-                                        >Selected Display</span
-                                    >
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span
-                                        class="text-sm font-bold {preferredMonitor
-                                            ? isMonitorOnline
-                                                ? 'text-white'
-                                                : 'text-red-400'
-                                            : 'text-gray-500'}"
-                                    >
-                                        {preferredMonitor || "None Selected"}
-                                    </span>
-                                    {#if preferredMonitor}
+                                    <span class="text-sm text-gray-300 block mb-1">Display Selection</span>
+                                    <div class="flex items-center gap-2">
                                         <span
-                                            class="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider {isMonitorOnline
-                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                                : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                                            class="text-[11px] font-bold {preferredMonitor
+                                                ? isMonitorOnline
+                                                    ? 'text-gray-400'
+                                                    : 'text-red-400'
+                                                : 'text-gray-500'}"
                                         >
-                                            {isMonitorOnline
-                                                ? "Connected"
-                                                : "Offline"}
+                                            {preferredMonitor || "None Selected"}
                                         </span>
-                                    {/if}
+                                        {#if preferredMonitor}
+                                            <span
+                                                class="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider {isMonitorOnline
+                                                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                    : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                                            >
+                                                {isMonitorOnline ? "Connected" : "Offline"}
+                                            </span>
+                                        {/if}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div
-                                class="flex h-[72px] items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
-                            >
-                                <div class="min-w-0">
-                                    <span class="text-sm text-gray-300 block"
-                                        >Available Displays</span
-                                    >
-                                </div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex flex-wrap items-center gap-2">
                                     <button
                                         class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
                                         onclick={fetchMonitors}
@@ -639,18 +633,17 @@
                                     </button>
                                     <div class="relative">
                                         <select
-                                            class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[240px]"
-                                            value={preferredMonitor}
+                                            class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[200px]"
+                                            value={selectedMonitorCandidate}
                                             onchange={(e) =>
-                                                updatePreferredMonitor(
-                                                    e.currentTarget.value,
-                                                )}
+                                                selectedMonitorCandidate = e.currentTarget.value
+                                            }
                                         >
                                             <option
                                                 value=""
                                                 disabled
-                                                selected={!preferredMonitor}
-                                                >Select a display...</option
+                                                selected={!selectedMonitorCandidate}
+                                                >Select display...</option
                                             >
                                             {#each monitors as monitor}
                                                 <option
@@ -686,6 +679,16 @@
                                             >
                                         </div>
                                     </div>
+                                    
+                                    <button
+                                        onclick={() => updatePreferredMonitor(selectedMonitorCandidate)}
+                                        disabled={!hasDiscardedChanges}
+                                        class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold shadow-lg {hasDiscardedChanges 
+                                            ? 'bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white shadow-indigo-600/20' 
+                                            : 'bg-white/5 text-gray-500 cursor-not-allowed opacity-50'}"
+                                    >
+                                        Confirm
+                                    </button>
                                 </div>
                             </div>
                         {/if}
@@ -798,13 +801,16 @@
     .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-track {
         background: transparent;
     }
+
     .custom-scrollbar::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.2);
     }
