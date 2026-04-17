@@ -12,6 +12,14 @@ export interface TimerEventData {
   timerId: string | null;
 }
 
+export interface AuthStatus {
+  authorized: boolean;
+  requiresPin: boolean;
+  pinEnabled: boolean;
+  pinLockAtStartup: boolean;
+  local: boolean;
+}
+
 export function getApiBaseUrl(): string {
   if (typeof window === "undefined") {
     return "http://localhost:4100";
@@ -49,6 +57,19 @@ export async function fetchWithPin(url: string, options: RequestInit = {}): Prom
     headers.set("Authorization", `PIN ${pin}`);
   }
   return fetch(url, { ...options, headers });
+}
+
+export async function checkAuth(): Promise<AuthStatus | null> {
+  const apiBase = getApiBaseUrl();
+  try {
+    const res = await fetchWithPin(`${apiBase}/security/status`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.error("Auth check failed:", err);
+  }
+  return null;
 }
 
 // SHARED SSE STORE

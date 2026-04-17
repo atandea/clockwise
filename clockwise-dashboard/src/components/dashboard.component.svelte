@@ -4,10 +4,8 @@
   import CustomTimer from "./custom-timer.component.svelte";
   import ActiveTimer from "./active-timer.component.svelte";
   import DisplaySelector from "./display-selector.component.svelte";
-  import PinScreen from "./pin-screen.component.svelte";
-  import Loading from "./loading.component.svelte";
   import { onMount } from "svelte";
-  import { getApiBaseUrl, fetchWithPin, getPin, setPin } from "../lib/api";
+  import { getApiBaseUrl, fetchWithPin } from "../lib/api";
 
   let {
     apiBase = getApiBaseUrl(),
@@ -23,57 +21,9 @@
       "__TAURI_INTERNALS__" in window,
   );
 
-  let localIp = $state<string>("...");
-  let needsPin = $state(false);
   let serverStatus = $state<"starting" | "running" | "error">("starting");
   let errorMessage = $state("");
-  let statusMessage = $state("");
   let controlComponent = $state<any>();
-
-  async function checkSecurityStatus() {
-    try {
-      const res = await fetch(`${apiBase}/security/status`, {
-        signal: AbortSignal.timeout(5000),
-      });
-      if (!res.ok) {
-        return false;
-      }
-
-      const data = await res.json();
-      const pin = getPin();
-
-      needsPin = data.requiresPin && !pin;
-
-      // local devices can fetch the pin from the server; used by settings context
-      if (data.local && needsPin) {
-        const fetchedPin = await fetchPin();
-        if (fetchedPin) {
-          setPin(fetchedPin);
-          needsPin = false;
-        }
-      }
-
-      return !needsPin;
-    } catch (err) {
-      console.error("Security check failed:", err);
-      return false;
-    }
-  }
-
-  async function fetchPin(): Promise<string | null> {
-    try {
-      const res = await fetch(`${apiBase}/security/pin`, {
-        signal: AbortSignal.timeout(5000),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return data.pin;
-      }
-    } catch (err) {
-      console.error("Failed to get PIN:", err);
-    }
-    return null;
-  }
 
   async function checkServerHealth() {
     try {
@@ -84,39 +34,15 @@
 
       if (res.ok) {
         serverStatus = "running";
-        statusMessage = "";
         return true;
       }
 
-      if (res.status === 403) {
-        // Security guard triggered, PIN required for this client.
-        serverStatus = "starting";
-        statusMessage = "PIN required to access Clockwise dashboard.";
-        return false;
-      }
-
-      serverStatus = "starting"; // Keep in starting mode while polling
-      statusMessage = `Server responding with ${res.status}`;
+      serverStatus = "starting";
       return false;
     } catch (err) {
       console.warn("Health check failed:", err);
-      serverStatus = "starting"; // Keep in starting mode while polling
-      statusMessage = "Waiting for server to respond...";
+      serverStatus = "starting";
       return false;
-    }
-  }
-
-  async function fetchLocalIp() {
-    if (!isTauri) {
-      localIp = window.location.hostname;
-      return;
-    }
-    try {
-      const { invoke } = await import("@tauri-apps/api/core");
-      localIp = await invoke("get_local_ip");
-    } catch (err) {
-      console.error("Failed to get local IP:", err);
-      localIp = window.location.hostname;
     }
   }
 
@@ -125,39 +51,21 @@
   const startPolling = () => {
     if (pollInterval) return;
     pollInterval = setInterval(async () => {
-      // If we already know we need a PIN, stop polling here (PinScreen handles it)
-      if (needsPin) {
-        clearInterval(pollInterval);
-        pollInterval = null;
-        return;
-      }
-
-      // Check server health/reachability
       const ready = await checkServerHealth();
       if (ready) {
-        // Server is up! Now check security status.
-        const securityReady = await checkSecurityStatus();
-        if (securityReady) {
-          // All good!
-          clearInterval(pollInterval);
-          pollInterval = null;
-        }
+        clearInterval(pollInterval);
+        pollInterval = null;
       }
     }, 1500);
   };
 
   onMount(() => {
-    fetchLocalIp();
-
-    // Start reaching out to the server
-    (async () => {
-      startPolling();
-    })();
+    startPolling();
 
     setTimeout(() => {
       if (serverStatus === "starting") {
         serverStatus = "error";
-        errorMessage = "Server timeout (30s)";
+        errorMessage = "Server synchronization timeout (30s)";
         if (pollInterval) {
           clearInterval(pollInterval);
           pollInterval = null;
@@ -173,19 +81,6 @@
     };
   });
 </script>
-
-{#if needsPin}
-  <PinScreen
-    {apiBase}
-    onSuccess={(p) => {
-      setPin(p);
-      needsPin = false;
-      checkServerHealth().then((ready) => {
-        if (!ready) startPolling();
-      });
-    }}
-  />
-{/if}
 
 <div class="h-screen bg-[#020617] text-white flex flex-col overflow-hidden">
   <section class="flex-1 flex flex-col p-3 lg:p-4 overflow-hidden min-h-0">
@@ -208,7 +103,7 @@
           </button>
         </div>
       </div>
-    {:else if !needsPin}
+    {:else}
       <header
         class="shrink-0 mb-4 flex h-12 items-center justify-between rounded-lg bg-gray-800/40 border border-gray-700/30 px-4 shadow-sm"
       >

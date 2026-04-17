@@ -7,11 +7,26 @@ export class SecurityController {
   constructor(private readonly securityService: SecurityService) { }
  
   @Get('status')
-  getStatus(@Ip() ip: string) {
+  getStatus(@Ip() ip: string, @Req() req: Request) {
     const local = this.securityService.isLocal(ip);
+    const pinEnabled = this.securityService.isPinEnabled();
+    const authHeader = req.headers['authorization'];
+    
+    let authorized = true;
+    if (!local && pinEnabled) {
+      authorized = false;
+      if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('PIN ')) {
+        const providedPin = authHeader.substring(4);
+        if (this.securityService.verifyPin(providedPin)) {
+          authorized = true;
+        }
+      }
+    }
+
     return {
-      requiresPin: !local && this.securityService.isPinEnabled(),
-      pinEnabled: this.securityService.isPinEnabled(),
+      authorized,
+      requiresPin: !local && pinEnabled && !authorized,
+      pinEnabled: pinEnabled,
       pinLockAtStartup: this.securityService.getPinLockAtStartup(),
       local: local
     };
