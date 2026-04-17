@@ -10,14 +10,19 @@
     let initializing = $state(true);
     let apiError = $state(false);
 
-    async function verifyAuth() {
-        const status = await checkAuth();
-        if (status) {
-            authStatus = status;
-            apiError = false;
-        } else {
-            apiError = true;
+    async function verifyAuth(retries = 10) {
+        for (let i = 0; i < retries; i++) {
+            const status = await checkAuth();
+            if (status) {
+                authStatus = status;
+                apiError = false;
+                initializing = false;
+                return;
+            }
+            // Wait 1 second before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
+        apiError = true;
         initializing = false;
     }
 
@@ -28,7 +33,7 @@
     function handlePinSuccess(pin: string) {
         setPin(pin);
         initializing = true;
-        verifyAuth();
+        verifyAuth(1); // Only check once after PIN entry
     }
 </script>
 

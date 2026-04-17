@@ -109,11 +109,17 @@
       >
         <div class="flex items-center gap-4">
           <span
-            class="h-2 w-2 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse {serverStatus === 'running' ? 'bg-green-500' : 'bg-yellow-500'}"
+            class="h-2 w-2 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.8)] animate-pulse {serverStatus ===
+            'running'
+              ? 'bg-green-500'
+              : 'bg-yellow-500'}"
           ></span>
           <span
-            class="text-[11px] font-bold uppercase tracking-widest {serverStatus === 'running' ? 'text-green-400' : 'text-yellow-400'}"
-            >{serverStatus === 'running' ? 'Online' : 'Connecting'}</span
+            class="text-[11px] font-bold uppercase tracking-widest {serverStatus ===
+            'running'
+              ? 'text-green-400'
+              : 'text-yellow-400'}"
+            >{serverStatus === "running" ? "Online" : "Connecting"}</span
           >
         </div>
         <span class="flex items-center gap-2">
@@ -173,7 +179,11 @@
         ></div>
 
         <div class="flex-1 flex flex-col min-h-0">
-          <Control bind:this={controlComponent} {apiBase} isLoading={serverStatus !== "running"} />
+          <Control
+            bind:this={controlComponent}
+            {apiBase}
+            isLoading={serverStatus !== "running"}
+          />
         </div>
       </div>
     {/if}

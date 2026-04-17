@@ -267,11 +267,29 @@ pub fn run() {
             // Start clockwise-server sidecar
             match app.shell().sidecar("clockwise-server") {
                 Ok(command) => {
-                    let (mut _rx, child) = command
+                    let (mut rx, child) = command
                         .env("APP_DATA_FILE", &data_file_str)
                         .spawn()
                         .expect("Failed to spawn sidecar");
+                    
                     log::info!("clockwise-server started with PID: {}", child.pid());
+                    
+                    // Pipe sidecar output to tauri logs
+                    tauri::async_runtime::spawn(async move {
+                        use tauri_plugin_shell::process::CommandEvent;
+                        while let Some(event) = rx.recv().await {
+                            match event {
+                                CommandEvent::Stdout(line) => {
+                                    log::info!("server: {}", String::from_utf8_lossy(&line).trim());
+                                }
+                                CommandEvent::Stderr(line) => {
+                                    log::error!("server: {}", String::from_utf8_lossy(&line).trim());
+                                }
+                                _ => {}
+                            }
+                        }
+                    });
+
                     *state.server_process.lock().unwrap() = Some(child);
                 }
                 Err(e) => {
@@ -300,6 +318,12 @@ pub fn run() {
             get_local_ip,
             is_timer_window_open,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app, event| {
+            if let tauri::RunEvent::Exit = event {
+                let state = app.state::<AppState>();
+                cleanup_processes(state.inner());
+            }
+        });
 }
