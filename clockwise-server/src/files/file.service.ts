@@ -12,12 +12,13 @@ export class FileStorageService {
     private cache: any[] | null = null;
 
     public readData(): any[] {
-        if (this.cache) return this.cache;
+        if (this.cache && Array.isArray(this.cache)) return this.cache;
         if (!existsSync(this.filePath)) return [];
         try {
             const content = readFileSync(this.filePath, 'utf8');
-            this.cache = JSON.parse(content);
-            return this.cache || [];
+            const parsed = JSON.parse(content);
+            this.cache = Array.isArray(parsed) ? parsed : [];
+            return this.cache;
         } catch (e) {
             return [];
         }

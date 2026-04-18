@@ -127,8 +127,13 @@
 		}
 	}
 
+	$effect(() => {
+		if (!isLoading) {
+			fetchTimers();
+		}
+	});
+
 	onMount(() => {
-		fetchTimers();
 		unsubscribe = timerEvents.subscribe((data: TimerEventData) => {
 			pendingEvent = data;
 			if (rafId === null) rafId = requestAnimationFrame(applyPendingTimerEvent);
