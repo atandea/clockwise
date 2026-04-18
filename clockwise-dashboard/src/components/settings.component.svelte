@@ -21,19 +21,23 @@
     let pin = $state(getPin() || "");
     let pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
     let pinLockAtStartup = $state(get(appAuthStatus)?.pinLockAtStartup ?? true);
-    let autoLaunch = $state(get(appSettings)?.launch_fullscreen_on_startup ?? false);
+    let autoLaunch = $state(
+        get(appSettings)?.launch_fullscreen_on_startup ?? false,
+    );
     let startAtLogin: boolean | null = $state(null);
     let isTauri = $state(false);
     let monitors = $state<any[]>([]);
     let preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
-    let selectedMonitorCandidate = $state(get(appSettings)?.preferred_monitor || "");
+    let selectedMonitorCandidate = $state(
+        get(appSettings)?.preferred_monitor || "",
+    );
     let isMonitorOnline = $derived(
         preferredMonitor
             ? monitors.some((m) => m.name === preferredMonitor)
             : false,
     );
     let hasDiscardedChanges = $derived(
-        selectedMonitorCandidate !== preferredMonitor
+        selectedMonitorCandidate !== preferredMonitor,
     );
     let isLoading = $state(!get(appAuthStatus));
 
@@ -107,7 +111,7 @@
     async function toggleStartAtLogin() {
         try {
             const { enable, disable, isEnabled } = await import(
-                '@tauri-apps/plugin-autostart'
+                "@tauri-apps/plugin-autostart"
             );
             if (startAtLogin) {
                 await disable();
@@ -115,20 +119,22 @@
                 await enable();
             }
             startAtLogin = await isEnabled();
-            showToast(`Launch at startup ${startAtLogin ? 'enabled' : 'disabled'}`);
+            showToast(
+                `Launch at startup ${startAtLogin ? "enabled" : "disabled"}`,
+            );
         } catch (err) {
-            console.error('Failed to toggle autostart:', err);
+            console.error("Failed to toggle autostart:", err);
         }
     }
 
     async function checkAutostart() {
         try {
-            const { isEnabled } = await import('@tauri-apps/plugin-autostart');
+            const { isEnabled } = await import("@tauri-apps/plugin-autostart");
             const enabled = await isEnabled();
             startAtLogin = enabled;
         } catch (err) {
             // Plugin not available or call failed (non-Windows) — keep toggle hidden
-            console.debug('Autostart plugin not available:', err);
+            console.debug("Autostart plugin not available:", err);
             startAtLogin = null;
         }
     }
@@ -252,7 +258,7 @@
     class="h-screen h-[100dvh] bg-[#020617] text-white flex flex-col overflow-hidden font-sans"
 >
     <section
-        class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto lg:overflow-hidden z-10 custom-scrollbar animate-in zoom-in-95 fade-in duration-500 ease-out"
+        class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 overflow-y-auto z-10 custom-scrollbar animate-in zoom-in-95 fade-in duration-500 ease-out"
     >
         <!-- Header -->
         <div
@@ -328,13 +334,18 @@
                         class="flex min-h-[72px] h-auto flex-col sm:flex-row sm:items-center justify-between p-4 gap-3 rounded-2xl bg-black/40 border border-white/5 group/row hover:border-white/10 transition-colors"
                     >
                         <div class="min-w-0">
-                            <span class="text-sm text-gray-300 block mb-1 sm:mb-0"
+                            <span
+                                class="text-sm text-gray-300 block mb-1 sm:mb-0"
                                 >Local URL</span
                             >
                         </div>
-                        <div class="flex items-center justify-between sm:justify-end gap-2 min-w-0 w-full sm:w-auto">
+                        <div
+                            class="flex items-center justify-between sm:justify-end gap-2 min-w-0 w-full sm:w-auto"
+                        >
                             {#if !localIp}
-                                <div class="h-5 w-48 rounded bg-white/5 animate-pulse"></div>
+                                <div
+                                    class="h-5 w-48 rounded bg-white/5 animate-pulse"
+                                ></div>
                             {:else}
                                 <a
                                     href={localAccessUrl}
@@ -344,7 +355,8 @@
                                     {localAccessUrl}
                                 </a>
                                 <button
-                                    onclick={() => copyText(localAccessUrl, "URL")}
+                                    onclick={() =>
+                                        copyText(localAccessUrl, "URL")}
                                     class="p-1.5 shrink-0 rounded-lg hover:bg-white/10 transition-colors text-gray-500 hover:text-white"
                                     aria-label="Copy URL"
                                 >
@@ -448,7 +460,9 @@
                         </div>
                         <div class="flex items-center gap-3">
                             {#if !serverPin}
-                                <div class="h-6 w-20 rounded bg-white/5 animate-pulse"></div>
+                                <div
+                                    class="h-6 w-20 rounded bg-white/5 animate-pulse"
+                                ></div>
                             {:else}
                                 <span
                                     class="text-xl font-black font-mono tracking-[0.2em] text-white underline decoration-indigo-500/50 underline-offset-4"
@@ -531,16 +545,23 @@
 
                     <div class="flex-1 flex flex-col gap-3">
                         {#if !monitors.length && isTauri}
-                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"></div>
-                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"></div>
-                            <div class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"></div>
+                            <div
+                                class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"
+                            ></div>
+                            <div
+                                class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"
+                            ></div>
+                            <div
+                                class="flex-1 rounded-2xl bg-white/5 animate-pulse h-[72px]"
+                            ></div>
                         {:else}
                             {#if startAtLogin !== null}
                                 <div
                                     class="flex-1 flex items-center justify-between p-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                                 >
                                     <div class="min-w-0">
-                                        <span class="text-sm text-gray-300 block"
+                                        <span
+                                            class="text-sm text-gray-300 block"
                                             >Launch at Startup</span
                                         >
                                     </div>
@@ -587,7 +608,10 @@
                                 class="flex-1 flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 rounded-2xl bg-black/40 border border-white/5 hover:border-white/10 transition-colors"
                             >
                                 <div class="min-w-0">
-                                    <span class="text-sm text-gray-300 block mb-1">Display Selection</span>
+                                    <span
+                                        class="text-sm text-gray-300 block mb-1"
+                                        >Display Selection</span
+                                    >
                                     <div class="flex items-center gap-2">
                                         <span
                                             class="text-[11px] font-bold {preferredMonitor
@@ -596,7 +620,8 @@
                                                     : 'text-red-400'
                                                 : 'text-gray-500'}"
                                         >
-                                            {preferredMonitor || "None Selected"}
+                                            {preferredMonitor ||
+                                                "None Selected"}
                                         </span>
                                         {#if preferredMonitor}
                                             <span
@@ -604,7 +629,9 @@
                                                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                                                     : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
                                             >
-                                                {isMonitorOnline ? "Connected" : "Offline"}
+                                                {isMonitorOnline
+                                                    ? "Connected"
+                                                    : "Offline"}
                                             </span>
                                         {/if}
                                     </div>
@@ -638,8 +665,8 @@
                                             class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer max-w-[200px]"
                                             value={selectedMonitorCandidate}
                                             onchange={(e) =>
-                                                selectedMonitorCandidate = e.currentTarget.value
-                                            }
+                                                (selectedMonitorCandidate =
+                                                    e.currentTarget.value)}
                                         >
                                             <option
                                                 value=""
@@ -681,12 +708,15 @@
                                             >
                                         </div>
                                     </div>
-                                    
+
                                     <button
-                                        onclick={() => updatePreferredMonitor(selectedMonitorCandidate)}
+                                        onclick={() =>
+                                            updatePreferredMonitor(
+                                                selectedMonitorCandidate,
+                                            )}
                                         disabled={!hasDiscardedChanges}
-                                        class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold shadow-lg {hasDiscardedChanges 
-                                            ? 'bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white shadow-indigo-600/20' 
+                                        class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold shadow-lg {hasDiscardedChanges
+                                            ? 'bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white shadow-indigo-600/20'
                                             : 'bg-white/5 text-gray-500 cursor-not-allowed opacity-50'}"
                                     >
                                         Confirm

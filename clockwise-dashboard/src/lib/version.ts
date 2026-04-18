@@ -3,7 +3,7 @@ export const versionInfo = {
   "nodeEngine": "24",
   "svelteKit": "2.57.1",
   "tauriApi": "2.10.1",
-  "buildDate": "Apr 18, 2026, 7:02:06 PM UTC"
+  "buildDate": "Apr 18, 2026, 7:35:34 PM UTC"
 } as const;
 
 export const aboutItems = [
