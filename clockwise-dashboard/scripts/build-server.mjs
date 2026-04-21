@@ -31,7 +31,7 @@ if (!fs.existsSync(binDir)) {
 
 // Ensure clockwise-server has dependencies and is built
 console.log("Installing server dependencies...");
-execSync("npm install", { cwd: serverDir, stdio: "inherit" });
+execSync("npm install --include=dev", { cwd: serverDir, stdio: "inherit" });
 
 console.log("Building server...");
 execSync("npm run build", { cwd: serverDir, stdio: "inherit" });

@@ -1,0 +1,5 @@
+{
+  "pin_lock_at_startup": true,
+  "preferred_monitor": "eDP-1-0x065A",
+  "launch_fullscreen_on_startup": false
+}

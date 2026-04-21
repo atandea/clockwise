@@ -26,10 +26,10 @@ export interface AuthStatus {
 }
 
 export function getApiBaseUrl(): string {
-  if (typeof window === "undefined") {
+  if (globalThis.window === undefined) {
     return "http://localhost:4100";
   }
-  const host = window.location.hostname;
+  const host = globalThis.window.location.hostname;
   if (host === "tauri.localhost") {
     return "http://localhost:4100";
   }
@@ -37,20 +37,20 @@ export function getApiBaseUrl(): string {
 }
 
 export function getCleanHostname(): string {
-  if (typeof window === "undefined") {
+  if (globalThis.window === undefined) {
     return "localhost";
   }
-  const host = window.location.hostname;
+  const host = globalThis.window.location.hostname;
   return host === "tauri.localhost" ? "localhost" : host;
 }
 
 export function getPin(): string | null {
-  if (typeof window === "undefined") return null;
+  if (globalThis.window === undefined) return null;
   return sessionStorage.getItem("clockwise_pin");
 }
 
 export function setPin(pin: string) {
-  if (typeof window !== "undefined") {
+  if (globalThis.window !== undefined) {
     sessionStorage.setItem("clockwise_pin", pin);
   }
 }
@@ -95,14 +95,14 @@ let _useCount = 0;
 
 export const timerEvents: Readable<TimerEventData> = {
   subscribe: (run: (value: TimerEventData) => void) => {
-    if (typeof window === "undefined") {
+    if (globalThis.window === undefined) {
       return _timerEvents.subscribe(run);
     }
 
     if (_useCount === 0) {
       const apiBase = getApiBaseUrl();
       const pin = getPin();
-      const url = new URL(`${apiBase}/timers/subscribe`, window.location.origin);
+      const url = new URL(`${apiBase}/timers/subscribe`, globalThis.window.location.origin);
       if (pin) url.searchParams.set("pin", pin);
 
       _eventSource = new EventSource(url.toString());

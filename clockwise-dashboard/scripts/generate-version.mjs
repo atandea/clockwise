@@ -29,7 +29,7 @@ const localizedBuildDate = new Intl.DateTimeFormat(undefined, {
 const versionInfo = {
   appVersion: pkg.version || "-",
   nodeEngine: lockPackages[""]?.engines?.node || pkg.engines?.node || "-",
-  svelteKit: getResolvedVersion("@sveltejs/kit", pkg.devDependencies?.["@sveltejs/kit"] || "-"),
+  svelte: getResolvedVersion("svelte", pkg.devDependencies?.["svelte"] || "-"),
   tauriApi: getResolvedVersion("@tauri-apps/api", pkg.dependencies?.["@tauri-apps/api"] || "-"),
   buildDate: localizedBuildDate,
 };
@@ -39,7 +39,7 @@ const contents = `export const versionInfo = ${JSON.stringify(versionInfo, null,
 export const aboutItems = [
   { label: "App version", value: versionInfo.appVersion },
   { label: "Node engine", value: versionInfo.nodeEngine },
-  { label: "SvelteKit", value: versionInfo.svelteKit },
+  { label: "Svelte", value: versionInfo.svelte },
   { label: "Tauri API", value: versionInfo.tauriApi },
   { label: "Build date", value: versionInfo.buildDate },
   { label: "GitHub", value: "https://github.com/atandea/clockwise", href: "https://github.com/atandea/clockwise" },

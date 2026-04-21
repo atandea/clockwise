@@ -4,6 +4,7 @@
     import { checkAuth, setPin, type AuthStatus, getApiBaseUrl, serverStatus } from "../lib/api";
     import PinScreen from "../components/pin-screen.component.svelte";
     import Loading from "../components/loading.component.svelte";
+    import ToastContainer from "../components/toast-container.component.svelte";
 
     let { children } = $props();
     let authStatus = $state<AuthStatus | null>(null);
@@ -68,4 +69,6 @@
             </div>
         {/if}
     {/if}
+    
+    <ToastContainer />
 </div>

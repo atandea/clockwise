@@ -1,15 +1,15 @@
 export const versionInfo = {
   "appVersion": "0.1.0",
   "nodeEngine": "24",
-  "svelteKit": "2.57.1",
+  "svelte": "5.55.4",
   "tauriApi": "2.10.1",
-  "buildDate": "Apr 18, 2026, 7:35:34 PM UTC"
+  "buildDate": "Apr 21, 2026, 12:19:06 PM UTC"
 } as const;
 
 export const aboutItems = [
   { label: "App version", value: versionInfo.appVersion },
   { label: "Node engine", value: versionInfo.nodeEngine },
-  { label: "SvelteKit", value: versionInfo.svelteKit },
+  { label: "Svelte", value: versionInfo.svelte },
   { label: "Tauri API", value: versionInfo.tauriApi },
   { label: "Build date", value: versionInfo.buildDate },
   { label: "GitHub", value: "https://github.com/atandea/clockwise", href: "https://github.com/atandea/clockwise" },
