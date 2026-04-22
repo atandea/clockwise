@@ -27,13 +27,13 @@ export interface AuthStatus {
 
 export function getApiBaseUrl(): string {
   if (globalThis.window === undefined) {
-    return "http://localhost:4100";
+    return "http://localhost:4100/api/v1";
   }
   const host = globalThis.window.location.hostname;
   if (host === "tauri.localhost") {
-    return "http://localhost:4100";
+    return "http://localhost:4100/api/v1";
   }
-  return `http://${host}:4100`;
+  return `http://${host}:4100/api/v1`;
 }
 
 export function getCleanHostname(): string {
