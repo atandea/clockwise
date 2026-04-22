@@ -18,7 +18,56 @@ on:
       - '.github/workflows/build-dashboard.yml'
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get Version
+        id: get_version
+        working-directory: ./clockwise-dashboard
+        run: |
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Delete existing release/tag
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            const tag = `app-v${{ steps.get_version.outputs.version }}`;
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag
+              });
+              console.log(`Deleting release ${release.id}`);
+              await github.rest.repos.deleteRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id
+              });
+            } catch (e) {
+              console.log('No release found for tag ' + tag);
+            }
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `tags/${tag}`
+              });
+              console.log(`Deleted tag ${tag}`);
+            } catch (e) {
+              console.log('No tag found for ' + tag);
+            }
+
   build-tauri:
+    needs: cleanup
     permissions:
       contents: write
       actions: write
@@ -31,6 +80,13 @@ jobs:
             sidecar_target: 'node24-linux-x64'
             sidecar_ext: ''
             sidecar_triple: 'x86_64-unknown-linux-gnu'
+            artifact_pattern: 'target/release/bundle/deb/*.deb'
+          - platform: 'windows-latest'
+            args: '--bundles msi'
+            sidecar_target: 'node24-win-x64'
+            sidecar_ext: '.exe'
+            sidecar_triple: 'x86_64-pc-windows-msvc'
+            artifact_pattern: 'target/release/bundle/msi/*.msi'
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -72,52 +128,13 @@ jobs:
           # Build sidecar using pkg
           npx @yao-pkg/pkg@latest . -t ${{ matrix.sidecar_target }} --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-${{ matrix.sidecar_triple }}${{ matrix.sidecar_ext }}
 
-      - name: Get Version
-        id: get_version
-        working-directory: ./clockwise-dashboard
-        run: |
-          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-
-      - name: Delete existing release/tag
-        uses: actions/github-script@v7
-        continue-on-error: true
-        with:
-          script: |
-            const tag = `app-v${{ steps.get_version.outputs.version }}`;
-            try {
-              const { data: release } = await github.rest.repos.getReleaseByTag({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag
-              });
-              console.log(`Deleting release ${release.id}`);
-              await github.rest.repos.deleteRelease({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: release.id
-              });
-            } catch (e) {
-              console.log('No release found for tag ' + tag);
-            }
-            try {
-              await github.rest.git.deleteRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `tags/${tag}`
-              });
-              console.log(`Deleted tag ${tag}`);
-            } catch (e) {
-              console.log('No tag found for ' + tag);
-            }
-
       - name: Build Dashboard (Tauri)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__ 
-          releaseName: 'Clockwise Dashboard v__VERSION__'
+          tagName: app-v${{ needs.cleanup.outputs.version }}
+          releaseName: 'Clockwise Dashboard v${{ needs.cleanup.outputs.version }}'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: false
           prerelease: false
@@ -148,5 +165,5 @@ jobs:
         with:
           name: clockwise-dashboard-${{ matrix.platform }}
           path: |
-            clockwise-dashboard/src-tauri/target/release/bundle/deb/*.deb
+            clockwise-dashboard/src-tauri/${{ matrix.artifact_pattern }}
           if-no-files-found: warn

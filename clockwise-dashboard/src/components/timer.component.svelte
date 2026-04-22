@@ -6,12 +6,9 @@
 	let {
 		onStatusChange = () => {},
 		onTick = (seconds: number) => {},
-		preview = false,
 	}: {
-		apiBaseUrl?: string;
 		onStatusChange?: (status: string) => void;
 		onTick?: (seconds: number) => void;
-		preview?: boolean;
 	} = $props();
 
 	let storeData = $state<TimerEventData | null>(null);

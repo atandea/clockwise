@@ -12,7 +12,9 @@ class ToastState {
 
     add(type: ToastType, message: string, duration = 3000) {
         const id = crypto.randomUUID();
+        console.log(`Adding toast: [${type}] ${message}`);
         this.toasts.push({ id, type, message, duration });
+        console.log('Current toasts length:', this.toasts.length);
         
         setTimeout(() => {
             this.remove(id);

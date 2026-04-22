@@ -26,7 +26,7 @@
   let controlComponent = $state<any>();
 
   onMount(() => {
-    const unsubscribe = serverStatus.subscribe(v => {
+    const unsubscribe = serverStatus.subscribe((v) => {
       status = v;
     });
 
@@ -106,9 +106,7 @@
               style="aspect-ratio: 16/9;"
             >
               <Viewer
-                apiBaseUrl={apiBase}
                 allowFullscreen={false}
-                preview={true}
                 isLoading={status !== "running"}
               />
             </div>

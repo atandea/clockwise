@@ -1,6 +1,6 @@
 <script lang="ts">
     import { fly, scale } from 'svelte/transition';
-    import { toast } from '../lib/toast.svelte';
+    import { toast } from '../lib/toast.svelte.ts';
 
     function getIcon(type: string) {
         switch (type) {
@@ -31,7 +31,7 @@
     }
 </script>
 
-<div class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none items-end">
+<div class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none items-end">
     {#each toast.toasts as t (t.id)}
         <div
             in:fly={{ y: 20, duration: 300 }}

@@ -4,10 +4,8 @@
 
 	let {
 		onStatusChange = () => {},
-		preview = false,
 	}: {
 		onStatusChange?: (status: string) => void;
-		preview?: boolean;
 	} = $props();
 
 	let now = $state(new Date());

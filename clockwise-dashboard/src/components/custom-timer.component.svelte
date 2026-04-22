@@ -1,6 +1,9 @@
 <script lang="ts">
-    import { onMount, onDestroy } from "svelte";
+    import { onDestroy } from "svelte";
     import { fetchWithPin } from "$lib/api";
+    import { toast } from "$lib/toast.svelte.ts";
+    import PlayIcon from "./icons/PlayIcon.svelte";
+    import PlusIcon from "./icons/PlusIcon.svelte";
 
     let {
         apiBase = "",
@@ -14,11 +17,6 @@
 
     let inputValue = $state("5");
     let creating = $state(false);
-    let error = $state<string | null>(null);
-    let status = $state<"running" | "paused" | "stopped" | "overtime" | "idle">(
-        "stopped",
-    );
-    let timerName = $state<string | null>(null);
     let evtSource: EventSource | null = $state(null);
 
     function formatDurationName(
@@ -48,7 +46,6 @@
         input = input.trim();
         if (!input) return null;
 
-        // Plain number -> minutes
         if (/^\d+$/.test(input)) {
             const val = parseInt(input, 10);
             return {
@@ -58,7 +55,6 @@
             };
         }
 
-        // Suffixes
         const suffixMatch = input.match(/^(\d+)([smh])$/i);
         if (suffixMatch) {
             const val = parseInt(suffixMatch[1], 10);
@@ -76,7 +72,6 @@
             };
         }
 
-        // Colon notation MM:SS
         const colonMatch = input.match(/^(\d+):(\d+)$/);
         if (colonMatch) {
             const m = parseInt(colonMatch[1], 10);
@@ -102,15 +97,12 @@
     async function startCustomTimer() {
         const parsed = parseInput(inputValue);
         if (!parsed || parsed.duration <= 0) {
-            error = "Invalid format. Try '5' (min), '30s', or '1:30'.";
-            // Clear error after a bit if desired
+            toast.error("Invalid format. Try '5' (min), '30s', or '1:30'.");
             return;
         }
 
         creating = true;
-        error = null;
         try {
-            // 1. Create timer (temporary)
             const createRes = await fetch(`${apiBase}/timers`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -126,7 +118,6 @@
                 throw new Error(`Create failed: ${createRes.status}`);
             const newTimer = await createRes.json();
 
-            // 2. Start it
             const startRes = await fetch(
                 `${apiBase}/timers/${encodeURIComponent(newTimer.id)}/start`,
                 {
@@ -135,11 +126,8 @@
             );
             if (!startRes.ok)
                 throw new Error(`Start failed: ${startRes.status}`);
-
-            status = "running"; // Optimistic update
-            timerName = parsed.name; // Optimistic update
         } catch (err: any) {
-            error = err?.message ?? String(err);
+            toast.error(err?.message ?? String(err));
         } finally {
             creating = false;
         }
@@ -149,11 +137,10 @@
         if (!inputValue) return;
         const parsed = parseInput(inputValue);
         if (!parsed || parsed.duration <= 0) {
-            error = "Invalid format. Try '5' (min), '30s', or '1:30'.";
+            toast.error("Invalid format. Try '5' (min), '30s', or '1:30'.");
             return;
         }
         creating = true;
-        error = null;
         try {
             const res = await fetchWithPin(`${apiBase}/timers`, {
                 method: "POST",
@@ -169,10 +156,10 @@
                 onTimerCreated?.();
             } else {
                 const data = await res.json();
-                error = data.message || "Failed to save timer";
+                toast.error(data.message || "Failed to save timer");
             }
         } catch (err: any) {
-            error = "Connection failed";
+            toast.error("Connection failed");
         } finally {
             creating = false;
         }
@@ -184,20 +171,12 @@
         }
     }
 
-    onMount(() => {
-        // No longer tracking status in CustomTimer for "currently running"
-    });
-
     onDestroy(() => {
         if (evtSource) {
             evtSource.close();
             evtSource = null;
         }
     });
-
-    let isTimerActive = $derived(
-        status === "running" || status === "paused" || status === "overtime",
-    );
 </script>
 
 <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -208,7 +187,9 @@
     >
     <div class="flex flex-1 min-w-0 items-center gap-2">
         {#if isLoading}
-            <div class="min-w-0 flex-1 h-9 rounded bg-white/5 animate-pulse"></div>
+            <div
+                class="min-w-0 flex-1 h-9 rounded bg-white/5 animate-pulse"
+            ></div>
             <div class="h-9 w-24 rounded-lg bg-white/5 animate-pulse"></div>
         {:else}
             <input
@@ -228,18 +209,7 @@
                     disabled={creating}
                     title="Start"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="w-5 h-5"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
+                    <PlayIcon size="20" />
                 </button>
                 <div class="w-px h-5 bg-gray-700/50"></div>
                 <button
@@ -248,18 +218,7 @@
                     disabled={creating}
                     title="Save Template"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        class="w-5 h-5"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
+                    <PlusIcon size="20" />
                 </button>
             </div>
         {/if}

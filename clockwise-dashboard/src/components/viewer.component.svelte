@@ -5,15 +5,11 @@
 	import { onMount, onDestroy } from "svelte";
 
 	let {
-		apiBaseUrl = undefined,
 		allowFullscreen = true,
-		preview = false,
 		onClose = undefined,
 		isLoading = false,
 	}: {
-		apiBaseUrl?: string;
 		allowFullscreen?: boolean;
-		preview?: boolean;
 		onClose?: () => void;
 		isLoading?: boolean;
 	} = $props();
@@ -81,7 +77,6 @@
 				"fullscreenchange",
 				handleFullscreenChange,
 			);
-			// Initialize activity timeout
 			handleMouseMove();
 		}
 	});
@@ -147,28 +142,16 @@
 		<div class="absolute inset-0 flex items-center justify-center">
 			<div class="h-1/3 w-1/2 rounded bg-white/5 animate-pulse"></div>
 		</div>
+	{:else if showClock}
+		<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
+			<Clock onStatusChange={handleTimerStatus} />
+		</div>
 	{:else}
-		{#if showClock}
-			<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
-				<Clock onStatusChange={handleTimerStatus} {preview} />
-			</div>
-		{:else}
-			<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
-				{#if apiBaseUrl}
-					<TimerSubscriber
-						{apiBaseUrl}
-						onStatusChange={handleTimerStatus}
-						onTick={(t) => (hasHours = t >= 3600)}
-						{preview}
-					/>
-				{:else}
-					<TimerSubscriber
-						onStatusChange={handleTimerStatus}
-						onTick={(t) => (hasHours = t >= 3600)}
-						{preview}
-					/>
-				{/if}
-			</div>
-		{/if}
+		<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
+			<TimerSubscriber
+				onStatusChange={handleTimerStatus}
+				onTick={(t) => (hasHours = t >= 3600)}
+			/>
+		</div>
 	{/if}
 </div>

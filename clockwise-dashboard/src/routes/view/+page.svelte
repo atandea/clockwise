@@ -27,9 +27,7 @@
 
 <div class="fixed inset-0 bg-gray-900 text-white overflow-hidden">
     <Viewer
-        apiBaseUrl={apiBase}
         allowFullscreen={true}
-        preview={false}
         onClose={closeHandler}
     />
 </div>
