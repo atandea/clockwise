@@ -108,7 +108,7 @@ export const timerEvents: Readable<TimerEventData> = {
       _eventSource = new EventSource(url.toString());
       _eventSource.addEventListener("timer-tick", (e) => {
         try {
-          const data = JSON.parse((e as MessageEvent).data);
+          const data = JSON.parse(e.data);
           _timerEvents.set(data);
         } catch (err) {
           console.error("Failed to parse timer event", err);

@@ -1,8 +1,8 @@
-import { Injectable, MessageEvent } from '@nestjs/common';
-import { Timer } from './timer';
-import { FileStorageService } from 'src/files/file.service';
+import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { BehaviorSubject, interval, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, interval, map, Observable } from 'rxjs';
+import { FileStorageService } from 'src/files/file.service';
+import { Timer } from './timer';
 import { TimerEvent } from './timer-event';
 import { TimerInstance } from './timer-instance';
 
@@ -17,7 +17,7 @@ export class TimerService {
   private activeSubscription: any;
   private countdown$ = interval(1000).pipe(
     map(() => {
-      if ((this.activeTimerInstance && this.activeTimerInstance.status === 'stopped') || !this.activeTimerInstance) {
+      if (this.activeTimerInstance?.status === 'stopped' || !this.activeTimerInstance) {
         return {
           status: "stopped",
           remainingSeconds: 0
@@ -49,6 +49,7 @@ export class TimerService {
   );
 
   startTimer(timer: Timer) {
+    console.log('Starting timer:', timer.id, '(', timer.name, ')');
     this.overtime = 0;
     if (this.activeSubscription) {
       this.activeSubscription.unsubscribe();
@@ -62,6 +63,18 @@ export class TimerService {
       progressPercent: 0,
       status: 'running'
     };
+
+    // Emit initial state immediately
+    const initialEvent: TimerEvent = {
+      status: 'running',
+      timerId: this.activeTimerInstance.id,
+      name: this.activeTimerInstance.name,
+      remainingSeconds: this.activeTimerInstance.remainingSeconds,
+      totalSeconds: this.activeTimerInstance.duration,
+      progressPercent: 0,
+      message: `${this.activeTimerInstance.name}: Starting...`,
+    };
+    this.activeTimerSubject.next(initialEvent);
 
     this.activeSubscription = this.countdown$.subscribe({
       next: (event) => this.activeTimerSubject.next(event),
@@ -90,7 +103,7 @@ export class TimerService {
   }
 
   pauseActiveTimer() {
-    if (this.activeTimerInstance && this.activeTimerInstance.status === 'running') {
+    if (this.activeTimerInstance?.status === 'running') {
       this.activeTimerInstance.status = 'paused';
       if (this.activeSubscription) {
         this.activeSubscription.unsubscribe();
@@ -108,7 +121,7 @@ export class TimerService {
   }
 
   resumeActiveTimer() {
-    if (this.activeTimerInstance && this.activeTimerInstance.status === 'paused') {
+    if (this.activeTimerInstance?.status === 'paused') {
       this.activeTimerInstance.status = 'running';
       this.activeSubscription = this.countdown$.subscribe({
         next: (event) => this.activeTimerSubject.next(event),

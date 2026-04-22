@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
 @Injectable()
 export class FileStorageService {
@@ -20,15 +20,16 @@ export class FileStorageService {
             this.cache = Array.isArray(parsed) ? parsed : [];
             return this.cache;
         } catch (e) {
+            console.error(e);
             return [];
         }
     }
 
     public writeData(data: any[]): void {
         this.cache = data;
-        const dir = require('path').dirname(this.filePath);
+        const dir = require('node:path').dirname(this.filePath);
         if (!existsSync(dir)) {
-            require('fs').mkdirSync(dir, { recursive: true });
+            require('node:fs').mkdirSync(dir, { recursive: true });
         }
         writeFileSync(this.filePath, JSON.stringify(data, null, 2));
     }

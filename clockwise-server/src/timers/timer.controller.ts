@@ -1,10 +1,9 @@
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Post, UseGuards } from '@nestjs/common';
-import { TimerService } from './timer.service';
-import { Timer } from './timer';
-import { Sse, MessageEvent, Param } from '@nestjs/common';
-import { TimerEvent } from './timer-event';
+import { Body, Controller, Delete, Get, MessageEvent, NotFoundException, Param, Post, Sse, UseGuards } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { SecurityGuard } from '../security.guard';
+import { Timer } from './timer';
+import { TimerEvent } from './timer-event';
+import { TimerService } from './timer.service';
 
 @Controller("/timers")
 @UseGuards(SecurityGuard)

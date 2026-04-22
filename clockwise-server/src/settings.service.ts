@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import * as path from 'path';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import * as path from 'node:path';
 
 export interface DashboardSettings {
     preferred_monitor?: string;
@@ -29,6 +29,7 @@ export class SettingsService {
             this.cache = JSON.parse(content);
             return this.cache || {};
         } catch (err) {
+            console.error(err);
             return {};
         }
     }
@@ -40,7 +41,7 @@ export class SettingsService {
 
         const dir = path.dirname(this.settingsPath);
         if (!existsSync(dir)) {
-            require('fs').mkdirSync(dir, { recursive: true });
+            require('node:fs').mkdirSync(dir, { recursive: true });
         }
 
         writeFileSync(this.settingsPath, JSON.stringify(merged, null, 2));

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
+import { join } from 'node:path';
 import { TimerController } from './timers/timer.controller';
 import { DiscoveryController } from './discovery.controller';
 import { TimerService } from './timers/timer.service';

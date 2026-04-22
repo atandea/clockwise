@@ -103,7 +103,7 @@
 
         creating = true;
         try {
-            const createRes = await fetch(`${apiBase}/timers`, {
+            const createRes = await fetchWithPin(`${apiBase}/timers`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -118,7 +118,7 @@
                 throw new Error(`Create failed: ${createRes.status}`);
             const newTimer = await createRes.json();
 
-            const startRes = await fetch(
+            const startRes = await fetchWithPin(
                 `${apiBase}/timers/${encodeURIComponent(newTimer.id)}/start`,
                 {
                     method: "POST",
