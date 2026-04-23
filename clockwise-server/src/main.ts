@@ -60,7 +60,7 @@ async function bootstrap() {
     app.useStaticAssets(clientPath, { maxAge: '1d' });
 
     // SPA fallback: serve index.html for non-API routes
-    expressApp.get('*', (req, res, next) => {
+    expressApp.get('{*path}', (req, res, next) => {
       if (req.path.startsWith('/api/')) {
         return next();
       }

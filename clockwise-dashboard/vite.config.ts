@@ -10,6 +10,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // https://vite.dev/config/
 export default defineConfig(async () => ({
     plugins: [sveltekit(), tailwindcss()],
+    resolve: {
+        conditions: ['browser', 'svelte']
+    },
 
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
     //
@@ -37,4 +40,15 @@ export default defineConfig(async () => ({
             ],
         },
     },
+    test: {
+        environment: 'jsdom',
+        globals: true,
+        setupFiles: ['src/setupTests.ts'],
+        include: ['src/**/*.{test,spec}.{js,ts}'],
+        coverage: {
+            provider: 'v8',
+            reporter: ['text', 'json', 'html', 'lcov'],
+            reportsDirectory: './coverage'
+        }
+    }
 }));

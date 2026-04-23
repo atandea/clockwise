@@ -34,6 +34,24 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            steps {
+                dir('/home/jenkins/agent/workspace/clockwise-local') {
+                    sh '''
+                        set -ex
+                        echo '--- Running Backend Unit Tests with Coverage ---'
+                        (cd clockwise-server && npm run test:cov)
+                        
+                        echo '--- Running Backend E2E Tests ---'
+                        (cd clockwise-server && npm run test:e2e)
+
+                        echo '--- Running Frontend Unit Tests with Coverage ---'
+                        (cd clockwise-dashboard && npm run test:cov)
+                    '''
+                }
+            }
+        }
+
         stage('Build Linux') {
             steps {
                 dir('/home/jenkins/agent/workspace/clockwise-local') {

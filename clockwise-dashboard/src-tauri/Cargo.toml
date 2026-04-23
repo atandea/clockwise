@@ -27,8 +27,7 @@ tauri-plugin-log = "2"
 tauri-plugin-shell = "2.3.5"
 tauri-plugin-autostart = "2"
 
-[target.'cfg(target_os="linux")'.dependencies]
-gtk = "0.18"
+
 
 [profile.release]
 panic = "abort" # Strip fatal error strings

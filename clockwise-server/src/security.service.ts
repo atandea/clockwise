@@ -7,7 +7,7 @@ export class SecurityService {
   private readonly logger = new Logger(SecurityService.name);
   private pin: string;
   private pinEnabled: boolean = true;
-  private pinLockAtStartup: boolean = true;
+  private readonly pinLockAtStartup: boolean = true;
 
   constructor(private readonly settingsService: SettingsService) {
     this.generatePin();
@@ -56,6 +56,6 @@ export class SecurityService {
 
   isLocal(ip: string | undefined): boolean {
     if (!ip) return false;
-    return ip === '127.0.0.1' || ip.startsWith('127.');
+    return ip.startsWith('127.') || ip === '::1' || ip.startsWith('::ffff:127.');
   }
 }

@@ -10,12 +10,12 @@ import { TimerInstance } from './timer-instance';
 export class TimerService {
   constructor(private readonly fileStorageService: FileStorageService) { }
 
-  private ephemeralTimers = new Map<string, Timer>();
-  private activeTimerSubject = new BehaviorSubject<any>({ status: 'idle', remainingSeconds: 0 });
   private activeTimerInstance: TimerInstance | null = null;
   private overtime = 0;
   private activeSubscription: any;
-  private countdown$ = interval(1000).pipe(
+  private readonly ephemeralTimers = new Map<string, Timer>();
+  private readonly activeTimerSubject = new BehaviorSubject<any>({ status: 'idle', remainingSeconds: 0 });
+  private readonly countdown$ = interval(1000).pipe(
     map(() => {
       if (this.activeTimerInstance?.status === 'stopped' || !this.activeTimerInstance) {
         return {

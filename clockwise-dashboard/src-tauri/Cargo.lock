@@ -581,7 +581,6 @@ dependencies = [
 name = "clockwise-dashboard"
 version = "0.1.0"
 dependencies = [
- "gtk",
  "log",
  "serde",
  "serde_json",
