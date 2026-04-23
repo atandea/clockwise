@@ -16,6 +16,8 @@ describe('TimerController', () => {
     startTimer: jest.fn(),
     deleteTimer: jest.fn(),
     subscribeToStream: jest.fn(),
+    pauseActiveTimer: jest.fn(),
+    resumeActiveTimer: jest.fn(),
   };
 
   const mockSecurityService = {
@@ -73,6 +75,42 @@ describe('TimerController', () => {
         mockTimerService.getTimerById.mockReturnValue(timer);
         controller.startTimer('1');
         expect(service.startTimer).toHaveBeenCalledWith(timer);
+    });
+  });
+
+  describe('stopTimer', () => {
+    it('should call timerService.stopActiveTimer', () => {
+      controller.stopTimer();
+      expect(service.stopActiveTimer).toHaveBeenCalled();
+    });
+  });
+
+  describe('pauseTimer', () => {
+    it('should call timerService.pauseActiveTimer', () => {
+      controller.pauseTimer();
+      expect(service.pauseActiveTimer).toHaveBeenCalled();
+    });
+  });
+
+  describe('resumeTimer', () => {
+    it('should call timerService.resumeActiveTimer', () => {
+      controller.resumeTimer();
+      expect(service.resumeActiveTimer).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteTimer', () => {
+    it('should call timerService.deleteTimer', () => {
+      controller.deleteTimer('1');
+      expect(service.deleteTimer).toHaveBeenCalledWith('1');
+    });
+  });
+
+  describe('subscribeToStream', () => {
+    it('should call timerService.subscribeToStream', () => {
+      mockTimerService.subscribeToStream.mockReturnValue({ pipe: jest.fn().mockReturnValue({}) });
+      controller.subscribeToStream();
+      expect(service.subscribeToStream).toHaveBeenCalled();
     });
   });
 });

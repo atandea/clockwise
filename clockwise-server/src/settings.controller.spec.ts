@@ -40,9 +40,10 @@ describe('SettingsController', () => {
     expect(service.getSettings).toHaveBeenCalled();
   });
 
-  it('should update settings', () => {
-    const updates = { preferred_monitor: 'M2' };
-    expect(controller.updateSettings(updates)).toEqual({ preferred_monitor: 'M2' });
+  it('should update network access setting', () => {
+    const updates = { network_access_enabled: false };
+    mockSettingsService.updateSettings.mockReturnValueOnce({ network_access_enabled: false });
+    expect(controller.updateSettings(updates)).toEqual({ network_access_enabled: false });
     expect(service.updateSettings).toHaveBeenCalledWith(updates);
   });
 });

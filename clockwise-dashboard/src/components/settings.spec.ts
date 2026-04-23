@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/svelte';
 import SettingsComponent from './settings.component.svelte';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { fetchWithPin } from '../lib/api';
 
 // Mock the API module
 vi.mock('../lib/api', () => ({
@@ -68,5 +69,22 @@ describe('SettingsComponent', () => {
     expect(screen.getByText('Security')).toBeInTheDocument();
     expect(screen.getByText('Preferences')).toBeInTheDocument();
     expect(screen.getByText('About')).toBeInTheDocument();
+  });
+
+  it('should toggle network access', async () => {
+    render(SettingsComponent);
+    const toggle = screen.getByLabelText('Toggle Network Access');
+    await fireEvent.click(toggle);
+    
+    // Check if fetchWithPin was called with the correct body
+    await vi.waitFor(() => {
+        expect(fetchWithPin).toHaveBeenCalledWith(
+            expect.stringContaining('/settings'),
+            expect.objectContaining({
+                method: 'POST',
+                body: expect.stringContaining('"network_access_enabled":false')
+            })
+        );
+    });
   });
 });
