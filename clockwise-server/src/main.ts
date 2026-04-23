@@ -23,7 +23,7 @@ async function bootstrap() {
       const isLocal =
         remoteIp === '127.0.0.1' ||
         remoteIp === '::1' ||
-        remoteIp === '::ffff:127.0.0.1';
+        remoteIp?.endsWith(':127.0.0.1');
 
       if (!isLocal) {
         return res.status(403).json({
