@@ -7,6 +7,7 @@ export interface DashboardSettings {
     launch_fullscreen_on_startup?: boolean;
     pin_lock_enabled?: boolean;
     pin_lock_at_startup?: boolean;
+    network_access_enabled?: boolean;
     [key: string]: any;
 }
 

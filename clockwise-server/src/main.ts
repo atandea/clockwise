@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import compression from 'compression';
+import { SettingsService } from './settings.service';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import http from 'node:http';
@@ -10,6 +11,32 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.setGlobalPrefix('api/v1');
   app.use(compression());
+
+  const settingsService = app.get(SettingsService);
+  app.use((req, res, next) => {
+    const settings = settingsService.getSettings();
+    // Default to true if not set
+    const isEnabled = settings.network_access_enabled !== false;
+
+    if (!isEnabled) {
+      const remoteIp = req.ip || req.socket.remoteAddress;
+      const isLocal =
+        remoteIp === '127.0.0.1' ||
+        remoteIp === '::1' ||
+        remoteIp === '::ffff:127.0.0.1';
+
+      if (!isLocal) {
+        return res.status(403).json({
+          statusCode: 403,
+          message:
+            'Network access is disabled. Access is only allowed from localhost.',
+          error: 'Forbidden',
+        });
+      }
+    }
+    next();
+  });
+
   app.enableCors({
     origin: (origin, callback) => {
       // Allow all origins for development to ensure Tauri connectivity

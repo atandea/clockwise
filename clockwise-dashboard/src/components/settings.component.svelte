@@ -28,6 +28,9 @@
         get(appSettings)?.launch_fullscreen_on_startup ?? false,
     );
     let startAtLogin: boolean | null = $state(null);
+    let networkAccessEnabled = $state(
+        get(appSettings)?.network_access_enabled !== false,
+    );
     let isTauri = $state(false);
     let monitors = $state<any[]>([]);
     let preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
@@ -50,6 +53,7 @@
             if (res.ok) {
                 const data = await res.json();
                 autoLaunch = !!data.launch_fullscreen_on_startup;
+                networkAccessEnabled = data.network_access_enabled !== false;
                 preferredMonitor = data.preferred_monitor || "";
                 selectedMonitorCandidate = preferredMonitor;
                 appSettings.set(data);
@@ -107,6 +111,28 @@
             }
         } catch (err) {
             console.error("Failed to toggle auto-launch:", err);
+        }
+    }
+
+    async function toggleNetworkAccess() {
+        const newValue = !networkAccessEnabled;
+        networkAccessEnabled = newValue;
+        try {
+            const res = await fetchWithPin(`${apiBase}/settings`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    network_access_enabled: newValue,
+                }),
+            });
+            if (res.ok) {
+                globalToast.success(
+                    `Network access ${newValue ? "enabled" : "disabled"}`,
+                );
+            }
+        } catch (err) {
+            console.error("Failed to toggle network access:", err);
+            globalToast.error(`Failed to update network access`);
         }
     }
 
@@ -279,7 +305,13 @@
             <div
                 class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch"
             >
-                <NetworkAccess {localIp} {localAccessUrl} {copyText} />
+                <NetworkAccess
+                    {localIp}
+                    {localAccessUrl}
+                    {copyText}
+                    enabled={networkAccessEnabled}
+                    toggle={toggleNetworkAccess}
+                />
                 <Security {pinEnabled} {serverPin} {togglePin} {copyText} />
                 {#if isTauri || isLoading}
                     <Preferences
