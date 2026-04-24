@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FileStorageService } from './file.service';
+import { FileStorageService } from 'src/files/file.service';
 import * as fs from 'node:fs';
 
 jest.mock('node:fs');

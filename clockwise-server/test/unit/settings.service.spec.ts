@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SettingsService } from './settings.service';
+import { SettingsService } from 'src/settings.service';
 import * as fs from 'node:fs';
 
 jest.mock('node:fs');

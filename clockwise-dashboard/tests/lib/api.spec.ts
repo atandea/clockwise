@@ -8,7 +8,7 @@ import {
   checkAuth, 
   timerEvents,
   appAuthStatus
-} from './api';
+} from '../../src/lib/api';
 import { get } from 'svelte/store';
 
 describe('api utilities', () => {

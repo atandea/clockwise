@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/svelte';
-import ProgressBar from './progress-bar.component.svelte';
+import ProgressBar from '../../src/components/progress-bar.component.svelte';
 import { describe, it, expect } from 'vitest';
 
 describe('ProgressBar Component', () => {

@@ -1,10 +1,10 @@
 import { render, screen, cleanup } from '@testing-library/svelte';
-import TimerComponent from './timer.component.svelte';
+import TimerComponent from '../../src/components/timer.component.svelte';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { writable } from 'svelte/store';
 
 // Mock the API module
-vi.mock('../lib/api', async () => {
+vi.mock('../../src/lib/api', async () => {
   const { writable } = await import('svelte/store');
   const mockTimerEvents = writable({
     status: 'idle',
@@ -20,7 +20,7 @@ vi.mock('../lib/api', async () => {
 });
 
 // We need a way to access the store in tests
-import { timerEvents } from '../lib/api';
+import { timerEvents } from '../../src/lib/api';
 const mockTimerEvents = timerEvents as any;
 
 describe('TimerComponent', () => {

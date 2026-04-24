@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TimerController } from './timer.controller';
-import { TimerService } from './timer.service';
-import { SecurityService } from '../security.service';
-import { SecurityGuard } from '../security.guard';
+import { TimerController } from 'src/timers/timer.controller';
+import { TimerService } from 'src/timers/timer.service';
+import { SecurityService } from 'src/security.service';
+import { SecurityGuard } from 'src/security.guard';
 
 describe('TimerController', () => {
   let controller: TimerController;

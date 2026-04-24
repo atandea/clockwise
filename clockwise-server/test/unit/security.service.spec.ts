@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SecurityService } from './security.service';
-import { SettingsService } from './settings.service';
+import { SecurityService } from 'src/security.service';
+import { SettingsService } from 'src/settings.service';
 
 describe('SecurityService', () => {
   let service: SecurityService;

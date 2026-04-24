@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SecurityController } from './security.controller';
-import { SecurityService } from './security.service';
+import { SecurityController } from 'src/security.controller';
+import { SecurityService } from 'src/security.service';
 import { ForbiddenException } from '@nestjs/common';
 
 describe('SecurityController', () => {

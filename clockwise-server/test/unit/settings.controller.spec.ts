@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SettingsController } from './settings.controller';
-import { SettingsService } from './settings.service';
-import { SecurityService } from './security.service';
-import { SecurityGuard } from './security.guard';
+import { SettingsController } from 'src/settings.controller';
+import { SettingsService } from 'src/settings.service';
+import { SecurityService } from 'src/security.service';
+import { SecurityGuard } from 'src/security.guard';
 
 describe('SettingsController', () => {
   let controller: SettingsController;

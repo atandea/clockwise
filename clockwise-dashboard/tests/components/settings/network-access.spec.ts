@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/svelte';
-import NetworkAccess from './network-access.component.svelte';
+import NetworkAccess from '../../../src/components/settings/network-access.component.svelte';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 describe('NetworkAccessComponent', () => {

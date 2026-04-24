@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/svelte';
-import SettingsComponent from './settings.component.svelte';
+import SettingsComponent from '../../src/components/settings.component.svelte';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fetchWithPin } from '../lib/api';
+import { fetchWithPin } from '../../src/lib/api';
 
 // Mock the API module
-vi.mock('../lib/api', () => ({
+vi.mock('../../src/lib/api', () => ({
   getApiBaseUrl: vi.fn(() => 'http://localhost:4100/api/v1'),
   getCleanHostname: vi.fn(() => 'localhost'),
   getPin: vi.fn(() => '1234'),
@@ -19,7 +19,7 @@ vi.mock('../lib/api', () => ({
 }));
 
 // Mock the Toast module
-vi.mock('../lib/toast.svelte', () => ({
+vi.mock('../../src/lib/toast.svelte', () => ({
     toast: {
         success: vi.fn(),
         error: vi.fn()
