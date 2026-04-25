@@ -47,7 +47,7 @@
 			if (!idleTimeout) {
 				idleTimeout = setTimeout(() => {
 					showClock = true;
-				}, 5000);
+				}, 3000);
 			}
 		}
 	}

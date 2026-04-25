@@ -51,7 +51,7 @@
 </script>
 
 <div
-	class="absolute inset-0 flex flex-col items-center justify-center text-white transition-colors duration-500 bg-[#020617] [container-type:size] px-4 pb-[5%]"
+	class="absolute inset-0 flex flex-col items-center justify-center text-white transition-colors duration-500 bg-[#020617] [container-type:size] px-4 pb-[3%]"
 >
 	<div
 		class="mb-4 font-mono transition-all duration-500"

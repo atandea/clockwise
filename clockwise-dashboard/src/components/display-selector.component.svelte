@@ -57,12 +57,7 @@
                     !get(autoLaunchAttempted)
                 ) {
                     autoLaunchAttempted.set(true);
-                    // Check if explicitly preferred monitor is missing
-                    if (pref && monitors.some((m) => m.name === pref)) {
-                        await toggleFullscreenWindow();
-                    } else if (!pref) {
-                        await toggleFullscreenWindow();
-                    }
+                    await toggleFullscreenWindow();
                 }
             } else if (monitors.length > 0) {
                 selectedMonitor = monitors[0].name;
