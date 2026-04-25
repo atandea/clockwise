@@ -4,6 +4,7 @@ use serde::Serialize;
 use tauri::Manager;
 use tauri_plugin_shell::ShellExt;
 use tauri_plugin_shell::process::CommandChild;
+use tauri_plugin_single_instance::init as single_instance;
 
 struct AppState {
     server_process: Mutex<Option<CommandChild>>,
@@ -282,6 +283,9 @@ pub fn run() {
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(single_instance(|app, _args, _cwd| {
+            show_main_window(app);
+        }))
         .manage(AppState {
             server_process: Mutex::new(None),
         })

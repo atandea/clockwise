@@ -26,6 +26,7 @@ log = "0.4"
 tauri-plugin-log = "2"
 tauri-plugin-shell = "2.3.5"
 tauri-plugin-autostart = "2"
+tauri-plugin-single-instance = "2.4.1"
 
 
 
