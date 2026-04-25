@@ -57,7 +57,12 @@
                     !get(autoLaunchAttempted)
                 ) {
                     autoLaunchAttempted.set(true);
-                    await toggleFullscreenWindow();
+                    // Check if explicitly preferred monitor is missing
+                    if (pref && monitors.some((m) => m.name === pref)) {
+                        await toggleFullscreenWindow();
+                    } else if (!pref) {
+                        await toggleFullscreenWindow();
+                    }
                 }
             } else if (monitors.length > 0) {
                 selectedMonitor = monitors[0].name;
@@ -103,7 +108,7 @@
         } else {
             try {
                 await invoke("open_timer_window", {
-                    monitorName: selectedMonitor || null,
+                    monitor_name: selectedMonitor || null,
                 });
                 timerWindowOpen.set(true);
             } catch (err) {

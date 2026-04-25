@@ -115,8 +115,12 @@ fn select_monitor<'a>(
     }
 }
 
-/// Creates the timer webview window (un-decorated, not yet positioned).
-fn create_timer_webview(app: &tauri::AppHandle) -> Result<tauri::WebviewWindow, String> {
+/// Creates the timer webview window on the requested monitor.
+fn create_timer_webview(
+    app: &tauri::AppHandle,
+    pos: tauri::PhysicalPosition<i32>,
+    size: tauri::PhysicalSize<u32>,
+) -> Result<tauri::WebviewWindow, String> {
     tauri::WebviewWindowBuilder::new(
         app,
         "timer-view",
@@ -124,6 +128,9 @@ fn create_timer_webview(app: &tauri::AppHandle) -> Result<tauri::WebviewWindow, 
     )
     .title("Clockwise Timer")
     .decorations(false)
+    .visible(false)
+    .position(pos.x as f64, pos.y as f64)
+    .inner_size(size.width as f64, size.height as f64)
     .build()
     .map_err(|e| e.to_string())
 }
@@ -131,7 +138,9 @@ fn create_timer_webview(app: &tauri::AppHandle) -> Result<tauri::WebviewWindow, 
 /// Moves the window to the target monitor and enters fullscreen.
 fn fullscreen_on_target_monitor(window: tauri::WebviewWindow) {
     std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(100));
+        std::thread::sleep(std::time::Duration::from_millis(400));
+        let _ = window.show();
+        let _ = window.set_focus();
         let _ = window.set_fullscreen(true);
     });
 }
@@ -151,13 +160,7 @@ fn open_timer_window(app: tauri::AppHandle, monitor_name: Option<String>) -> Res
         selected.name(), pos.x, pos.y, size.width, size.height
     );
 
-    let window = create_timer_webview(&app)?;
-
-    use tauri::PhysicalPosition;
-    window
-        .set_position(PhysicalPosition::new(pos.x, pos.y))
-        .map_err(|e| e.to_string())?;
-
+    let window = create_timer_webview(&app, *pos, *size)?;
     fullscreen_on_target_monitor(window);
 
     Ok(())
