@@ -107,9 +107,9 @@
             }
         } else {
             try {
-                await invoke("open_timer_window", {
-                    monitor_name: selectedMonitor || null,
-                });
+                const payload = { request: { monitor_name: selectedMonitor || null } };
+                console.log("Invoking open_timer_window with:", payload, "selectedMonitor:", selectedMonitor);
+                await invoke("open_timer_window", payload);
                 timerWindowOpen.set(true);
             } catch (err) {
                 console.error("Failed to open timer window:", err);

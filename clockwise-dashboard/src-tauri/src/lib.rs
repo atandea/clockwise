@@ -6,6 +6,9 @@ use tauri_plugin_shell::ShellExt;
 use tauri_plugin_shell::process::CommandChild;
 use tauri_plugin_single_instance::init as single_instance;
 
+mod commands;
+use commands::OpenTimerWindowRequest;
+
 struct AppState {
     server_process: Mutex<Option<CommandChild>>,
 }
@@ -103,16 +106,13 @@ fn select_monitor<'a>(
     monitors: &'a [tauri::Monitor],
     monitor_name: &Option<String>,
 ) -> Result<&'a tauri::Monitor, String> {
-    if let Some(ref name) = monitor_name {
-        monitors
-            .iter()
-            .find(|m| m.name().map(|n| n == name).unwrap_or(false))
-            .ok_or_else(|| format!("Monitor '{}' not found", name))
-    } else {
-        monitors
-            .first()
-            .ok_or_else(|| "No monitors found".to_string())
-    }
+    let name = monitor_name
+        .as_ref().map(|s| s.as_str())
+        .unwrap_or("unknown");
+    return monitors
+        .iter()
+        .find(|m| m.name().map(|n| n == name).unwrap_or(false))
+        .ok_or_else(|| format!("Monitor '{}' not found", name))
 }
 
 /// Creates the timer webview window on the requested monitor.
@@ -135,18 +135,92 @@ fn create_timer_webview(
     .map_err(|e| e.to_string())
 }
 
-/// Moves the window to the target monitor and enters fullscreen.
-fn fullscreen_on_target_monitor(window: tauri::WebviewWindow) {
-    std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(400));
-        let _ = window.show();
-        let _ = window.set_focus();
-        let _ = window.set_fullscreen(true);
+fn fullscreen_on_target_monitor(
+    window: tauri::WebviewWindow,
+    target_monitor_pos: tauri::PhysicalPosition<i32>,
+) {
+    std::thread::spawn({
+        let window = window.clone();
+        move || {
+            std::thread::sleep(std::time::Duration::from_millis(400));
+
+            let _ = window.show();
+            let _ = window.set_position(target_monitor_pos);
+
+            #[cfg(target_os = "linux")]
+            {
+                let window_clone = window.clone();
+                let _ = window.run_on_main_thread(move || {
+                    gtk_fullscreen(&window_clone, target_monitor_pos);
+                });
+
+                let _ = window.set_fullscreen(true);
+            }
+
+            #[cfg(not(target_os = "linux"))]
+            {
+                let _ = window.set_fullscreen(true);
+            }
+        }
     });
 }
 
+#[cfg(target_os = "linux")]
+fn gtk_fullscreen(
+    window: &tauri::WebviewWindow,
+    target_monitor_pos: tauri::PhysicalPosition<i32>,
+) {
+    use gtk::prelude::*;
+
+    if let Ok(gtk_window) = window.gtk_window() {
+        if let Some(screen) = gtk::prelude::GtkWindowExt::screen(&gtk_window) {
+            let display = screen.display();
+            let best_monitor_idx = find_gtk_monitor(display, target_monitor_pos);
+
+            gtk_window.fullscreen_on_monitor(&screen, best_monitor_idx);
+        }
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn find_gtk_monitor(
+    display: gtk::gdk::Display,
+    target_monitor_pos: tauri::PhysicalPosition<i32>,
+) -> i32 {
+    use gtk::prelude::MonitorExt;
+
+    let mut best_monitor_idx = 0;
+    let mut min_distance = i64::MAX;
+
+    for i in 0..display.n_monitors() {
+        if let Some(m) = display.monitor(i) {
+            let geom = m.geometry();
+
+            let dx = geom.x() as i64 - target_monitor_pos.x as i64;
+            let dy = geom.y() as i64 - target_monitor_pos.y as i64;
+            let dist = dx * dx + dy * dy;
+
+            if dist < min_distance {
+                min_distance = dist;
+                best_monitor_idx = i;
+            }
+        }
+    }
+
+    best_monitor_idx
+}
+
 #[tauri::command]
-fn open_timer_window(app: tauri::AppHandle, monitor_name: Option<String>) -> Result<(), String> {
+fn open_timer_window(app: tauri::AppHandle, request: OpenTimerWindowRequest) -> Result<(), String> {
+    let monitor_name = request.monitor_name;
+    log::info!(
+        "Attempt fulscreen on: {:?} (raw: {:?})",
+        monitor_name.as_deref().unwrap_or("unknown"),
+        monitor_name
+    );
+    if monitor_name.is_none() {
+        log::warn!("monitor_name is None - this may indicate a parameter passing issue");
+    }
     close_existing_timer_window(&app);
 
     let monitors = app.available_monitors().map_err(|e| e.to_string())?;
@@ -161,7 +235,7 @@ fn open_timer_window(app: tauri::AppHandle, monitor_name: Option<String>) -> Res
     );
 
     let window = create_timer_webview(&app, *pos, *size)?;
-    fullscreen_on_target_monitor(window);
+    fullscreen_on_target_monitor(window, *pos);
 
     Ok(())
 }
