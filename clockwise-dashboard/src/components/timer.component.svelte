@@ -18,12 +18,8 @@
 	let status = $derived(storeData?.status ?? "idle");
 	let progress = $derived(storeData?.progressPercent ?? 0);
 
-	let isWarning = $derived(
-		status === "running" && progress >= 80 && progress <= 90,
-	);
-	let isCritical = $derived(
-		(status === "running" && progress > 90) || status === "overtime",
-	);
+	let isWarning = $derived(status === "running" && progress >= 80);
+	let isCritical = $derived(status === "overtime");
 
 	function formatTime(seconds: number) {
 		const hours = Math.floor(seconds / 3600);
