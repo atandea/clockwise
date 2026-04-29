@@ -27,6 +27,14 @@
     let loading = $state(true);
     let toast = $state("");
     let pollInterval: ReturnType<typeof setInterval> | null = null;
+    let preferenceLoaded = false;
+
+    $effect(() => {
+        if (!isLoading && !preferenceLoaded) {
+            preferenceLoaded = true;
+            loadPreference();
+        }
+    });
 
     async function loadMonitors() {
         try {
@@ -130,7 +138,6 @@
     onMount(async () => {
         await loadMonitors();
         await checkWindowState();
-        await loadPreference();
         loading = false;
 
         // Poll timer window state every 2s to catch external closes
