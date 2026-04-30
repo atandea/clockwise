@@ -8,6 +8,13 @@ export interface DashboardSettings {
     pin_lock_enabled?: boolean;
     pin_lock_at_startup?: boolean;
     network_access_enabled?: boolean;
+    show_progress_bar?: boolean;
+    show_secondary_clock?: boolean;
+    show_clock_seconds?: boolean;
+    show_clock_date?: boolean;
+    clock_date_format?: string;
+    selected_preset_id?: string;
+    custom_presets?: any[];
     [key: string]: any;
 }
 

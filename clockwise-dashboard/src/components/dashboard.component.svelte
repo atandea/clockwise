@@ -6,6 +6,9 @@
   import DisplaySelector from "./display-selector.component.svelte";
   import { onMount } from "svelte";
   import { getApiBaseUrl, serverStatus } from "../lib/api";
+  import { SettingsState } from "../lib/settings.state.svelte";
+  
+  const settings = new SettingsState();
 
   let {
     apiBase = getApiBaseUrl(),
@@ -93,21 +96,25 @@
       {/if}
 
       <div
-        class="flex-1 flex flex-col lg:flex-row gap-3 overflow-hidden min-h-0"
+        class="flex-1 flex flex-col lg:flex-row gap-2 overflow-hidden min-h-0"
       >
         <div
-          class="flex-1 flex flex-col gap-3 overflow-y-auto pr-1 flex-shrink-0 custom-scrollbar"
+          class="flex-1 flex flex-col gap-2 overflow-hidden flex-shrink-0"
         >
           <div
-            class="rounded border border-gray-700/60 bg-gray-800/60 p-3 shadow-lg"
+            class="flex-1 flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg min-h-0"
           >
             <div
-              class="relative w-full overflow-hidden rounded shadow-inner bg-black/20"
-              style="aspect-ratio: 16/9;"
+              class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video"
             >
               <Viewer
                 allowFullscreen={false}
                 isLoading={status !== "running"}
+                showProgressBar={settings.showProgressBar}
+                showSecondaryClock={settings.showSecondaryClock}
+                showClockSeconds={settings.showClockSeconds}
+                showClockDate={settings.showClockDate}
+                clockDateFormat={settings.clockDateFormat}
               />
             </div>
 
@@ -115,7 +122,7 @@
           </div>
 
           <div
-            class="rounded border border-gray-700/60 bg-gray-800/60 p-3 shadow-lg mt-auto"
+            class="rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg"
           >
             <CustomTimer
               {apiBase}
@@ -130,7 +137,7 @@
           aria-hidden="true"
         ></div>
 
-        <div class="flex-1 flex flex-col min-h-0">
+        <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
           <Control
             bind:this={controlComponent}
             {apiBase}
@@ -141,19 +148,3 @@
     {/if}
   </section>
 </div>
-
-<style>
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #374151; /* gray-700 */
-    border-radius: 3px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #4b5563; /* gray-600 */
-  }
-</style>

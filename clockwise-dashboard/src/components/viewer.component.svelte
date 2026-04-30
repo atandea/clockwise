@@ -8,10 +8,20 @@
 		allowFullscreen = true,
 		onClose = undefined,
 		isLoading = false,
+		showProgressBar = true,
+		showSecondaryClock = false,
+		showClockSeconds = false,
+		showClockDate = false,
+		clockDateFormat = "DD/MM/YYYY",
 	}: {
 		allowFullscreen?: boolean;
 		onClose?: () => void;
 		isLoading?: boolean;
+		showProgressBar?: boolean;
+		showSecondaryClock?: boolean;
+		showClockSeconds?: boolean;
+		showClockDate?: boolean;
+		clockDateFormat?: string;
 	} = $props();
 
 	let showClock = $state(true);
@@ -143,14 +153,21 @@
 			<div class="h-1/3 w-1/2 rounded bg-white/5 animate-pulse"></div>
 		</div>
 	{:else if showClock}
-		<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
-			<Clock onStatusChange={handleTimerStatus} />
+		<div class="absolute inset-0 z-0">
+			<Clock
+				onStatusChange={handleTimerStatus}
+				showSeconds={showClockSeconds}
+				showDate={showClockDate}
+				dateFormat={clockDateFormat}
+			/>
 		</div>
 	{:else}
 		<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
 			<TimerSubscriber
 				onStatusChange={handleTimerStatus}
 				onTick={(t) => (hasHours = t >= 3600)}
+				{showProgressBar}
+				{showSecondaryClock}
 			/>
 		</div>
 	{/if}

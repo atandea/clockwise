@@ -1,7 +1,10 @@
 <script lang="ts">
     import Viewer from "../../components/viewer.component.svelte";
     import { getApiBaseUrl } from "$lib/api";
+    import { SettingsState } from "$lib/settings.state.svelte";
     import { onMount } from "svelte";
+    
+    const settings = new SettingsState();
 
     const apiBase = getApiBaseUrl();
 
@@ -29,5 +32,10 @@
     <Viewer
         allowFullscreen={true}
         onClose={closeHandler}
+        showProgressBar={settings.showProgressBar}
+        showSecondaryClock={settings.showSecondaryClock}
+        showClockSeconds={settings.showClockSeconds}
+        showClockDate={settings.showClockDate}
+        clockDateFormat={settings.clockDateFormat}
     />
 </div>
