@@ -29,9 +29,21 @@ if (!fs.existsSync(binDir)) {
   fs.mkdirSync(binDir, { recursive: true });
 }
 
+const clientDir = path.resolve(serverDir, "client");
+
 // Ensure clockwise-server has dependencies and is built
 console.log("Installing server dependencies...");
 execSync("npm install --include=dev", { cwd: serverDir, stdio: "inherit" });
+
+console.log("Building dashboard UI...");
+execSync("npm run build", { cwd: root, stdio: "inherit" });
+
+console.log("Cleaning and copying client code...");
+if (fs.existsSync(clientDir)) {
+  fs.rmSync(clientDir, { recursive: true, force: true });
+}
+fs.mkdirSync(clientDir, { recursive: true });
+fs.cpSync(path.join(root, "build"), clientDir, { recursive: true });
 
 console.log("Building server...");
 execSync("npm run build", { cwd: serverDir, stdio: "inherit" });

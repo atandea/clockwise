@@ -1,5 +1,5 @@
 pkgname=clockwise-dashboard
-pkgver=0.1.0
+pkgver=$(node -p "require('./clockwise-dashboard/package.json').version" 2>/dev/null || node -p "require('../clockwise-dashboard/package.json').version" 2>/dev/null || echo "1.0.0")
 pkgrel=1
 pkgdesc="Clockwise - Time Management"
 arch=('x86_64' 'aarch64')
@@ -31,7 +31,7 @@ package() {
 
   mkdir -p "$srcdir/deb"
   bsdtar -xf "$debfile" -C "$srcdir/deb"
-1
+
   local data_archive
   data_archive=$(find "$srcdir/deb" -maxdepth 1 -type f -name 'data.tar.*' | head -n 1)
   bsdtar -xf "$data_archive" -C "$pkgdir"

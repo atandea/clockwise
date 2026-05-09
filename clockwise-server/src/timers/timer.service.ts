@@ -138,6 +138,12 @@ export class TimerService {
     return subject.asObservable();
   }
 
+  emitSettingsUpdated() {
+    this.activeTimerSubject.next({
+      status: 'settings-updated'
+    });
+  }
+
   getTimerInfo(timerId: string): Timer | undefined {
     return this.getTimerById(timerId);
   }

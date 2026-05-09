@@ -61,7 +61,7 @@ export async function fetchWithPin(url: string, options: RequestInit = {}): Prom
   if (pin) {
     headers.set("Authorization", `PIN ${pin}`);
   }
-  return fetch(url, { ...options, headers });
+  return fetch(url, { cache: "no-store", ...options, headers });
 }
 
 export async function checkAuth(): Promise<AuthStatus | null> {
@@ -109,6 +109,17 @@ export const timerEvents: Readable<TimerEventData> = {
       _eventSource.addEventListener("timer-tick", (e) => {
         try {
           const data = JSON.parse(e.data);
+
+          if (data.status === "settings-updated") {
+            console.log("Settings updated");
+            const apiBase = getApiBaseUrl();
+            fetchWithPin(`${apiBase}/settings`)
+              .then(res => res.json())
+              .then(settings => appSettings.set(settings))
+              .catch(err => console.error("Failed to fetch updated settings", err));
+            return;
+          }
+
           _timerEvents.set(data);
         } catch (err) {
           console.error("Failed to parse timer event", err);

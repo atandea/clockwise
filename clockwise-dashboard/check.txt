@@ -1,0 +1,287 @@
+Loading svelte-check in workspace: /home/alin/work/clockwise/clockwise-dashboard
+Getting Svelte diagnostics...
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/about.component.svelte:35:27
+Error: Property 'href' does not exist on type '{ readonly label: "App version"; readonly value: "0.1.0"; } | { readonly label: "Node engine"; readonly value: "24"; } | { readonly label: "Svelte"; readonly value: "5.55.5"; } | { readonly label: "Tauri API"; readonly value: "2.10.1"; } | { ...; } | { ...; }'.
+  Property 'href' does not exist on type '{ readonly label: "App version"; readonly value: "0.1.0"; }'. (ts)
+                >
+                {#if item.href}
+                    <a
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/about.component.svelte:37:36
+Error: Property 'href' does not exist on type '{ readonly label: "App version"; readonly value: "0.1.0"; } | { readonly label: "Node engine"; readonly value: "24"; } | { readonly label: "Svelte"; readonly value: "5.55.5"; } | { readonly label: "Tauri API"; readonly value: "2.10.1"; } | { ...; } | { ...; }'.
+  Property 'href' does not exist on type '{ readonly label: "App version"; readonly value: "0.1.0"; }'. (ts)
+                    <a
+                        href={item.href}
+                        target="_blank"
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:27:19
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+    class SettingsState {
+        localIp = $state(get(appLocalIp) || "");
+        serverPin = $state(get(appServerPin) || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:28:21
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        localIp = $state(get(appLocalIp) || "");
+        serverPin = $state(get(appServerPin) || "");
+        pin = $state(getPin() || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:29:15
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        serverPin = $state(get(appServerPin) || "");
+        pin = $state(getPin() || "");
+        pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:30:22
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        pin = $state(getPin() || "");
+        pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+        autoLaunch = $state(
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:31:22
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+        autoLaunch = $state(
+            get(appSettings)?.launch_fullscreen_on_startup ?? false,
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:34:40
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        );
+        startAtLogin: boolean | null = $state(null);
+        networkAccessEnabled = $state(
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:35:32
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        startAtLogin: boolean | null = $state(null);
+        networkAccessEnabled = $state(
+            get(appSettings)?.network_access_enabled !== false,
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:38:19
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        );
+        isTauri = $state(false);
+        monitors = $state<any[]>([]);
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:39:20
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        isTauri = $state(false);
+        monitors = $state<any[]>([]);
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:40:28
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        monitors = $state<any[]>([]);
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+        selectedMonitorCandidate = $state(
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:41:36
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+        selectedMonitorCandidate = $state(
+            get(appSettings)?.preferred_monitor || "",
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:44:21
+Warn: It looks like you're using the `$state` rune, but there is a local binding called `state`. Referencing a local variable with a `$` prefix will create a store subscription. Please rename `state` to avoid the ambiguity
+https://svelte.dev/e/store_rune_conflict (svelte)
+        );
+        isLoading = $state(!get(appAuthStatus));
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:39:20
+Error: Untyped function calls may not accept type arguments. (ts)
+        isTauri = $state(false);
+        monitors = $state<any[]>([]);
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:58:39
+Error: Parameter 'm' implicitly has an 'any' type. (ts)
+            return this.preferredMonitor
+                ? this.monitors.some((m) => m.name === this.preferredMonitor)
+                : false;
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:27:19
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+    class SettingsState {
+        localIp = $state(get(appLocalIp) || "");
+        serverPin = $state(get(appServerPin) || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:28:21
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        localIp = $state(get(appLocalIp) || "");
+        serverPin = $state(get(appServerPin) || "");
+        pin = $state(getPin() || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:29:15
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        serverPin = $state(get(appServerPin) || "");
+        pin = $state(getPin() || "");
+        pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:30:22
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        pin = $state(getPin() || "");
+        pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+        autoLaunch = $state(
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:31:22
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        pinEnabled = $state(get(appAuthStatus)?.pinEnabled ?? true);
+        autoLaunch = $state(
+            get(appSettings)?.launch_fullscreen_on_startup ?? false,
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:34:40
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        );
+        startAtLogin: boolean | null = $state(null);
+        networkAccessEnabled = $state(
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:35:32
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        startAtLogin: boolean | null = $state(null);
+        networkAccessEnabled = $state(
+            get(appSettings)?.network_access_enabled !== false,
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:38:19
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        );
+        isTauri = $state(false);
+        monitors = $state<any[]>([]);
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:39:20
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        isTauri = $state(false);
+        monitors = $state<any[]>([]);
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:40:28
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        monitors = $state<any[]>([]);
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+        selectedMonitorCandidate = $state(
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:41:36
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        preferredMonitor = $state(get(appSettings)?.preferred_monitor || "");
+        selectedMonitorCandidate = $state(
+            get(appSettings)?.preferred_monitor || "",
+
+/home/alin/work/clockwise/clockwise-dashboard/src/components/settings.component.svelte:44:21
+Error: Cannot use 'state' as a store. 'state' needs to be an object with a subscribe method on it.
+
+No overload matches this call.
+  Overload 1 of 2, '(store: SvelteStore<any>): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'.
+  Overload 2 of 2, '(store: SvelteStore<any> | null | undefined): any', gave the following error.
+    Argument of type 'SettingsState' is not assignable to parameter of type 'SvelteStore<any>'.
+      Property 'subscribe' is missing in type 'SettingsState' but required in type 'SvelteStore<any>'. (ts)
+        );
+        isLoading = $state(!get(appAuthStatus));
+
+/home/alin/work/clockwise/clockwise-dashboard/tests/components/settings/network-access.spec.ts:2:27
+Error: Cannot find module '../../../src/components/settings/network-access.component.svelte' or its corresponding type declarations. 
+import { render, screen, fireEvent, cleanup } from '@testing-library/svelte';
+import NetworkAccess from '../../../src/components/settings/network-access.component.svelte';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+
+====================================
+svelte-check found 17 errors and 12 warnings in 3 files

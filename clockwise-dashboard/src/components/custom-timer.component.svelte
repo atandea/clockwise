@@ -179,7 +179,7 @@
     });
 </script>
 
-<div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
     <label
         for="custom-timer-input"
         class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-gray-500"

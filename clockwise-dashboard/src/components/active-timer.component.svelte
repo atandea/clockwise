@@ -42,7 +42,7 @@
     });
 </script>
 
-<div class="flex flex-col gap-3 mt-4 pt-4 border-t border-gray-700/30 sm:flex-row sm:items-center">
+<div class="flex flex-col gap-2 mt-2 pt-2 border-t border-gray-700/30 sm:flex-row sm:items-center">
     <label
         for="active-timer-input"
         class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-gray-500"

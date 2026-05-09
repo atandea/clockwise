@@ -36,6 +36,24 @@ case "$ARCH" in
 DEB_NAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${DEB_ARCH}.deb"
 DEB_OUTPUT_DIR="$APP_DIR/src-tauri/target/release/bundle/deb"
 
+# Sync versions to Tauri config
+echo "==> Syncing version $PACKAGE_VERSION to Tauri configs"
+node -e "
+const fs = require('fs');
+const tauriConfPath = './clockwise-dashboard/src-tauri/tauri.conf.json';
+if (fs.existsSync(tauriConfPath)) {
+    const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
+    tauriConf.version = process.argv[1];
+    fs.writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n');
+}
+const cargoPath = './clockwise-dashboard/src-tauri/Cargo.toml';
+if (fs.existsSync(cargoPath)) {
+    let cargo = fs.readFileSync(cargoPath, 'utf8');
+    cargo = cargo.replace(/^version = \".*\"/m, 'version = \"' + process.argv[1] + '\"');
+    fs.writeFileSync(cargoPath, cargo);
+}
+" "$PACKAGE_VERSION"
+
 pushd "$APP_DIR" >/dev/null
 
 echo "==> Building server and frontend assets"

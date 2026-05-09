@@ -1,28 +1,20 @@
 <script lang="ts">
-	import { onMount, onDestroy } from "svelte";
 	import ProgressBar from "./progress-bar.component.svelte";
 	import SecondaryClock from "./secondary-clock.component.svelte";
-	import { timerEvents, type TimerEventData } from "../lib/api";
 
 	let {
-		onStatusChange = () => {},
-		onTick = (seconds: number) => {},
+		time = 60,
+		progress = 0,
 		showProgressBar = true,
 		showSecondaryClock = false,
+		status = "running"
 	}: {
-		onStatusChange?: (status: string) => void;
-		onTick?: (seconds: number) => void;
+		time?: number;
+		progress?: number;
 		showProgressBar?: boolean;
 		showSecondaryClock?: boolean;
+		status?: string;
 	} = $props();
-
-	let storeData = $state<TimerEventData | null>(null);
-	let unsubscribe: (() => void) | null = null;
-
-	let time = $derived(storeData?.remainingSeconds ?? 0);
-	let status = $derived(storeData?.status ?? "idle");
-	let progress = $derived(storeData?.progressPercent ?? 0);
-
 
 	let isWarning = $derived(status === "running" && progress >= 80);
 	let isCritical = $derived(status === "overtime");
@@ -38,18 +30,6 @@
 			return `${minutes.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 		}
 	}
-
-	onMount(() => {
-		unsubscribe = timerEvents.subscribe((data) => {
-			storeData = data;
-			onStatusChange(data.status);
-			onTick(data.remainingSeconds);
-		});
-	});
-
-	onDestroy(() => {
-		if (unsubscribe) unsubscribe();
-	});
 </script>
 
 <div

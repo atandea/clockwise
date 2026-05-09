@@ -1,7 +1,7 @@
 <script lang="ts">
     import "../app.css";
     import { onMount } from "svelte";
-    import { checkAuth, setPin, type AuthStatus, getApiBaseUrl, serverStatus } from "../lib/api";
+    import { checkAuth, setPin, type AuthStatus, getApiBaseUrl, serverStatus, appSettings, fetchWithPin } from "../lib/api";
     import PinScreen from "../components/pin-screen.component.svelte";
     import Loading from "../components/loading.component.svelte";
     import ToastContainer from "../components/toast-container.component.svelte";
@@ -17,6 +17,20 @@
             const status = await checkAuth();
             if (status) {
                 authStatus = status;
+
+                // If authorized or no pin required, fetch initial settings before rendering
+                if (!status.requiresPin) {
+                    try {
+                        const res = await fetchWithPin(`${getApiBaseUrl()}/settings`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            appSettings.set(data);
+                        }
+                    } catch (e) {
+                        console.error("Failed to fetch initial settings:", e);
+                    }
+                }
+
                 apiError = false;
                 initializing = false;
                 serverStatus.set("running");
@@ -31,6 +45,18 @@
     }
 
     onMount(() => {
+        // Auto-read PIN from URL query param (e.g. from QR code scan)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlPin = urlParams.get("pin");
+        
+        if (urlPin) {
+            setPin(urlPin);
+            // Strip the pin param from the URL for cleanliness
+            const cleanUrl = new URL(window.location.href);
+            cleanUrl.searchParams.delete("pin");
+            window.history.replaceState({}, "", cleanUrl.toString());
+        }
+
         verifyAuth();
     });
 
@@ -55,19 +81,14 @@
                 </button>
             </div>
         </div>
+    {:else if initializing}
+        <div class="flex-1 flex items-center justify-center p-4">
+            <Loading />
+        </div>
     {:else if authStatus?.requiresPin}
         <PinScreen apiBase={getApiBaseUrl()} onSuccess={handlePinSuccess} />
     {:else}
-        <!-- Render children immediately, passing the connection status via context or props if needed -->
-        <!-- For now, we render children and they handle the 'connecting' state via authStatus being null -->
         {@render children?.()}
-        
-        {#if initializing}
-            <div class="fixed bottom-4 right-4 flex items-center gap-3 bg-black/60 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full shadow-2xl z-50">
-                <div class="h-2 w-2 bg-yellow-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(234,179,8,0.6)]"></div>
-                <span class="text-[10px] font-bold uppercase tracking-widest text-yellow-500/80">Connecting to Server</span>
-            </div>
-        {/if}
     {/if}
     
     <ToastContainer />
