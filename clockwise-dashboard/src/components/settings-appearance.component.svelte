@@ -274,16 +274,14 @@
                 </div>
 
                 <div
-                    class="flex flex-col gap-3 py-4 px-2 border-b border-white/5 last:border-0 transition-all duration-300 {!settings.showClockDate
-                        ? 'opacity-40 grayscale-[0.5]'
-                        : ''}"
+                    class="flex flex-col gap-3 py-4 px-2 border-b border-white/5 last:border-0 transition-all duration-300"
                 >
                     <label
                         for="date-format"
-                        class="text-xs lg:text-sm font-black text-gray-500 uppercase tracking-[0.3em]"
+                        class="text-base lg:text-lg font-bold text-gray-300 block"
                         >Date Format</label
                     >
-                    <div class="relative">
+                    <div class="relative transition-all duration-300 {!settings.showClockDate ? 'opacity-40 grayscale-[0.5]' : ''}">
                         <select
                             id="date-format"
                             class="w-full appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-2 text-xs font-medium text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all cursor-pointer hover:border-white/20 disabled:cursor-not-allowed"

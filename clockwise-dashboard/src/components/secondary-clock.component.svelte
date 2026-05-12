@@ -15,7 +15,9 @@
 	});
 </script>
 
-<div class="font-mono text-[clamp(1rem,14cqw,16rem)] opacity-40">
+<div
+	class="font-mono text-[clamp(1rem,8cqw,10rem)] opacity-40 tracking-tighter"
+>
 	{now.getHours().toString().padStart(2, "0")}:{now
 		.getMinutes()
 		.toString()

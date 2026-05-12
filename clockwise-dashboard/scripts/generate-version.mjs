@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "fs/promises";
+import { execSync } from "child_process";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -9,7 +10,19 @@ const lockJsonPath = path.join(root, "package-lock.json");
 const outputPath = path.join(root, "src", "lib", "version.ts");
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
+
+const getVersion = (command) => {
+  try {
+    return execSync(command).toString().trim().split(" ")[1];
+  } catch (e) {
+    return "-";
+  }
+};
+
 const pkg = await readJson(packageJsonPath);
+const serverPkgPath = path.join(root, "..", "clockwise-server", "package.json");
+const serverPkg = await readJson(serverPkgPath).catch(() => ({}));
+
 const lock = await readJson(lockJsonPath);
 const lockPackages = lock.packages || {};
 const getResolvedVersion = (name, fallback = "-") =>
@@ -31,6 +44,9 @@ const versionInfo = {
   nodeEngine: lockPackages[""]?.engines?.node || pkg.engines?.node || "-",
   svelte: getResolvedVersion("svelte", pkg.devDependencies?.["svelte"] || "-"),
   tauriApi: getResolvedVersion("@tauri-apps/api", pkg.dependencies?.["@tauri-apps/api"] || "-"),
+  rust: getVersion("rustc --version"),
+  cargo: getVersion("cargo --version"),
+  nest: serverPkg.dependencies?.["@nestjs/core"]?.replace("^", "") || "-",
   buildDate: localizedBuildDate,
 };
 
@@ -40,6 +56,9 @@ export const aboutItems = [
   { label: "App version", value: versionInfo.appVersion },
   { label: "Node engine", value: versionInfo.nodeEngine },
   { label: "Svelte", value: versionInfo.svelte },
+  { label: "NestJS", value: versionInfo.nest },
+  { label: "Rust version", value: versionInfo.rust },
+  { label: "Cargo version", value: versionInfo.cargo },
   { label: "Tauri API", value: versionInfo.tauriApi },
   { label: "Build date", value: versionInfo.buildDate },
   { label: "GitHub", value: "https://github.com/atandea/clockwise", href: "https://github.com/atandea/clockwise" },

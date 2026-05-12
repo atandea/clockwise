@@ -52,6 +52,6 @@
 	{/if}
 
 	{#if showSecondaryClock}
-		<SecondaryClock />
+		<div class="mt-[4%]"><SecondaryClock /></div>
 	{/if}
 </div>

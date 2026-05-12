@@ -3,7 +3,7 @@
 </script>
 
 <div
-    class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 animate-in fade-in slide-in-from-bottom-4 duration-500"
+    class="grid grid-cols-1 max-w-xl animate-in fade-in slide-in-from-bottom-4 duration-500"
 >
     {#each aboutItems as item}
         <div

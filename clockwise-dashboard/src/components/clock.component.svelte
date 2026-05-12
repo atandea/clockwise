@@ -73,7 +73,7 @@
 	</div>
 
 	{#if showDate}
-		<div class="mt-[4%] font-mono text-[clamp(1rem,10cqw,12rem)] opacity-40">
+		<div class="mt-[4%] font-mono text-[clamp(1rem,8cqw,10rem)] opacity-40 tracking-tighter">
 			{formatDate(now)}
 		</div>
 	{/if}
