@@ -103,15 +103,15 @@
 </script>
 
 <div
-    class="w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-start animate-in fade-in slide-in-from-bottom-4 duration-500 px-1"
+    class="w-full h-full @container grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-10 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500 px-1"
 >
     <!-- Left side: Preview -->
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col h-full gap-2 @lg:gap-4 min-h-0">
         <div
-            class="flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg min-h-0"
+            class="flex flex-col flex-1 justify-center gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 @lg:p-4 shadow-lg min-h-0"
         >
             <div
-                class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video"
+                class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video max-h-full"
             >
                 {#if previewMode === "timer"}
                     <PreviewTimer
@@ -131,15 +131,15 @@
         </div>
 
         <!-- Test Controls -->
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2 @lg:gap-3 shrink-0">
             <span
-                class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] px-2"
+                class="text-[clamp(0.625rem,2cqi,0.75rem)] @2xl:text-[clamp(0.75rem,2.5cqi,0.875rem)] font-black text-gray-500 uppercase tracking-[0.3em] px-2"
                 >Live Preview Controls</span
             >
             <div class="grid grid-cols-5 gap-2">
                 {#each TEST_DURATIONS as duration}
                     <button
-                        class="px-2 py-3 rounded-2xl text-xs font-bold transition-all {previewMode ===
+                        class="px-1 py-2 @lg:py-3 rounded-2xl text-[clamp(0.625rem,2cqi,0.75rem)] font-bold transition-all {previewMode ===
                             'timer' &&
                         previewTotalTime === duration.value &&
                         previewInterval
@@ -151,7 +151,7 @@
                     </button>
                 {/each}
                 <button
-                    class="px-2 py-3 rounded-2xl text-xs font-bold transition-all {previewMode ===
+                    class="px-1 py-2 @lg:py-3 rounded-2xl text-[clamp(0.625rem,2cqi,0.75rem)] font-bold transition-all {previewMode ===
                     'clock'
                         ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
                         : 'bg-black/40 text-gray-400 hover:text-white hover:bg-white/5 border border-white/5'}"
@@ -164,157 +164,153 @@
     </div>
 
     <!-- Right side: Appearance Settings -->
-    <div class="flex flex-col gap-8">
+    <div class="flex flex-col h-full min-h-0">
         <!-- Timer Settings Section -->
-        <div class="flex flex-col gap-3">
-            <span
-                class="text-xs lg:text-sm font-black text-gray-500 uppercase tracking-[0.3em] px-2"
-                >Timer Appearance</span
-            >
-            <div class="flex flex-col gap-2">
-                <div
-                    class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+        <span
+            class="text-[clamp(0.75rem,2.5cqi,0.875rem)] @2xl:text-[clamp(0.875rem,3cqi,1rem)] font-black text-gray-500 uppercase tracking-[0.3em] px-2 shrink-0 mb-1 @lg:mb-2"
+            >Timer Appearance</span
+        >
+        
+        <div
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 transition-colors min-h-0"
+        >
+            <div class="min-w-0 flex items-center">
+                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
+                    >Progress Bar</span
                 >
-                    <div class="min-w-0">
-                        <span class="text-base lg:text-lg font-bold text-gray-300 block"
-                            >Progress Bar</span
-                        >
-                    </div>
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showProgressBar
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleProgressBar()}
-                        aria-label="Toggle Progress Bar"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showProgressBar
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
-                </div>
-
-                <div
-                    class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
-                >
-                    <div class="min-w-0">
-                        <span class="text-base lg:text-lg font-bold text-gray-300 block"
-                            >Current Time</span
-                        >
-                    </div>
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showSecondaryClock
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleSecondaryClock()}
-                        aria-label="Toggle Current Time"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showSecondaryClock
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
-                </div>
             </div>
+            <button
+                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showProgressBar
+                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                    : 'bg-gray-800'}"
+                onclick={() => settings.toggleProgressBar()}
+                aria-label="Toggle Progress Bar"
+            >
+                <span
+                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showProgressBar
+                        ? 'translate-x-6'
+                        : 'translate-x-1'} shadow-sm"
+                ></span>
+            </button>
+        </div>
+
+        <div
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 transition-colors min-h-0"
+        >
+            <div class="min-w-0 flex items-center">
+                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
+                    >Current Time</span
+                >
+            </div>
+            <button
+                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showSecondaryClock
+                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                    : 'bg-gray-800'}"
+                onclick={() => settings.toggleSecondaryClock()}
+                aria-label="Toggle Current Time"
+            >
+                <span
+                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showSecondaryClock
+                        ? 'translate-x-6'
+                        : 'translate-x-1'} shadow-sm"
+                ></span>
+            </button>
         </div>
 
         <!-- Clock Settings Section -->
-        <div class="flex flex-col gap-3">
-            <span
-                class="text-xs lg:text-sm font-black text-gray-500 uppercase tracking-[0.3em] px-2"
-                >Clock Appearance</span
+        <span
+            class="text-[clamp(0.75rem,2.5cqi,0.875rem)] @2xl:text-[clamp(0.875rem,3cqi,1rem)] font-black text-gray-500 uppercase tracking-[0.3em] px-2 shrink-0 mt-4 @lg:mt-6 mb-1 @lg:mb-2"
+            >Clock Appearance</span
+        >
+
+        <div
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 transition-colors min-h-0"
+        >
+            <div class="min-w-0 flex items-center">
+                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
+                    >Show Seconds</span
+                >
+            </div>
+            <button
+                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showClockSeconds
+                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                    : 'bg-gray-800'}"
+                onclick={() => settings.toggleClockSeconds()}
+                aria-label="Toggle Clock Seconds"
             >
-            <div class="flex flex-col gap-2">
-                <div
-                    class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
-                >
-                    <div class="min-w-0">
-                        <span class="text-base lg:text-lg font-bold text-gray-300 block"
-                            >Show Seconds</span
-                        >
-                    </div>
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showClockSeconds
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleClockSeconds()}
-                        aria-label="Toggle Clock Seconds"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showClockSeconds
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
-                </div>
+                <span
+                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showClockSeconds
+                        ? 'translate-x-6'
+                        : 'translate-x-1'} shadow-sm"
+                ></span>
+            </button>
+        </div>
 
-                <div
-                    class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+        <div
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 transition-colors min-h-0"
+        >
+            <div class="min-w-0 flex items-center">
+                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
+                    >Show Date</span
                 >
-                    <div class="min-w-0">
-                        <span class="text-base lg:text-lg font-bold text-gray-300 block"
-                            >Show Date</span
-                        >
-                    </div>
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showClockDate
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleClockDate()}
-                        aria-label="Toggle Clock Date"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showClockDate
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
-                </div>
+            </div>
+            <button
+                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showClockDate
+                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                    : 'bg-gray-800'}"
+                onclick={() => settings.toggleClockDate()}
+                aria-label="Toggle Clock Date"
+            >
+                <span
+                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showClockDate
+                        ? 'translate-x-6'
+                        : 'translate-x-1'} shadow-sm"
+                ></span>
+            </button>
+        </div>
 
-                <div
-                    class="flex flex-col gap-3 py-4 px-2 border-b border-white/5 last:border-0 transition-all duration-300"
+        <div
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-all duration-300 min-h-0 gap-4"
+        >
+            <div class="min-w-0 flex items-center">
+                <label
+                    for="date-format"
+                    class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
+                    >Date Format</label
                 >
-                    <label
-                        for="date-format"
-                        class="text-base lg:text-lg font-bold text-gray-300 block"
-                        >Date Format</label
+            </div>
+            <div class="relative shrink-0 w-36 @lg:w-48 transition-all duration-300 {!settings.showClockDate ? 'opacity-40 grayscale-[0.5]' : ''}">
+                <select
+                    id="date-format"
+                    class="w-full appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-2 text-[clamp(0.75rem,2cqi,0.875rem)] font-medium text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all cursor-pointer hover:border-white/20 disabled:cursor-not-allowed"
+                    value={settings.clockDateFormat}
+                    disabled={!settings.showClockDate}
+                    onchange={(e) =>
+                        settings.setClockDateFormat(
+                            e.currentTarget.value,
+                        )}
+                >
+                    <option value="DD/MM/YYYY" class="bg-gray-900"
+                        >DD/MM/YYYY</option
                     >
-                    <div class="relative transition-all duration-300 {!settings.showClockDate ? 'opacity-40 grayscale-[0.5]' : ''}">
-                        <select
-                            id="date-format"
-                            class="w-full appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-2 text-xs font-medium text-white focus:outline-none focus:ring-1 focus:ring-blue-500/50 transition-all cursor-pointer hover:border-white/20 disabled:cursor-not-allowed"
-                            value={settings.clockDateFormat}
-                            disabled={!settings.showClockDate}
-                            onchange={(e) =>
-                                settings.setClockDateFormat(
-                                    e.currentTarget.value,
-                                )}
-                        >
-                            <option value="DD/MM/YYYY" class="bg-gray-900"
-                                >DD/MM/YYYY</option
-                            >
-                            <option value="MM/DD/YYYY" class="bg-gray-900"
-                                >MM/DD/YYYY</option
-                            >
-                            <option value="YYYY-MM-DD" class="bg-gray-900"
-                                >YYYY-MM-DD</option
-                            >
-                            <option value="MMM D, YYYY" class="bg-gray-900"
-                                >MMM D, YYYY</option
-                            >
-                        </select>
-                        <div
-                            class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
-                        >
-                            <ChevronDownIcon
-                                width="14"
-                                height="14"
-                                strokeWidth="2.5"
-                            />
-                        </div>
-                    </div>
+                    <option value="MM/DD/YYYY" class="bg-gray-900"
+                        >MM/DD/YYYY</option
+                    >
+                    <option value="YYYY-MM-DD" class="bg-gray-900"
+                        >YYYY-MM-DD</option
+                    >
+                    <option value="MMM D, YYYY" class="bg-gray-900"
+                        >MMM D, YYYY</option
+                    >
+                </select>
+                <div
+                    class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                >
+                    <ChevronDownIcon
+                        width="14"
+                        height="14"
+                        strokeWidth="2.5"
+                    />
                 </div>
             </div>
         </div>

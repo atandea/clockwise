@@ -45,7 +45,6 @@ const versionInfo = {
   svelte: getResolvedVersion("svelte", pkg.devDependencies?.["svelte"] || "-"),
   tauriApi: getResolvedVersion("@tauri-apps/api", pkg.dependencies?.["@tauri-apps/api"] || "-"),
   rust: getVersion("rustc --version"),
-  cargo: getVersion("cargo --version"),
   nest: serverPkg.dependencies?.["@nestjs/core"]?.replace("^", "") || "-",
   buildDate: localizedBuildDate,
 };
@@ -58,7 +57,6 @@ export const aboutItems = [
   { label: "Svelte", value: versionInfo.svelte },
   { label: "NestJS", value: versionInfo.nest },
   { label: "Rust version", value: versionInfo.rust },
-  { label: "Cargo version", value: versionInfo.cargo },
   { label: "Tauri API", value: versionInfo.tauriApi },
   { label: "Build date", value: versionInfo.buildDate },
   { label: "GitHub", value: "https://github.com/atandea/clockwise", href: "https://github.com/atandea/clockwise" },

@@ -172,16 +172,16 @@
 </script>
 
 <div
-    class="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-start animate-in fade-in slide-in-from-bottom-4 duration-500"
+    class="w-full h-full @container grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500"
 >
     <!-- Left Side: All Toggles & Preferences -->
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col h-full gap-2 @lg:gap-4">
         <!-- Network Access Toggle -->
         <div
-            class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
         >
-            <div class="min-w-0">
-                <span class="text-base lg:text-lg font-bold text-gray-300 block"
+            <div class="min-w-0 flex items-center">
+                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
                     >Allow Network Access</span
                 >
             </div>
@@ -202,10 +202,10 @@
 
         <!-- PIN Lock Toggle -->
         <div
-            class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
         >
-            <div class="min-w-0">
-                <span class="text-base lg:text-lg font-bold text-gray-300 block"
+            <div class="min-w-0 flex items-center">
+                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
                     >PIN Security</span
                 >
             </div>
@@ -228,10 +228,10 @@
             {#if settings.startAtLogin !== null}
                 <!-- Launch at Startup -->
                 <div
-                    class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+                    class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
                 >
-                    <div class="min-w-0">
-                        <span class="text-base lg:text-lg font-bold text-gray-300 block"
+                    <div class="min-w-0 flex items-center">
+                        <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
                             >Launch at Startup</span
                         >
                     </div>
@@ -253,10 +253,10 @@
 
             <!-- Auto-launch Fullscreen -->
             <div
-                class="flex items-center justify-between py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+                class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
             >
-                <div class="min-w-0">
-                    <span class="text-base lg:text-lg font-bold text-gray-300 block"
+                <div class="min-w-0 flex items-center">
+                    <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
                         >Auto-launch Fullscreen</span
                     >
                 </div>
@@ -277,14 +277,14 @@
 
             <!-- Display Selection -->
             <div
-                class="flex flex-col gap-4 py-4 px-2 border-b border-white/5 last:border-0 transition-colors"
+                class="flex flex-col flex-1 justify-center gap-2 @lg:gap-4 py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
             >
                 <div
                     class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
-                    <div class="min-w-0">
+                    <div class="min-w-0 flex flex-col justify-center">
                         <span
-                            class="text-sm lg:text-base font-semibold text-gray-300 block mb-1"
+                            class="text-[clamp(0.875rem,2.5cqi,1rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-semibold text-gray-300 block mb-1"
                             >Target Display</span
                         >
                         <div class="flex items-center gap-2">
@@ -375,21 +375,21 @@
     </div>
 
     <!-- Right Side: Connection Block -->
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col h-full gap-2 @lg:gap-3 min-h-0">
         <div
-            class="flex flex-col items-center justify-center p-6 overflow-hidden relative group/qr"
+            class="flex flex-col items-center justify-center p-4 @lg:p-6 overflow-hidden relative group/qr flex-1 gap-4 @lg:gap-6"
         >
-            <div class="relative mb-6">
+            <div class="relative w-full max-w-[min(100%,35vh,260px)] aspect-square shrink">
                 <div
-                    class="p-4 bg-white rounded-3xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-[filter,opacity] duration-500 {!settings.networkAccessEnabled
+                    class="p-2 @lg:p-4 bg-white rounded-3xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-[filter,opacity] duration-500 {!settings.networkAccessEnabled
                         ? 'blur-md grayscale opacity-50'
-                        : ''}"
+                        : ''} w-full h-full flex items-center justify-center"
                 >
                     {#if qrCodeUrl}
-                        <img src={qrCodeUrl} alt="QR Code" class="w-40 h-40" />
+                        <img src={qrCodeUrl} alt="QR Code" class="w-full h-full object-contain" />
                     {:else}
                         <div
-                            class="w-40 h-40 bg-gray-200 animate-pulse rounded-2xl"
+                            class="w-full h-full bg-gray-200 animate-pulse rounded-2xl"
                         ></div>
                     {/if}
                 </div>
@@ -399,15 +399,15 @@
                         class="absolute inset-0 flex items-center justify-center pointer-events-none"
                     >
                         <LockIcon
-                            width="40"
-                            height="40"
+                            width="30%"
+                            height="30%"
                             class="text-black/40"
                         />
                     </div>
                 {/if}
             </div>
 
-            <div class="w-full text-center space-y-2">
+            <div class="w-full text-center space-y-1 @lg:space-y-2 shrink-0">
                 {#if !settings.localIp && settings.networkAccessEnabled}
                     <div
                         class="h-3 w-32 mx-auto rounded bg-white/5 animate-pulse"
@@ -416,7 +416,7 @@
                     <a
                         href={settings.displayUrl}
                         target="_blank"
-                        class="text-xs lg:text-sm font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-[0.2em] break-all"
+                        class="text-[clamp(0.75rem,2.5cqi,0.875rem)] @2xl:text-[clamp(0.875rem,3cqi,1.125rem)] font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-[0.2em] break-all"
                     >
                         {settings.networkAccessEnabled
                             ? settings.displayUrl
@@ -432,7 +432,7 @@
                             ></div>
                         {:else}
                             <span
-                                class="text-sm font-mono text-gray-400 uppercase tracking-[0.3em]"
+                                class="text-[clamp(0.875rem,2.5cqi,1rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-mono text-gray-400 uppercase tracking-[0.3em]"
                             >
                                 PIN: <span class="text-white font-black"
                                     >{settings.serverPin}</span
@@ -443,7 +443,7 @@
                 {/if}
 
                 <p
-                    class="text-[10px] text-gray-500 uppercase tracking-[0.3em] pt-6 font-black opacity-50"
+                    class="text-[clamp(0.625rem,2cqi,0.75rem)] @2xl:text-[clamp(0.75rem,2.5cqi,0.875rem)] text-gray-500 uppercase tracking-[0.3em] pt-4 @lg:pt-6 font-black opacity-50"
                 >
                     {settings.networkAccessEnabled
                         ? "Scan to Connect"
