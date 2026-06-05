@@ -13,6 +13,11 @@
 		showClockSeconds = false,
 		showClockDate = false,
 		clockDateFormat = "DD/MM/YYYY",
+		timerNormalColor = "#ffffff",
+		timerWarningColor = "#eab308",
+		timerOvertimeColor = "#ef4444",
+		timerWarningThreshold = 80,
+		timerAllowOvertime = true,
 	}: {
 		allowFullscreen?: boolean;
 		onClose?: () => void;
@@ -22,6 +27,11 @@
 		showClockSeconds?: boolean;
 		showClockDate?: boolean;
 		clockDateFormat?: string;
+		timerNormalColor?: string;
+		timerWarningColor?: string;
+		timerOvertimeColor?: string;
+		timerWarningThreshold?: number;
+		timerAllowOvertime?: boolean;
 	} = $props();
 
 	let showClock = $state(true);
@@ -168,6 +178,11 @@
 				onTick={(t) => (hasHours = t >= 3600)}
 				{showProgressBar}
 				{showSecondaryClock}
+				normalColor={timerNormalColor}
+				warningColor={timerWarningColor}
+				overtimeColor={timerOvertimeColor}
+				warningThreshold={timerWarningThreshold}
+				allowOvertime={timerAllowOvertime}
 			/>
 		</div>
 	{/if}

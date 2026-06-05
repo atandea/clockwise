@@ -72,19 +72,19 @@ describe('TimerComponent', () => {
     expect(screen.getByText('01:01:01')).toBeInTheDocument();
   });
 
-  it('should apply red color when critical (progress > 90%)', () => {
+  it('should apply warning color when progress >= threshold (warning)', () => {
     mockTimerEvents.set({
         status: 'running',
         remainingSeconds: 10,
         totalSeconds: 100,
-        name: 'Critical Timer',
-        progressPercent: 91,
+        name: 'Warning Timer',
+        progressPercent: 85,
         timerId: '3'
     });
 
     const { container } = render(TimerComponent);
     const timerText = container.querySelector('.font-mono');
-    expect(timerText).toHaveClass('text-red-500');
+    expect(timerText).toHaveStyle('color: #eab308');
   });
 
   it('should apply red color when in overtime', () => {
@@ -99,6 +99,6 @@ describe('TimerComponent', () => {
 
     const { container } = render(TimerComponent);
     const timerText = container.querySelector('.font-mono');
-    expect(timerText).toHaveClass('text-red-500');
+    expect(timerText).toHaveStyle('color: #ef4444');
   });
 });

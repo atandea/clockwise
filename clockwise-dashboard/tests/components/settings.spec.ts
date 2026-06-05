@@ -65,9 +65,8 @@ describe('SettingsComponent', () => {
 
   it('should render all settings sections', () => {
     render(SettingsComponent);
-    expect(screen.getByText('Network Access')).toBeInTheDocument();
-    expect(screen.getByText('Security')).toBeInTheDocument();
-    expect(screen.getByText('Preferences')).toBeInTheDocument();
+    expect(screen.getByText('General')).toBeInTheDocument();
+    expect(screen.getByText('Appearance')).toBeInTheDocument();
     expect(screen.getByText('About')).toBeInTheDocument();
   });
 

@@ -15,6 +15,7 @@ export interface DashboardSettings {
     clock_date_format?: string;
     selected_preset_id?: string;
     custom_presets?: any[];
+    timer_progress_base_color?: string;
     [key: string]: any;
 }
 

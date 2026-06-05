@@ -37,5 +37,10 @@
         showClockSeconds={settings.showClockSeconds}
         showClockDate={settings.showClockDate}
         clockDateFormat={settings.clockDateFormat}
+        timerNormalColor={settings.timerNormalColor}
+        timerWarningColor={settings.timerWarningColor}
+        timerOvertimeColor={settings.timerOvertimeColor}
+        timerWarningThreshold={settings.timerWarningThreshold}
+        timerAllowOvertime={settings.timerAllowOvertime}
     />
 </div>

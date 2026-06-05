@@ -379,6 +379,14 @@
         <div
             class="flex flex-col items-center justify-center p-4 @lg:p-6 overflow-hidden relative group/qr flex-1 gap-4 @lg:gap-6"
         >
+            <p
+                class="text-[clamp(0.625rem,2cqi,0.75rem)] @2xl:text-[clamp(0.75rem,2.5cqi,0.875rem)] text-gray-500 uppercase tracking-[0.3em] font-black opacity-50 text-center"
+            >
+                {settings.networkAccessEnabled
+                    ? "Scan to Connect"
+                    : "Enable access to view"}
+            </p>
+
             <div class="relative w-full max-w-[min(100%,35vh,260px)] aspect-square shrink">
                 <div
                     class="p-2 @lg:p-4 bg-white rounded-3xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-[filter,opacity] duration-500 {!settings.networkAccessEnabled
@@ -441,14 +449,6 @@
                         {/if}
                     </div>
                 {/if}
-
-                <p
-                    class="text-[clamp(0.625rem,2cqi,0.75rem)] @2xl:text-[clamp(0.75rem,2.5cqi,0.875rem)] text-gray-500 uppercase tracking-[0.3em] pt-4 @lg:pt-6 font-black opacity-50"
-                >
-                    {settings.networkAccessEnabled
-                        ? "Scan to Connect"
-                        : "Enable access to view"}
-                </p>
             </div>
         </div>
     </div>

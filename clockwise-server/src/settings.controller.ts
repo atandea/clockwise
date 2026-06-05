@@ -4,6 +4,7 @@ import { SecurityGuard } from './security.guard';
 import { TimerService } from './timers/timer.service';
 
 @Controller('settings')
+@UseGuards(SecurityGuard)
 export class SettingsController {
     constructor(
         private readonly settingsService: SettingsService,
@@ -16,7 +17,6 @@ export class SettingsController {
     }
 
     @Post()
-    @UseGuards(SecurityGuard)
     updateSettings(@Body() body: Partial<DashboardSettings>): DashboardSettings {
         const result = this.settingsService.updateSettings(body);
         this.timerService.emitSettingsUpdated();

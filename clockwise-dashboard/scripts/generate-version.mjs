@@ -28,6 +28,25 @@ const lockPackages = lock.packages || {};
 const getResolvedVersion = (name, fallback = "-") =>
   lockPackages[`node_modules/${name}`]?.version || fallback;
 
+// Statically extract the exact Node version packaged by @yao-pkg/pkg from pkg-fetch metadata
+const targetMajor = pkg.engines?.node || "24";
+let nodeEngineVersion = "-";
+try {
+  const serverRoot = path.resolve(root, "..", "clockwise-server");
+  const shasJsonPath = path.join(serverRoot, "node_modules", "@yao-pkg", "pkg-fetch", "lib-es5", "expected-shas.json");
+  const shas = await readJson(shasJsonPath);
+  const prefix = `node-v${targetMajor}.`;
+  const matchedKey = Object.keys(shas).find(k => k.startsWith(prefix));
+  if (matchedKey) {
+    const match = matchedKey.match(/node-v([^-]+)/);
+    if (match) {
+      nodeEngineVersion = match[1];
+    }
+  }
+} catch (e) {
+  nodeEngineVersion = process.version.replace(/^v/, "");
+}
+
 const buildDate = new Date();
 const localizedBuildDate = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
@@ -41,7 +60,7 @@ const localizedBuildDate = new Intl.DateTimeFormat(undefined, {
 }).format(buildDate);
 const versionInfo = {
   appVersion: pkg.version || "-",
-  nodeEngine: lockPackages[""]?.engines?.node || pkg.engines?.node || "-",
+  nodeEngine: nodeEngineVersion,
   svelte: getResolvedVersion("svelte", pkg.devDependencies?.["svelte"] || "-"),
   tauriApi: getResolvedVersion("@tauri-apps/api", pkg.dependencies?.["@tauri-apps/api"] || "-"),
   rust: getVersion("rustc --version"),

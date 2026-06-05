@@ -9,23 +9,38 @@
 		onTick = (seconds: number) => {},
 		showProgressBar = true,
 		showSecondaryClock = false,
+		normalColor = "#ffffff",
+		warningColor = "#eab308",
+		overtimeColor = "#ef4444",
+		warningThreshold = 80,
+		allowOvertime = true,
 	}: {
 		onStatusChange?: (status: string) => void;
 		onTick?: (seconds: number) => void;
 		showProgressBar?: boolean;
 		showSecondaryClock?: boolean;
+		normalColor?: string;
+		warningColor?: string;
+		overtimeColor?: string;
+		warningThreshold?: number;
+		allowOvertime?: boolean;
 	} = $props();
 
 	let storeData = $state<TimerEventData | null>(null);
 	let unsubscribe: (() => void) | null = null;
 
-	let time = $derived(storeData?.remainingSeconds ?? 0);
-	let status = $derived(storeData?.status ?? "idle");
+	let rawTime = $derived(storeData?.remainingSeconds ?? 0);
+	let rawStatus = $derived(storeData?.status ?? "idle");
+	
+	let status = $derived(!allowOvertime && rawStatus === "overtime" ? "stopped" : rawStatus);
+	let time = $derived(!allowOvertime && rawStatus === "overtime" ? 0 : rawTime);
+	
 	let progress = $derived(storeData?.progressPercent ?? 0);
 
 
-	let isWarning = $derived(status === "running" && progress >= 80);
+	let isWarning = $derived(status === "running" && progress >= warningThreshold);
 	let isCritical = $derived(status === "overtime");
+	let currentColor = $derived(isCritical ? overtimeColor : isWarning ? warningColor : normalColor);
 
 	function formatTime(seconds: number) {
 		const hours = Math.floor(seconds / 3600);
@@ -42,9 +57,15 @@
 	onMount(() => {
 		unsubscribe = timerEvents.subscribe((data) => {
 			storeData = data;
-			onStatusChange(data.status);
-			onTick(data.remainingSeconds);
 		});
+	});
+
+	$effect(() => {
+		onStatusChange(status);
+	});
+
+	$effect(() => {
+		onTick(time);
 	});
 
 	onDestroy(() => {
@@ -59,15 +80,14 @@
 		class="font-mono transition-all duration-500 leading-none"
 		class:text-[clamp(1rem,34cqw,42rem)]={Math.floor(time / 3600) === 0}
 		class:text-[clamp(1rem,21cqw,40rem)]={Math.floor(time / 3600) > 0}
-		class:text-yellow-500={isWarning}
-		class:text-red-500={isCritical}
+		style="color: {currentColor}"
 	>
 		{formatTime(time)}
 	</div>
 
 	{#if showProgressBar}
 		<div class="w-full flex justify-center mt-[4%]">
-			<ProgressBar {progress} />
+			<ProgressBar {progress} baseColor={currentColor} />
 		</div>
 	{/if}
 

@@ -6,12 +6,10 @@ Clockwise is a time management dashboard application.
 
 To bump the version across all packages and components (dashboard, server, Tauri configs, and Cargo manifests), you can use the provided script at the root of the repository.
 
-### How to bump the version
-
-Run the following command from the root of the repository, replacing `1.0.2` with your target version:
+Run the following command, replacing `<version>` with your target version:
 
 ```bash
-node scripts/bump-version.mjs 1.0.2
+node scripts/bump-version.mjs <version>
 ```
 
 This will automatically update the version in:

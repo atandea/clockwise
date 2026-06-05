@@ -62,6 +62,13 @@ export class SettingsState {
     showClockSeconds: boolean = $state(false);
     showClockDate: boolean = $state(false);
     clockDateFormat: string = $state("DD/MM/YYYY");
+    
+    // Timer specific appearance
+    timerNormalColor: string = $state("#ffffff");
+    timerWarningColor: string = $state("#eab308");
+    timerOvertimeColor: string = $state("#ef4444");
+    timerWarningThreshold: number = $state(80);
+    timerAllowOvertime: boolean = $state(true);
 
     constructor() {
         appSettings.subscribe((data) => {
@@ -84,6 +91,12 @@ export class SettingsState {
         if (data.clock_date_format) this.clockDateFormat = data.clock_date_format;
         if (data.selected_preset_id) this.selectedPresetId = data.selected_preset_id;
         if (data.custom_presets) this.customPresets = data.custom_presets;
+        
+        if (data.timer_normal_color) this.timerNormalColor = data.timer_normal_color;
+        if (data.timer_warning_color) this.timerWarningColor = data.timer_warning_color;
+        if (data.timer_overtime_color) this.timerOvertimeColor = data.timer_overtime_color;
+        if (data.timer_warning_threshold !== undefined) this.timerWarningThreshold = data.timer_warning_threshold;
+        if (data.timer_allow_overtime !== undefined) this.timerAllowOvertime = data.timer_allow_overtime;
     }
 
     async updateBackendSetting(key: string, value: any) {
@@ -141,6 +154,31 @@ export class SettingsState {
     setClockDateFormat(format: string) {
         this.clockDateFormat = format;
         this.updateBackendSetting("clock_date_format", format);
+    }
+
+    setTimerNormalColor(color: string) {
+        this.timerNormalColor = color;
+        this.updateBackendSetting("timer_normal_color", color);
+    }
+
+    setTimerWarningColor(color: string) {
+        this.timerWarningColor = color;
+        this.updateBackendSetting("timer_warning_color", color);
+    }
+
+    setTimerOvertimeColor(color: string) {
+        this.timerOvertimeColor = color;
+        this.updateBackendSetting("timer_overtime_color", color);
+    }
+
+    setTimerWarningThreshold(threshold: number) {
+        this.timerWarningThreshold = threshold;
+        this.updateBackendSetting("timer_warning_threshold", threshold);
+    }
+
+    toggleTimerAllowOvertime() {
+        this.timerAllowOvertime = !this.timerAllowOvertime;
+        this.updateBackendSetting("timer_allow_overtime", this.timerAllowOvertime);
     }
 
     savePreset(name: string) {

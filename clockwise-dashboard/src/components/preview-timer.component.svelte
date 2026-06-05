@@ -7,17 +7,31 @@
 		progress = 0,
 		showProgressBar = true,
 		showSecondaryClock = false,
-		status = "running"
+		status = "running",
+		normalColor = "#ffffff",
+		warningColor = "#eab308",
+		overtimeColor = "#ef4444",
+		warningThreshold = 80,
+		allowOvertime = true,
 	}: {
 		time?: number;
 		progress?: number;
 		showProgressBar?: boolean;
 		showSecondaryClock?: boolean;
 		status?: string;
+		normalColor?: string;
+		warningColor?: string;
+		overtimeColor?: string;
+		warningThreshold?: number;
+		allowOvertime?: boolean;
 	} = $props();
 
-	let isWarning = $derived(status === "running" && progress >= 80);
-	let isCritical = $derived(status === "overtime");
+	let computedStatus = $derived(!allowOvertime && status === "overtime" ? "stopped" : status);
+	let displayTime = $derived(!allowOvertime && status === "overtime" ? 0 : time);
+
+	let isWarning = $derived(computedStatus === "running" && progress >= warningThreshold);
+	let isCritical = $derived(computedStatus === "overtime");
+	let currentColor = $derived(isCritical ? overtimeColor : isWarning ? warningColor : normalColor);
 
 	function formatTime(seconds: number) {
 		const hours = Math.floor(seconds / 3600);
@@ -37,17 +51,16 @@
 >
 	<div
 		class="font-mono transition-all duration-500 leading-none"
-		class:text-[clamp(1rem,34cqw,42rem)]={Math.floor(time / 3600) === 0}
-		class:text-[clamp(1rem,21cqw,40rem)]={Math.floor(time / 3600) > 0}
-		class:text-yellow-500={isWarning}
-		class:text-red-500={isCritical}
+		class:text-[clamp(1rem,34cqw,42rem)]={Math.floor(displayTime / 3600) === 0}
+		class:text-[clamp(1rem,21cqw,40rem)]={Math.floor(displayTime / 3600) > 0}
+		style="color: {currentColor}"
 	>
-		{formatTime(time)}
+		{formatTime(displayTime)}
 	</div>
 
 	{#if showProgressBar}
 		<div class="w-full flex justify-center mt-[4%]">
-			<ProgressBar {progress} />
+			<ProgressBar {progress} baseColor={currentColor} />
 		</div>
 	{/if}
 

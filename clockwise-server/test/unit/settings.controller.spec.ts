@@ -3,6 +3,7 @@ import { SettingsController } from 'src/settings.controller';
 import { SettingsService } from 'src/settings.service';
 import { SecurityService } from 'src/security.service';
 import { SecurityGuard } from 'src/security.guard';
+import { TimerService } from 'src/timers/timer.service';
 
 describe('SettingsController', () => {
   let controller: SettingsController;
@@ -14,6 +15,9 @@ describe('SettingsController', () => {
   };
 
   const mockSecurityService = {};
+  const mockTimerService = {
+    emitSettingsUpdated: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +25,7 @@ describe('SettingsController', () => {
       providers: [
         { provide: SettingsService, useValue: mockSettingsService },
         { provide: SecurityService, useValue: mockSecurityService },
+        { provide: TimerService, useValue: mockTimerService },
       ],
     })
     .overrideGuard(SecurityGuard)
