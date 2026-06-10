@@ -4,9 +4,11 @@
   import CustomTimer from "./custom-timer.component.svelte";
   import ActiveTimer from "./active-timer.component.svelte";
   import DisplaySelector from "./display-selector.component.svelte";
+  import UpdateModal from "./update-modal.component.svelte";
   import { onMount } from "svelte";
   import { getApiBaseUrl, serverStatus } from "../lib/api";
   import { SettingsState } from "../lib/settings.state.svelte";
+  import { updateChecker } from "../lib/update-checker.svelte.ts";
   
   const settings = new SettingsState();
 
@@ -27,11 +29,15 @@
   let status = $state<"starting" | "running" | "error">("starting");
   let errorMessage = $state("Server synchronization timeout");
   let controlComponent = $state<any>();
+  let showUpdateModal = $state(false);
 
   onMount(() => {
     const unsubscribe = serverStatus.subscribe((v) => {
       status = v;
     });
+
+    // Check for updates once the app launches
+    updateChecker.checkForUpdate();
 
     return () => {
       unsubscribe();
@@ -80,6 +86,18 @@
           >
         </div>
         <span class="flex items-center gap-2">
+          {#if updateChecker.showBadge}
+            <button
+              onclick={() => showUpdateModal = true}
+              class="rounded px-2.5 py-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-900/30"
+            >
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-300"></span>
+              </span>
+              Update v{updateChecker.latestVersion}
+            </button>
+          {/if}
           <a
             href="/settings"
             class="ml-2 rounded px-2 py-1 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white"
@@ -153,3 +171,5 @@
     {/if}
   </section>
 </div>
+
+<UpdateModal bind:open={showUpdateModal} />

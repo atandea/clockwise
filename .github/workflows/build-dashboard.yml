@@ -24,6 +24,7 @@ jobs:
       contents: write
     outputs:
       version: ${{ steps.get_version.outputs.version }}
+      changelog_body: ${{ steps.changelog.outputs.body }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +34,16 @@ jobs:
         run: |
           VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog
+        id: changelog
+        run: |
+          node ./clockwise-dashboard/scripts/generate-changelog.mjs --unreleased --output ./clockwise-dashboard
+          BODY=$(cat ./clockwise-dashboard/CHANGELOG.md)
+          # Use GitHub Actions multi-line output
+          echo "body<<CHANGELOG_EOF" >> $GITHUB_OUTPUT
+          echo "$BODY" >> $GITHUB_OUTPUT
+          echo "CHANGELOG_EOF" >> $GITHUB_OUTPUT
 
       - name: Delete existing release/tag
         uses: actions/github-script@v7
@@ -135,7 +146,7 @@ jobs:
         with:
           tagName: app-v${{ needs.cleanup.outputs.version }}
           releaseName: 'Clockwise Dashboard v${{ needs.cleanup.outputs.version }}'
-          releaseBody: 'See the assets to download this version and install.'
+          releaseBody: ${{ needs.cleanup.outputs.changelog_body }}
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
@@ -167,3 +178,34 @@ jobs:
           path: |
             clockwise-dashboard/src-tauri/${{ matrix.artifact_pattern }}
           if-no-files-found: warn
+
+      - name: Upload changelog.json to release
+        if: matrix.platform == 'ubuntu-latest'
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            const fs = require('fs');
+            const tag = `app-v${{ needs.cleanup.outputs.version }}`;
+            const changelogPath = 'clockwise-dashboard/changelog.json';
+            if (!fs.existsSync(changelogPath)) {
+              console.log('changelog.json not found, skipping upload');
+              return;
+            }
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag
+              });
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                name: 'changelog.json',
+                data: fs.readFileSync(changelogPath)
+              });
+              console.log('Uploaded changelog.json to release');
+            } catch (e) {
+              console.log('Failed to upload changelog.json:', e.message);
+            }
