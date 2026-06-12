@@ -9,7 +9,7 @@
   import { getApiBaseUrl, serverStatus } from "../lib/api";
   import { SettingsState } from "../lib/settings.state.svelte";
   import { updateChecker } from "../lib/update-checker.svelte.ts";
-  
+
   const settings = new SettingsState();
 
   let {
@@ -88,14 +88,10 @@
         <span class="flex items-center gap-2">
           {#if updateChecker.showBadge}
             <button
-              onclick={() => showUpdateModal = true}
+              onclick={() => (showUpdateModal = true)}
               class="rounded px-2.5 py-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-900/30"
             >
-              <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-300"></span>
-              </span>
-              Update v{updateChecker.latestVersion}
+              New version available: v{updateChecker.latestVersion}
             </button>
           {/if}
           <a
@@ -116,9 +112,7 @@
       <div
         class="flex-1 flex flex-col lg:flex-row gap-2 overflow-hidden min-h-0"
       >
-        <div
-          class="flex-1 flex flex-col gap-2 overflow-hidden flex-shrink-0"
-        >
+        <div class="flex-1 flex flex-col gap-2 overflow-hidden flex-shrink-0">
           <div
             class="flex-1 flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg min-h-0"
           >
