@@ -3,7 +3,7 @@
   "engines": {
     "node": "24"
   },
-  "version": "1.0.3",
+  "version": "1.0.2",
   "description": "",
   "type": "module",
   "scripts": {
