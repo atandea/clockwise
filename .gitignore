@@ -9,3 +9,5 @@ pkg/
 *.pkg.tar.zst
 .vscode/
 .scannerwork/
+changelog.json
+CHANGELOG.md

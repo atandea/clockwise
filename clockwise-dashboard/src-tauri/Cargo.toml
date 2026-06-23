@@ -1,6 +1,6 @@
 [package]
 name = "clockwise-dashboard"
-version = "1.0.4"
+version = "1.0.5"
 description = "Clockwise Dashboard - Time Management"
 authors = ["Alin Tandea"]
 edition = "2024"
