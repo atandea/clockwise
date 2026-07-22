@@ -90,8 +90,8 @@ async function fetchChangelog(assets: ReleaseAsset[]): Promise<ChangelogEntry[] 
  * Group changelog entries by type, in display order.
  */
 export function groupChangelog(entries: ChangelogEntry[]): Map<string, ChangelogEntry[]> {
-  const TYPE_ORDER = ["feat", "fix", "refactor", "perf", "style", "other"];
-  const HIDDEN = new Set(["chore", "ci", "docs", "test"]);
+  const TYPE_ORDER = ["feat", "fix", "refactor", "perf", "style", "chore", "other"];
+  const HIDDEN = new Set(["ci", "docs", "test"]);
 
   const grouped = new Map<string, ChangelogEntry[]>();
   for (const entry of entries) {
@@ -115,6 +115,7 @@ export const TYPE_LABELS: Record<string, { emoji: string; heading: string }> = {
   refactor: { emoji: "🔧", heading: "Improvements" },
   perf: { emoji: "⚡", heading: "Performance" },
   style: { emoji: "🎨", heading: "Styling" },
+  chore: { emoji: "🧹", heading: "Chores" },
   other: { emoji: "📦", heading: "Other Changes" },
 };
 

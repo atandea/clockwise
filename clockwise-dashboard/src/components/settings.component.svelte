@@ -136,68 +136,76 @@
     });
 
     let activeTab: "general" | "appearance" | "about" = $state("general");
+
+    const tabs = [
+        { id: "general" as const, label: "General" },
+        { id: "appearance" as const, label: "Appearance" },
+        { id: "about" as const, label: "About" },
+    ];
 </script>
 
 <div
     class="h-screen h-[100dvh] bg-[#020617] text-white flex flex-col overflow-hidden font-sans relative"
 >
-    <!-- Fixed Header -->
-    <div
-        class="absolute top-0 left-0 right-0 p-4 lg:p-6 flex justify-between items-start z-50 pointer-events-none"
-    >
-        <h1
-            class="text-2xl lg:text-3xl font-black uppercase tracking-tight text-white/90"
-        >
-            Settings
-        </h1>
-        <a
-            href="/"
-            class="flex items-center gap-2 rounded-xl px-4 py-2 text-sm lg:text-base font-bold bg-white/5 hover:bg-white/10 active:scale-95 transition-all ring-1 ring-white/10 pointer-events-auto backdrop-blur-md"
-        >
-            <BackIcon width="16" height="16" strokeWidth="2.5" />
-            Back
-        </a>
-    </div>
-
     <section
-        class="flex-1 flex flex-col p-4 lg:p-6 py-8 lg:py-12 z-10 animate-in zoom-in-95 fade-in duration-500 ease-out pt-20 overflow-hidden"
+        class="flex-1 flex flex-col p-3 lg:p-4 overflow-hidden min-h-0 animate-in zoom-in-95 fade-in duration-500 ease-out"
     >
-        <div class="w-full flex-1 flex flex-col overflow-hidden">
-            <div
-                class="flex items-center justify-center gap-12 mb-10 pointer-events-auto shrink-0 border-b border-white/5"
+        <!-- Header bar — matches dashboard header style -->
+        <header
+            class="shrink-0 mb-3 flex h-12 items-center justify-between rounded-lg bg-gray-800/40 border border-gray-700/30 px-4 shadow-sm"
+        >
+            <h1
+                class="text-xs font-bold uppercase tracking-widest text-gray-400"
             >
-                {#each ["general", "appearance", "about"] as tab}
+                Settings
+            </h1>
+            <a
+                href="/"
+                class="flex items-center gap-1 rounded pl-1.5 pr-2.5 py-1 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white transition-colors"
+            >
+                <BackIcon width="14" height="14" strokeWidth="2.5" />
+                Back
+            </a>
+        </header>
+
+        <!-- Tab navigation — inside a dashboard-style container -->
+        <div
+            class="shrink-0 mb-3 rounded-lg bg-gray-800/60 border border-gray-700/60 shadow-lg overflow-hidden"
+        >
+            <div class="flex items-center px-1">
+                {#each tabs as tab}
                     <button
-                        class="pb-4 px-2 text-sm lg:text-base font-bold transition-all relative group"
-                        onclick={() => (activeTab = tab as any)}
+                        class="relative px-5 py-3 text-xs font-bold uppercase tracking-widest transition-all group"
+                        onclick={() => (activeTab = tab.id)}
                     >
-                        <span class="transition-colors {activeTab === tab ? 'text-white' : 'text-gray-500 group-hover:text-gray-300'}">
-                            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                        <span
+                            class="transition-colors {activeTab === tab.id
+                                ? 'text-white'
+                                : 'text-gray-500 group-hover:text-gray-300'}"
+                        >
+                            {tab.label}
                         </span>
-                        {#if activeTab === tab}
+                        {#if activeTab === tab.id}
                             <div
-                                class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)] animate-in slide-in-from-left-full duration-300"
+                                class="absolute bottom-0 left-2 right-2 h-0.5 bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"
                             ></div>
                         {/if}
                     </button>
                 {/each}
             </div>
+        </div>
 
-            <div class="flex-1 w-full relative">
-                <div
-                    class="absolute inset-0 overflow-y-auto custom-scrollbar pr-2 pb-8"
-                >
-                    {#if activeTab === "general"}
-                        <SettingsGeneral {settings} />
-                    {:else if activeTab === "appearance"}
-                        <SettingsAppearance {settings} />
-                    {:else if activeTab === "about"}
-                        <div class="w-full h-full">
-                            <About />
-                        </div>
-                    {/if}
+        <!-- Content area — flat styling without double-nested container -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar">
+            {#if activeTab === "general"}
+                <SettingsGeneral {settings} />
+            {:else if activeTab === "appearance"}
+                <SettingsAppearance {settings} />
+            {:else if activeTab === "about"}
+                <div class="w-full h-full p-3 lg:p-4">
+                    <About />
                 </div>
-            </div>
+            {/if}
         </div>
     </section>
 </div>

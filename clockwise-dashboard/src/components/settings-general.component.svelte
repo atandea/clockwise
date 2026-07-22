@@ -172,202 +172,210 @@
 </script>
 
 <div
-    class="w-full h-full @container grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500"
+    class="w-full h-full @container grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4 items-stretch animate-in fade-in slide-in-from-bottom-4 duration-500"
 >
     <!-- Left Side: All Toggles & Preferences -->
-    <div class="flex flex-col h-full gap-2 @lg:gap-4">
-        <!-- Network Access Toggle -->
-        <div
-            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
-        >
-            <div class="min-w-0 flex items-center">
-                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
-                    >Allow Network Access</span
-                >
+    <div class="flex flex-col h-full gap-3 @lg:gap-4">
+        <!-- Network & Security section -->
+        <div class="rounded border border-gray-700/60 bg-gray-800/80 shadow-lg overflow-hidden">
+            <div class="p-3 border-b border-gray-700/50 bg-gray-900/30">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Network & Security</h3>
             </div>
-            <button
-                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.networkAccessEnabled
-                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                    : 'bg-gray-800'}"
-                onclick={toggleNetworkAccess}
-                aria-label="Toggle Network Access"
-            >
-                <span
-                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.networkAccessEnabled
-                        ? 'translate-x-6'
-                        : 'translate-x-1'} shadow-sm"
-                ></span>
-            </button>
-        </div>
-
-        <!-- PIN Lock Toggle -->
-        <div
-            class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
-        >
-            <div class="min-w-0 flex items-center">
-                <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
-                    >PIN Security</span
-                >
-            </div>
-            <button
-                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.pinEnabled
-                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                    : 'bg-gray-800'}"
-                onclick={togglePin}
-                aria-label="Toggle PIN Lock"
-            >
-                <span
-                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.pinEnabled
-                        ? 'translate-x-6'
-                        : 'translate-x-1'} shadow-sm"
-                ></span>
-            </button>
-        </div>
-
-        {#if settings.isTauri || settings.isLoading}
-            {#if settings.startAtLogin !== null}
-                <!-- Launch at Startup -->
+            <div class="divide-y divide-gray-700/30">
+                <!-- Network Access Toggle -->
                 <div
-                    class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
+                    class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
                 >
-                    <div class="min-w-0 flex items-center">
-                        <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
-                            >Launch at Startup</span
-                        >
-                    </div>
+                    <span class="text-sm font-bold text-gray-300"
+                        >Allow Network Access</span
+                    >
                     <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.startAtLogin
+                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.networkAccessEnabled
                             ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
                             : 'bg-gray-800'}"
-                        onclick={toggleStartAtLogin}
-                        aria-label="Toggle Launch at Startup"
+                        onclick={toggleNetworkAccess}
+                        aria-label="Toggle Network Access"
                     >
                         <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.startAtLogin
+                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.networkAccessEnabled
                                 ? 'translate-x-6'
                                 : 'translate-x-1'} shadow-sm"
                         ></span>
                     </button>
                 </div>
-            {/if}
 
-            <!-- Auto-launch Fullscreen -->
-            <div
-                class="flex flex-1 items-center justify-between py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
-            >
-                <div class="min-w-0 flex items-center">
-                    <span class="text-[clamp(0.875rem,2cqi,1.125rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-bold text-gray-300 block"
-                        >Auto-launch Fullscreen</span
-                    >
-                </div>
-                <button
-                    class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.autoLaunch
-                        ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                        : 'bg-gray-800'}"
-                    onclick={toggleAutoLaunch}
-                    aria-label="Toggle Auto-launch"
-                >
-                    <span
-                        class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.autoLaunch
-                            ? 'translate-x-6'
-                            : 'translate-x-1'} shadow-sm"
-                    ></span>
-                </button>
-            </div>
-
-            <!-- Display Selection -->
-            <div
-                class="flex flex-col flex-1 justify-center gap-2 @lg:gap-4 py-2 @lg:py-4 px-2 border-b border-white/5 last:border-0 transition-colors min-h-0"
-            >
+                <!-- PIN Lock Toggle -->
                 <div
-                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
                 >
-                    <div class="min-w-0 flex flex-col justify-center">
+                    <span class="text-sm font-bold text-gray-300"
+                        >PIN Security</span
+                    >
+                    <button
+                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.pinEnabled
+                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                            : 'bg-gray-800'}"
+                        onclick={togglePin}
+                        aria-label="Toggle PIN Lock"
+                    >
                         <span
-                            class="text-[clamp(0.875rem,2.5cqi,1rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-semibold text-gray-300 block mb-1"
-                            >Target Display</span
+                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.pinEnabled
+                                ? 'translate-x-6'
+                                : 'translate-x-1'} shadow-sm"
+                        ></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {#if settings.isTauri || settings.isLoading}
+            <!-- Application section -->
+            <div class="rounded border border-gray-700/60 bg-gray-800/80 shadow-lg overflow-hidden">
+                <div class="p-3 border-b border-gray-700/50 bg-gray-900/30">
+                    <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Application</h3>
+                </div>
+                <div class="divide-y divide-gray-700/30">
+                    {#if settings.startAtLogin !== null}
+                        <!-- Launch at Startup -->
+                        <div
+                            class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
                         >
-                        <div class="flex items-center gap-2">
-                            <span
-                                class="text-[11px] font-bold {settings.preferredMonitor
-                                    ? settings.isMonitorOnline
-                                        ? 'text-indigo-400'
-                                        : 'text-red-400'
-                                    : 'text-gray-500'}"
+                            <span class="text-sm font-bold text-gray-300"
+                                >Launch at Startup</span
                             >
-                                {settings.preferredMonitor || "Not selected"}
-                            </span>
-                            {#if settings.preferredMonitor}
+                            <button
+                                class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.startAtLogin
+                                    ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                                    : 'bg-gray-800'}"
+                                onclick={toggleStartAtLogin}
+                                aria-label="Toggle Launch at Startup"
+                            >
                                 <span
-                                    class="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider {settings.isMonitorOnline
-                                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                                        : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
-                                >
-                                    {settings.isMonitorOnline
-                                        ? "Connected"
-                                        : "Offline"}
-                                </span>
-                            {/if}
+                                    class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.startAtLogin
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'} shadow-sm"
+                                ></span>
+                            </button>
                         </div>
+                    {/if}
+
+                    <!-- Auto-launch Fullscreen -->
+                    <div
+                        class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
+                    >
+                        <span class="text-sm font-bold text-gray-300"
+                            >Auto-launch Fullscreen</span
+                        >
+                        <button
+                            class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.autoLaunch
+                                ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
+                                : 'bg-gray-800'}"
+                            onclick={toggleAutoLaunch}
+                            aria-label="Toggle Auto-launch"
+                        >
+                            <span
+                                class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.autoLaunch
+                                    ? 'translate-x-6'
+                                    : 'translate-x-1'} shadow-sm"
+                            ></span>
+                        </button>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <button
-                            class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
-                            onclick={fetchMonitors}
-                            title="Scan for monitors"
+                    <!-- Display Selection -->
+                    <div
+                        class="flex flex-col gap-3 py-3 px-4 transition-colors"
+                    >
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                         >
-                            <RefreshIcon
-                                width="14"
-                                height="14"
-                                strokeWidth="2.5"
-                            />
-                        </button>
-                        <div class="relative">
-                            <select
-                                class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer min-w-[160px]"
-                                value={settings.selectedMonitorCandidate}
-                                onchange={(e) =>
-                                    (settings.selectedMonitorCandidate =
-                                        e.currentTarget.value)}
-                            >
-                                <option
-                                    value=""
-                                    disabled
-                                    selected={!settings.selectedMonitorCandidate}
-                                    >Select display...</option
+                            <div class="min-w-0 flex flex-col justify-center">
+                                <span
+                                    class="text-sm font-semibold text-gray-300 block mb-1"
+                                    >Target Display</span
                                 >
-                                {#each settings.monitors as monitor}
-                                    <option
-                                        value={monitor.name}
-                                        class="bg-gray-900 text-white"
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[11px] font-bold {settings.preferredMonitor
+                                            ? settings.isMonitorOnline
+                                                ? 'text-indigo-400'
+                                                : 'text-red-400'
+                                            : 'text-gray-500'}"
                                     >
-                                        {monitor.name} ({monitor.width}×{monitor.height})
-                                    </option>
-                                {/each}
-                            </select>
-                            <div
-                                class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
-                            >
-                                <ChevronDownIcon
-                                    width="14"
-                                    height="14"
-                                    strokeWidth="2.5"
-                                />
+                                        {settings.preferredMonitor || "Not selected"}
+                                    </span>
+                                    {#if settings.preferredMonitor}
+                                        <span
+                                            class="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider {settings.isMonitorOnline
+                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                                        >
+                                            {settings.isMonitorOnline
+                                                ? "Connected"
+                                                : "Offline"}
+                                        </span>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button
+                                    class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
+                                    onclick={fetchMonitors}
+                                    title="Scan for monitors"
+                                >
+                                    <RefreshIcon
+                                        width="14"
+                                        height="14"
+                                        strokeWidth="2.5"
+                                    />
+                                </button>
+                                <div class="relative">
+                                    <select
+                                        class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer min-w-[160px]"
+                                        value={settings.selectedMonitorCandidate}
+                                        onchange={(e) =>
+                                            (settings.selectedMonitorCandidate =
+                                                e.currentTarget.value)}
+                                    >
+                                        <option
+                                            value=""
+                                            disabled
+                                            selected={!settings.selectedMonitorCandidate}
+                                            >Select display...</option
+                                        >
+                                        {#each settings.monitors as monitor}
+                                            <option
+                                                value={monitor.name}
+                                                class="bg-gray-900 text-white"
+                                            >
+                                                {monitor.name} ({monitor.width}×{monitor.height})
+                                            </option>
+                                        {/each}
+                                    </select>
+                                    <div
+                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                    >
+                                        <ChevronDownIcon
+                                            width="14"
+                                            height="14"
+                                            strokeWidth="2.5"
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    onclick={() =>
+                                        updatePreferredMonitor(
+                                            settings.selectedMonitorCandidate,
+                                        )}
+                                    disabled={!settings.hasDiscardedChanges}
+                                    class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold {settings.hasDiscardedChanges
+                                        ? 'bg-blue-600 hover:bg-blue-500 active:scale-95 text-white shadow-lg shadow-blue-600/20'
+                                        : 'bg-white/5 text-gray-500 cursor-not-allowed opacity-50'}"
+                                >
+                                    Confirm
+                                </button>
                             </div>
                         </div>
-                        <button
-                            onclick={() =>
-                                updatePreferredMonitor(
-                                    settings.selectedMonitorCandidate,
-                                )}
-                            disabled={!settings.hasDiscardedChanges}
-                            class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold {settings.hasDiscardedChanges
-                                ? 'bg-blue-600 hover:bg-blue-500 active:scale-95 text-white shadow-lg shadow-blue-600/20'
-                                : 'bg-white/5 text-gray-500 cursor-not-allowed opacity-50'}"
-                        >
-                            Confirm
-                        </button>
                     </div>
                 </div>
             </div>
@@ -375,80 +383,85 @@
     </div>
 
     <!-- Right Side: Connection Block -->
-    <div class="flex flex-col h-full gap-2 @lg:gap-3 min-h-0">
-        <div
-            class="flex flex-col items-center justify-center p-4 @lg:p-6 overflow-hidden relative group/qr flex-1 gap-4 @lg:gap-6"
-        >
-            <p
-                class="text-[clamp(0.625rem,2cqi,0.75rem)] @2xl:text-[clamp(0.75rem,2.5cqi,0.875rem)] text-gray-500 uppercase tracking-[0.3em] font-black opacity-50 text-center"
+    <div class="flex flex-col h-full gap-3 @lg:gap-4 min-h-0">
+        <div class="rounded border border-gray-700/60 bg-gray-800/80 shadow-lg overflow-hidden flex-1 flex flex-col">
+            <div class="p-3 border-b border-gray-700/50 bg-gray-900/30">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Connection</h3>
+            </div>
+            <div
+                class="flex flex-col items-center justify-center p-4 @lg:p-6 overflow-hidden relative group/qr flex-1 gap-4 @lg:gap-6"
             >
-                {settings.networkAccessEnabled
-                    ? "Scan to Connect"
-                    : "Enable access to view"}
-            </p>
-
-            <div class="relative w-full max-w-[min(100%,35vh,260px)] aspect-square shrink">
-                <div
-                    class="p-2 @lg:p-4 bg-white rounded-3xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-[filter,opacity] duration-500 {!settings.networkAccessEnabled
-                        ? 'blur-md grayscale opacity-50'
-                        : ''} w-full h-full flex items-center justify-center"
+                <p
+                    class="text-[clamp(0.625rem,2cqi,0.75rem)] @2xl:text-[clamp(0.75rem,2.5cqi,0.875rem)] text-gray-500 uppercase tracking-[0.3em] font-black opacity-50 text-center"
                 >
-                    {#if qrCodeUrl}
-                        <img src={qrCodeUrl} alt="QR Code" class="w-full h-full object-contain" />
-                    {:else}
+                    {settings.networkAccessEnabled
+                        ? "Scan to Connect"
+                        : "Enable access to view"}
+                </p>
+
+                <div class="relative w-full max-w-[min(100%,35vh,260px)] aspect-square shrink">
+                    <div
+                        class="p-2 @lg:p-4 bg-white rounded-3xl shadow-[0_0_50px_rgba(255,255,255,0.1)] transition-[filter,opacity] duration-500 {!settings.networkAccessEnabled
+                            ? 'blur-md grayscale opacity-50'
+                            : ''} w-full h-full flex items-center justify-center"
+                    >
+                        {#if qrCodeUrl}
+                            <img src={qrCodeUrl} alt="QR Code" class="w-full h-full object-contain" />
+                        {:else}
+                            <div
+                                class="w-full h-full bg-gray-200 animate-pulse rounded-2xl"
+                            ></div>
+                        {/if}
+                    </div>
+
+                    {#if !settings.networkAccessEnabled}
                         <div
-                            class="w-full h-full bg-gray-200 animate-pulse rounded-2xl"
-                        ></div>
+                            class="absolute inset-0 flex items-center justify-center pointer-events-none"
+                        >
+                            <LockIcon
+                                width="30%"
+                                height="30%"
+                                class="text-black/40"
+                            />
+                        </div>
                     {/if}
                 </div>
 
-                {#if !settings.networkAccessEnabled}
-                    <div
-                        class="absolute inset-0 flex items-center justify-center pointer-events-none"
-                    >
-                        <LockIcon
-                            width="30%"
-                            height="30%"
-                            class="text-black/40"
-                        />
-                    </div>
-                {/if}
-            </div>
+                <div class="w-full text-center space-y-1 @lg:space-y-2 shrink-0">
+                    {#if !settings.localIp && settings.networkAccessEnabled}
+                        <div
+                            class="h-3 w-32 mx-auto rounded bg-white/5 animate-pulse"
+                        ></div>
+                    {:else}
+                        <a
+                            href={settings.displayUrl}
+                            target="_blank"
+                            class="text-[clamp(0.75rem,2.5cqi,0.875rem)] @2xl:text-[clamp(0.875rem,3cqi,1.125rem)] font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-[0.2em] break-all"
+                        >
+                            {settings.networkAccessEnabled
+                                ? settings.displayUrl
+                                : "Network Access Disabled"}
+                        </a>
+                    {/if}
 
-            <div class="w-full text-center space-y-1 @lg:space-y-2 shrink-0">
-                {#if !settings.localIp && settings.networkAccessEnabled}
-                    <div
-                        class="h-3 w-32 mx-auto rounded bg-white/5 animate-pulse"
-                    ></div>
-                {:else}
-                    <a
-                        href={settings.displayUrl}
-                        target="_blank"
-                        class="text-[clamp(0.75rem,2.5cqi,0.875rem)] @2xl:text-[clamp(0.875rem,3cqi,1.125rem)] font-mono text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-[0.2em] break-all"
-                    >
-                        {settings.networkAccessEnabled
-                            ? settings.displayUrl
-                            : "Network Access Disabled"}
-                    </a>
-                {/if}
-
-                {#if settings.pinEnabled}
-                    <div class="pt-1">
-                        {#if !settings.serverPin}
-                            <div
-                                class="h-3 w-20 mx-auto rounded bg-white/5 animate-pulse"
-                            ></div>
-                        {:else}
-                            <span
-                                class="text-[clamp(0.875rem,2.5cqi,1rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-mono text-gray-400 uppercase tracking-[0.3em]"
-                            >
-                                PIN: <span class="text-white font-black"
-                                    >{settings.serverPin}</span
+                    {#if settings.pinEnabled}
+                        <div class="pt-1">
+                            {#if !settings.serverPin}
+                                <div
+                                    class="h-3 w-20 mx-auto rounded bg-white/5 animate-pulse"
+                                ></div>
+                            {:else}
+                                <span
+                                    class="text-[clamp(0.875rem,2.5cqi,1rem)] @2xl:text-[clamp(1rem,3cqi,1.25rem)] font-mono text-gray-400 uppercase tracking-[0.3em]"
                                 >
-                            </span>
-                        {/if}
-                    </div>
-                {/if}
+                                    PIN: <span class="text-white font-black"
+                                        >{settings.serverPin}</span
+                                    >
+                                </span>
+                            {/if}
+                        </div>
+                    {/if}
+                </div>
             </div>
         </div>
     </div>

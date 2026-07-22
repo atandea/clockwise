@@ -99,7 +99,7 @@ const TYPE_LABELS = {
 };
 
 // Types hidden from user-facing changelog (still kept in JSON)
-const HIDDEN_TYPES = new Set(["chore", "ci", "docs", "test"]);
+const HIDDEN_TYPES = new Set(["ci", "docs", "test"]);
 
 function categorize(commit) {
   const match = commit.subject.match(COMMIT_PATTERN);
@@ -181,7 +181,56 @@ console.log(
 // Collect and categorize commits
 // ---------------------------------------------------------------------------
 const rawCommits = getCommitsBetween(fromRef, toRef);
-const entries = rawCommits.map(categorize);
+let entries = rawCommits.map(categorize);
+
+// Merge dependency update commits
+const depUpdateEntries = [];
+for (const entry of entries) {
+  const msg = entry.message.toLowerCase();
+  const isDep =
+    msg.includes("dependencies update") ||
+    msg.includes("update dependencies") ||
+    entry.scope === "deps" ||
+    msg.startsWith("bump ");
+  if (isDep) {
+    depUpdateEntries.push(entry);
+  }
+}
+
+if (depUpdateEntries.length > 0) {
+  const baseEntry = depUpdateEntries[0];
+  const uniqueHashes = [...new Set(depUpdateEntries.map((e) => e.hash))].filter(Boolean);
+  const hash = uniqueHashes.join(", ");
+
+  const mergedEntry = {
+    type: "chore",
+    scope: null,
+    message: "dependencies update",
+    hash,
+    author: baseEntry.author,
+    date: baseEntry.date,
+  };
+
+  let mergedAdded = false;
+  const mergedEntries = [];
+  for (const entry of entries) {
+    const msg = entry.message.toLowerCase();
+    const isDep =
+      msg.includes("dependencies update") ||
+      msg.includes("update dependencies") ||
+      entry.scope === "deps" ||
+      msg.startsWith("bump ");
+    if (isDep) {
+      if (!mergedAdded) {
+        mergedEntries.push(mergedEntry);
+        mergedAdded = true;
+      }
+    } else {
+      mergedEntries.push(entry);
+    }
+  }
+  entries = mergedEntries;
+}
 
 // Group by type
 const grouped = {};
