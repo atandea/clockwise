@@ -252,8 +252,13 @@ class UpdateCheckerState {
       this.downloadAssetName = cache.downloadAssetName ?? null;
 
       if (this.latestVersion) {
-        const dismissed = localStorage.getItem(DISMISSED_VERSION_KEY);
-        this._dismissed = dismissed === this.latestVersion;
+        if (compareSemver(this.latestVersion, versionInfo.appVersion) <= 0) {
+          this.updateAvailable = false;
+          this._saveToCache();
+        } else {
+          const dismissed = localStorage.getItem(DISMISSED_VERSION_KEY);
+          this._dismissed = dismissed === this.latestVersion;
+        }
       }
     } catch {
       // Ignore cache parsing errors
