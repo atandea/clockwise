@@ -154,6 +154,57 @@ jobs:
           args: ${{ matrix.args }}
           projectPath: ./clockwise-dashboard
 
+      - name: Build Arch Linux Package
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          VERSION="${{ needs.cleanup.outputs.version }}"
+          cp clockwise-dashboard/src-tauri/target/release/bundle/deb/clockwise-dashboard_${VERSION}_amd64.deb pkgbuild/clockwise-dashboard_${VERSION}_amd64.deb
+          docker run --rm \
+            -v "$PWD:/workspace" \
+            -w /workspace/pkgbuild \
+            archlinux:latest \
+            bash -c "
+              pacman -Sy --noconfirm --needed fakeroot binutils nodejs
+              useradd -m builder
+              chown -R builder:builder /workspace/pkgbuild /workspace/clockwise-dashboard
+              su builder -c 'makepkg -df'
+            "
+
+      - name: Upload Arch Linux Package to Release
+        if: matrix.platform == 'ubuntu-latest'
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+            const tag = `app-v${{ needs.cleanup.outputs.version }}`;
+            const pkgDir = 'pkgbuild';
+            const files = fs.readdirSync(pkgDir);
+            const pkgFile = files.find(f => f.endsWith('.pkg.tar.zst'));
+            if (!pkgFile) {
+              console.log('No .pkg.tar.zst file found, skipping upload');
+              return;
+            }
+            const pkgPath = path.join(pkgDir, pkgFile);
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                tag
+              });
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: release.id,
+                name: pkgFile,
+                data: fs.readFileSync(pkgPath)
+              });
+              console.log(`Uploaded ${pkgFile} to release`);
+            } catch (e) {
+              console.log(`Failed to upload ${pkgFile}:`, e.message);
+            }
+
       - name: Delete old artifacts
         uses: actions/github-script@v7
         continue-on-error: true
@@ -179,6 +230,7 @@ jobs:
           name: clockwise-dashboard-${{ matrix.platform }}
           path: |
             clockwise-dashboard/src-tauri/${{ matrix.artifact_pattern }}
+            pkgbuild/*.pkg.tar.zst
           if-no-files-found: warn
 
       - name: Upload changelog.json to release
