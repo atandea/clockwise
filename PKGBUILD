@@ -5,7 +5,7 @@ pkgdesc="Clockwise - Time Management"
 arch=('x86_64' 'aarch64')
 url="https://github.com/atandea/clockwise"
 license=('MIT')
-depends=('cairo' 'desktop-file-utils' 'gdk-pixbuf2' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libsoup' 'pango' 'webkit2gtk-4.1')
+depends=('cairo' 'desktop-file-utils' 'gdk-pixbuf2' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libsoup3' 'pango' 'webkit2gtk-4.1')
 makedepends=('nodejs' 'npm' 'rust' 'cargo' 'cargo-tauri' 'pkg-config')
 options=('!strip' '!emptydirs')
 # Use locally built .deb artifacts for PKGBUILD testing.
