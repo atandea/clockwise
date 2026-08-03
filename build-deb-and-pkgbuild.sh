@@ -85,7 +85,8 @@ if [[ -z "$DEB_SOURCE" ]]; then
   find "$DEB_OUTPUT_DIR" -maxdepth 1 -type f -name "*.deb" -print
   exit 1
 fi
-
+mkdir -p "$PKGBUILD_DIR"
+cp -f "$REPO_ROOT/PKGBUILD" "$PKGBUILD_DIR/PKGBUILD"
 cp -f "$DEB_SOURCE" "$PKGBUILD_DIR/$DEB_NAME"
 echo "==> Copied $DEB_SOURCE -> $PKGBUILD_DIR/$DEB_NAME"
 

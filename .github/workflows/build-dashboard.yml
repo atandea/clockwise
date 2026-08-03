@@ -158,13 +158,15 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           VERSION="${{ needs.cleanup.outputs.version }}"
+          mkdir -p pkgbuild
+          cp PKGBUILD pkgbuild/PKGBUILD
           cp clockwise-dashboard/src-tauri/target/release/bundle/deb/clockwise-dashboard_${VERSION}_amd64.deb pkgbuild/clockwise-dashboard_${VERSION}_amd64.deb
           docker run --rm \
             -v "$PWD:/workspace" \
             -w /workspace/pkgbuild \
             archlinux:latest \
             bash -c "
-              pacman -Sy --noconfirm --needed fakeroot binutils nodejs
+              pacman -Sy --noconfirm --needed fakeroot binutils nodejs debugedit
               useradd -m builder
               chown -R builder:builder /workspace/pkgbuild /workspace/clockwise-dashboard
               su builder -c 'makepkg -df'
