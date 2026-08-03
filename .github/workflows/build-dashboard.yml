@@ -40,7 +40,7 @@ jobs:
       - name: Generate Changelog
         id: changelog
         run: |
-          node ./clockwise-dashboard/scripts/generate-changelog.mjs --unreleased --output ./clockwise-dashboard
+          node ./scripts/generate-changelog.mjs --unreleased --output ./clockwise-dashboard
           BODY=$(cat ./clockwise-dashboard/CHANGELOG.md)
           # Use GitHub Actions multi-line output
           echo "body<<CHANGELOG_EOF" >> $GITHUB_OUTPUT

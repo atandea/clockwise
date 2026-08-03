@@ -7,8 +7,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "generate:version": "node scripts/generate-version.mjs",
-    "build:server": "node scripts/build-server.mjs",
+    "generate:version": "node ../scripts/generate-version.mjs",
+    "build:server": "node ../scripts/build-server.mjs",
     "predev": "npm run generate:version",
     "prebuild": "npm run generate:version",
     "pretauri": "npm run generate:version",

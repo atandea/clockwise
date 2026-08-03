@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, "..");
+const root = path.resolve(__dirname, "..", "clockwise-dashboard");
 const packageJsonPath = path.join(root, "package.json");
 const lockJsonPath = path.join(root, "package-lock.json");
 const outputPath = path.join(root, "src", "lib", "version.ts");

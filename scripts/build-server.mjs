@@ -4,8 +4,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(__dirname, "..");
-const serverDir = path.resolve(root, "..", "clockwise-server");
+const root = path.resolve(__dirname, "..", "clockwise-dashboard");
+const serverDir = path.resolve(__dirname, "..", "clockwise-server");
 const binDir = path.resolve(root, "src-tauri", "bin");
 
 // Determine the target triple. For now, we assume linux x64 as requested.
