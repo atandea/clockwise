@@ -43,6 +43,11 @@
 	let userActive = $state(true);
 	let activityTimeout: any = null;
 
+	// Prevent text selection on the fullscreen timer view
+	function preventSelect(e: Event) {
+		e.preventDefault();
+	}
+
 	function handleMouseMove() {
 		userActive = true;
 		if (activityTimeout) clearTimeout(activityTimeout);
@@ -97,6 +102,8 @@
 				"fullscreenchange",
 				handleFullscreenChange,
 			);
+			// Prevent text selection via mouse or keyboard
+			document.addEventListener("selectstart", preventSelect);
 			handleMouseMove();
 		}
 	});
@@ -107,6 +114,7 @@
 				"fullscreenchange",
 				handleFullscreenChange,
 			);
+			document.removeEventListener("selectstart", preventSelect);
 		}
 		if (idleTimeout) {
 			clearTimeout(idleTimeout);
@@ -126,7 +134,7 @@
 	bind:this={rootEl}
 	onmousemove={handleMouseMove}
 	role="presentation"
-	style="container-type: size;"
+	style="container-type: size; user-select: none; -webkit-user-select: none; -ms-user-select: none;"
 >
 	{#if onClose}
 		<div
