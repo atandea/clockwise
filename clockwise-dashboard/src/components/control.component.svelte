@@ -180,27 +180,26 @@
 					<li class="flex items-center justify-between px-4 py-3 hover:bg-white/[0.02] transition-colors">
 						<div class="h-2 w-2 rounded-full shadow-[0_0_8px_rgba(var(--dot-color),0.5)]" style="--dot-color: {timer.id === $activeTimerId ? '34, 197, 94' : '107, 114, 128'}" class:bg-green-500={timer.id === $activeTimerId} class:bg-gray-500={timer.id !== $activeTimerId} aria-hidden="true"></div>
 						<div class="flex-1 px-4">
-							<div class="text-sm font-medium text-gray-200">{timer.name}</div>
-							<div class="text-[10px] font-mono text-gray-500 uppercase">{timer.duration} {timer.unit}</div>
+							<div class="text-lg font-semibold text-gray-200">{timer.name}</div>
 						</div>
 						<div class="flex items-center bg-gray-900/60 rounded-lg p-1 border border-gray-700/50 shadow-sm gap-1">
 							<button class="p-1.5 rounded hover:bg-white/10 transition-colors" class:text-red-500={timer.id === $activeTimerId} class:text-green-500={timer.id !== $activeTimerId} disabled={$globalPending || ($actionPending[timer.id] ?? false)} onclick={() => timer.id === $activeTimerId ? stopActiveTimer() : startTimer(timer.id)} title={timer.id === $activeTimerId ? "Stop" : "Start"}>
 								{#if $globalPending || ($actionPending[timer.id] ?? false)}
-									<span class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+									<span class="inline-block w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
 								{:else}
 									{#if timer.id === $activeTimerId}
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd"/></svg>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M4.5 7.5a3 3 0 013-3h9a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9z" clip-rule="evenodd"/></svg>
 									{:else}
-										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd"/></svg>
+										<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd"/></svg>
 									{/if}
 								{/if}
 							</button>
 							<div class="w-px h-3 bg-gray-700/50"></div>
 							<button class="p-1.5 rounded text-gray-500 hover:text-red-500 hover:bg-white/10 transition-colors" disabled={$globalPending || ($actionPending[timer.id] ?? false)} onclick={() => deleteTimer(timer.id)} title="Delete">
-								{#if $globalPending || ($actionPending[timer.id] ?? false)}
-									<span class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+								    {#if $globalPending || ($actionPending[timer.id] ?? false)}
+									    <span class="inline-block w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
 								{:else}
-									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5 0l.5 8.5a.75.75 0 101.5 0l-.5-8.5zm4.33.75a.75.75 0 00.75-.75l-.5-8.5a.75.75 0 00-1.5 0l.5 8.5z" clip-rule="evenodd"/></svg>
+									    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5 0l.5 8.5a.75.75 0 101.5 0l-.5-8.5zm4.33.75a.75.75 0 00.75-.75l-.5-8.5a.75.75 0 00-1.5 0l.5 8.5z" clip-rule="evenodd"/></svg>
 								{/if}
 							</button>
 						</div>

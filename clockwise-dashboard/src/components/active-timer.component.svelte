@@ -71,7 +71,7 @@
                         disabled={!isTimerActive}
                         title="Resume"
                     >
-                        <PlayIcon size="20" />
+                        <PlayIcon size="24" />
                     </button>
                 {:else}
                     <button
@@ -80,7 +80,7 @@
                         disabled={!isTimerActive || status === "overtime"}
                         title="Pause"
                     >
-                        <PauseIcon size="20" />
+                        <PauseIcon size="24" />
                     </button>
                 {/if}
                 <div class="w-px h-5 bg-gray-700/50"></div>
@@ -90,7 +90,7 @@
                     disabled={!isTimerActive}
                     title="Stop"
                 >
-                    <StopIcon size="20" />
+                    <StopIcon size="24" />
                 </button>
             </div>
         {/if}

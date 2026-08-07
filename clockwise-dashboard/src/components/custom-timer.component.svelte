@@ -209,7 +209,7 @@
                     disabled={creating}
                     title="Start"
                 >
-                    <PlayIcon size="20" />
+                    <PlayIcon size="24" />
                 </button>
                 <div class="w-px h-5 bg-gray-700/50"></div>
                 <button
@@ -218,7 +218,7 @@
                     disabled={creating}
                     title="Save Template"
                 >
-                    <PlusIcon size="20" />
+                    <PlusIcon size="24" />
                 </button>
             </div>
         {/if}
