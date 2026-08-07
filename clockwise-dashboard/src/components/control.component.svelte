@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
+	import ConfirmModal from "./confirm-modal.svelte";
 	import { get, writable } from "svelte/store";
 	import { fetchWithPin, timerEvents, type TimerEventData } from "$lib/api";
 
@@ -26,6 +27,11 @@
 	let unsubscribe: (() => void) | null = null;
 	let pendingEvent: TimerEventData | null = null;
 	let rafId: number | null = null;
+
+	// Confirmation modal state
+	let confirmVisible = $state(false);
+	let confirmTimerId = $state<string | null>(null);
+	let confirmTimerName = $state<string | null>(null);
 
 	function setActionPending(timerId: string | null, value: boolean) {
 		actionPending.update((prev) => {
@@ -195,7 +201,7 @@
 								{/if}
 							</button>
 							<div class="w-px h-3 bg-gray-700/50"></div>
-							<button class="p-1.5 rounded text-gray-500 hover:text-red-500 hover:bg-white/10 transition-colors" disabled={$globalPending || ($actionPending[timer.id] ?? false)} onclick={() => deleteTimer(timer.id)} title="Delete">
+							<button class="p-1.5 rounded text-gray-500 hover:text-red-500 hover:bg-white/10 transition-colors" disabled={$globalPending || ($actionPending[timer.id] ?? false)} onclick={() => { confirmTimerId = timer.id; confirmTimerName = timer.name; confirmVisible = true; }} title="Delete">
 								    {#if $globalPending || ($actionPending[timer.id] ?? false)}
 									    <span class="inline-block w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
 								{:else}
@@ -211,6 +217,25 @@
 			</ul>
 		{/if}
 	</div>
+
+	<ConfirmModal
+		visible={confirmVisible}
+		title="Delete Timer"
+		message={confirmTimerName ? `Delete "${confirmTimerName}"? This cannot be undone.` : "Delete this timer?"}
+		confirmText="Delete"
+		cancelText="Cancel"
+		onConfirm={() => {
+			if (confirmTimerId) deleteTimer(confirmTimerId);
+			confirmVisible = false;
+			confirmTimerId = null;
+			confirmTimerName = null;
+		}}
+		onCancel={() => {
+			confirmVisible = false;
+			confirmTimerId = null;
+			confirmTimerName = null;
+		}}
+	/>
 </div>
 
 <style>
