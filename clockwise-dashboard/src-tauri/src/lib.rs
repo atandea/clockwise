@@ -170,6 +170,25 @@ fn fullscreen_on_target_monitor(
     });
 }
 
+#[tauri::command]
+fn set_main_window_monitor(app: tauri::AppHandle, monitor_name: Option<String>) -> Result<(), String> {
+    let monitors = app.available_monitors().map_err(|e| e.to_string())?;
+    // If no monitor specified, nothing to do
+    if monitor_name.is_none() {
+        return Ok(());
+    }
+
+    let selected = select_monitor(&monitors, &monitor_name)?;
+    let pos = selected.position();
+
+    if let Some(win) = app.get_webview_window("main") {
+        let _ = win.set_position(*pos);
+        let _ = win.maximize();
+    }
+
+    Ok(())
+}
+
 #[cfg(target_os = "linux")]
 fn gtk_fullscreen(
     window: &tauri::WebviewWindow,
@@ -368,6 +387,19 @@ fn start_sidecar(app: &tauri::App, state: &AppState, data_file_str: &str) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    // Force X11/XWayland backends on Linux to improve compatibility when
+    // running under Wayland compositors that may not support all windowing
+    // features we rely on (like fullscreen on a specific monitor).
+    #[cfg(target_os = "linux")]
+    {
+        // Prefer the X11 backend for winit/wry and GTK where applicable.
+        // This helps ensure behavior is consistent via XWayland.
+        unsafe {
+            std::env::set_var("WINIT_UNIX_BACKEND", "x11");
+            std::env::set_var("GDK_BACKEND", "x11");
+        }
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_log::Builder::default().build())
         .plugin(tauri_plugin_opener::init())
@@ -390,6 +422,47 @@ pub fn run() {
             let state = app.state::<AppState>();
             start_sidecar(app, state.inner(), &data_file_str);
 
+            // After starting the sidecar, attempt to read the persisted
+            // settings file and position the main window on the preferred
+            // monitor if one is configured.
+            let settings_path = std::path::Path::new(&data_file_str)
+                .parent()
+                .map(|p| p.join("settings.json"));
+
+            if let Some(path) = settings_path {
+                if let Ok(contents) = std::fs::read_to_string(&path) {
+                    if let Ok(json) = serde_json::from_str::<serde_json::Value>(&contents) {
+                        // Prefer a dedicated main window preference, fall back to
+                        // the old fullscreen preference for compatibility.
+                        let mut main_pref: Option<&str> = None;
+                        if let Some(v) = json.get("preferred_main_monitor").and_then(|v| v.as_str()) {
+                            if !v.is_empty() {
+                                main_pref = Some(v);
+                            }
+                        }
+                        if main_pref.is_none() {
+                            if let Some(v) = json.get("preferred_monitor").and_then(|v| v.as_str()) {
+                                if !v.is_empty() {
+                                    main_pref = Some(v);
+                                }
+                            }
+                        }
+
+                        if let Some(pref) = main_pref {
+                            if let Ok(monitors) = app.available_monitors() {
+                                if let Some(m) = monitors.iter().find(|m| m.name().map(|n| n == pref).unwrap_or(false)) {
+                                    if let Some(win) = app.get_webview_window("main") {
+                                        let pos = m.position();
+                                        let _ = win.set_position(*pos);
+                                        let _ = win.maximize();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             Ok(())
         })
         .on_window_event(|window, event| {
@@ -409,6 +482,7 @@ pub fn run() {
             close_timer_window,
             get_local_ip,
             is_timer_window_open,
+            set_main_window_monitor,
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
