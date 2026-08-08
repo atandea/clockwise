@@ -52,6 +52,11 @@ export class SettingsState {
     selectedMonitorCandidate = $state(
         get(appSettings)?.preferred_monitor || "",
     );
+    // Main window display preference (separate from fullscreen target)
+    preferredMainMonitor = $state(get(appSettings)?.preferred_main_monitor || "");
+    selectedMainMonitorCandidate = $state(
+        get(appSettings)?.preferred_main_monitor || "",
+    );
     isLoading = $state(!get(appAuthStatus));
 
     // Appearance presets
@@ -83,6 +88,8 @@ export class SettingsState {
         this.networkAccessEnabled = data.network_access_enabled !== false;
         this.preferredMonitor = data.preferred_monitor || "";
         this.selectedMonitorCandidate = this.preferredMonitor;
+        this.preferredMainMonitor = data.preferred_main_monitor || "";
+        this.selectedMainMonitorCandidate = this.preferredMainMonitor;
         
         if (data.show_progress_bar !== undefined) this.showProgressBar = data.show_progress_bar;
         if (data.show_secondary_clock !== undefined) this.showSecondaryClock = data.show_secondary_clock;
@@ -213,7 +220,26 @@ export class SettingsState {
             : false;
     }
 
+    get isMainMonitorOnline() {
+        return this.preferredMainMonitor
+            ? this.monitors.some((m) => m.name === this.preferredMainMonitor)
+            : false;
+    }
+
     get hasDiscardedChanges() {
         return this.selectedMonitorCandidate !== this.preferredMonitor;
+    }
+
+    get hasDiscardedMainChanges() {
+        return this.selectedMainMonitorCandidate !== this.preferredMainMonitor;
+    }
+
+    async setPreferredMainMonitor(monitorName: string) {
+        this.preferredMainMonitor = monitorName;
+        try {
+            await this.updateBackendSetting("preferred_main_monitor", monitorName);
+        } catch (err) {
+            console.error("Failed to save preferred_main_monitor:", err);
+        }
     }
 }

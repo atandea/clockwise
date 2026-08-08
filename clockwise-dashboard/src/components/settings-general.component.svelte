@@ -7,6 +7,7 @@
     import ChevronDownIcon from "./icons/ChevronDownIcon.svelte";
     import QrCodeIcon from "./icons/QrCodeIcon.svelte";
     import { getApiBaseUrl, fetchWithPin } from "../lib/api";
+    import { invoke } from "@tauri-apps/api/core";
     import QRCode from "qrcode";
     import { toast as globalToast } from "../lib/toast.svelte";
     import type { SettingsState } from "../lib/settings.state.svelte";
@@ -130,6 +131,33 @@
             }
         } catch (err) {
             console.error("Failed to update preferred monitor:", err);
+            globalToast.error(`Error: ${err}`);
+        }
+    }
+
+    async function updatePreferredMainMonitor(monitorName: string) {
+        settings.preferredMainMonitor = monitorName;
+        try {
+            const res = await fetchWithPin(`${apiBase}/settings`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    preferred_main_monitor: monitorName,
+                }),
+            });
+            if (res.ok) {
+                globalToast.success(`Main window display updated`);
+                try {
+                    // Ask the backend (Tauri) to immediately move the main window
+                    await invoke("set_main_window_monitor", { monitor_name: monitorName });
+                } catch (err) {
+                    console.error("Failed to move main window via invoke:", err);
+                }
+            } else {
+                globalToast.error(`Failed to update main display`);
+            }
+        } catch (err) {
+            console.error("Failed to update preferred main monitor:", err);
             globalToast.error(`Error: ${err}`);
         }
     }
@@ -369,6 +397,103 @@
                                         )}
                                     disabled={!settings.hasDiscardedChanges}
                                     class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold {settings.hasDiscardedChanges
+                                        ? 'bg-blue-600 hover:bg-blue-500 active:scale-95 text-white shadow-lg shadow-blue-600/20'
+                                        : 'bg-white/5 text-gray-500 cursor-not-allowed opacity-50'}"
+                                >
+                                    Confirm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Window Display Selection -->
+                    <div
+                        class="flex flex-col gap-3 py-3 px-4 transition-colors"
+                    >
+                        <div
+                            class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                        >
+                            <div class="min-w-0 flex flex-col justify-center">
+                                <span
+                                    class="text-sm font-semibold text-gray-300 block mb-1"
+                                    >Main Window Display</span
+                                >
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        class="text-[11px] font-bold {settings.preferredMainMonitor
+                                            ? settings.isMainMonitorOnline
+                                                ? 'text-indigo-400'
+                                                : 'text-red-400'
+                                            : 'text-gray-500'}"
+                                    >
+                                        {settings.preferredMainMonitor || "Not selected"}
+                                    </span>
+                                    {#if settings.preferredMainMonitor}
+                                        <span
+                                            class="px-1.5 py-0.5 rounded-full text-[8px] font-black uppercase tracking-wider {settings.isMainMonitorOnline
+                                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                                : 'bg-red-500/10 text-red-400 border border-red-500/20'}"
+                                        >
+                                            {settings.isMainMonitorOnline
+                                                ? "Connected"
+                                                : "Offline"}
+                                        </span>
+                                    {/if}
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <button
+                                    class="p-2 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 transition-all text-gray-400 hover:text-white border border-white/5"
+                                    onclick={fetchMonitors}
+                                    title="Scan for monitors"
+                                >
+                                    <RefreshIcon
+                                        width="14"
+                                        height="14"
+                                        strokeWidth="2.5"
+                                    />
+                                </button>
+                                <div class="relative">
+                                    <select
+                                        class="appearance-none bg-gray-900/60 border border-white/10 rounded-xl pl-3 pr-8 py-1.5 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all cursor-pointer min-w-[160px]"
+                                        value={settings.selectedMainMonitorCandidate}
+                                        onchange={(e) =>
+                                            (settings.selectedMainMonitorCandidate =
+                                                e.currentTarget.value)}
+                                    >
+                                        <option
+                                            value=""
+                                            disabled
+                                            selected={!settings.selectedMainMonitorCandidate}
+                                            >Select display...</option
+                                        >
+                                        {#each settings.monitors as monitor}
+                                            <option
+                                                value={monitor.name}
+                                                class="bg-gray-900 text-white"
+                                            >
+                                                {monitor.name} ({monitor.width}×{monitor.height})
+                                            </option>
+                                        {/each}
+                                    </select>
+                                    <div
+                                        class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500"
+                                    >
+                                        <ChevronDownIcon
+                                            width="14"
+                                            height="14"
+                                            strokeWidth="2.5"
+                                        />
+                                    </div>
+                                </div>
+                                <button
+                                    onclick={() =>
+                                        updatePreferredMainMonitor(
+                                            settings.selectedMainMonitorCandidate,
+                                        )}
+                                    disabled={!settings.hasDiscardedMainChanges}
+                                    class="px-4 py-1.5 rounded-xl transition-all text-xs font-bold {settings.hasDiscardedMainChanges
                                         ? 'bg-blue-600 hover:bg-blue-500 active:scale-95 text-white shadow-lg shadow-blue-600/20'
                                         : 'bg-white/5 text-gray-500 cursor-not-allowed opacity-50'}"
                                 >
