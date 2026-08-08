@@ -179,47 +179,47 @@
     });
 </script>
 
-<div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-    <label
-        for="custom-timer-input"
-        class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-gray-500"
-        >New:</label
-    >
-    <div class="flex flex-1 min-w-0 items-center gap-2">
+<div class="w-full py-3">
+    <div class="w-full max-w-full">
+
         {#if isLoading}
-            <div
-                class="min-w-0 flex-1 h-9 rounded bg-white/5 animate-pulse"
-            ></div>
-            <div class="h-9 w-24 rounded-lg bg-white/5 animate-pulse"></div>
+            <div class="flex flex-col gap-2 lg:flex-row lg:items-center justify-center">
+                <div class="min-w-0 flex-1 h-10 sm:h-12 rounded-2xl bg-white/5 animate-pulse"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-2xl bg-white/5 animate-pulse"></div>
+                    <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-2xl bg-white/5 animate-pulse"></div>
+                </div>
+            </div>
         {:else}
-            <input
-                id="custom-timer-input"
-                type="text"
-                bind:value={inputValue}
-                onkeydown={handleKeydown}
-                placeholder="e.g. 5m"
-                class="min-w-0 flex-1 h-9 rounded bg-gray-900/50 border border-gray-700/50 px-3 text-sm text-gray-300 outline-none focus:border-green-500/50 transition-colors font-mono placeholder-gray-600"
-            />
-            <div
-                class="flex h-9 items-center gap-0.5 bg-gray-800/80 rounded-lg p-0.5 border border-gray-700/50 shadow-sm"
-            >
-                <button
-                    class="p-1.5 rounded text-green-500 hover:bg-white/10 transition-colors disabled:opacity-30"
-                    onclick={startCustomTimer}
-                    disabled={creating}
-                    title="Start"
-                >
-                    <PlayIcon size="24" />
-                </button>
-                <div class="w-px h-5 bg-gray-700/50"></div>
-                <button
-                    class="p-1.5 rounded text-blue-400 hover:bg-white/10 transition-colors disabled:opacity-30"
-                    onclick={saveCustomTimer}
-                    disabled={creating}
-                    title="Save Template"
-                >
-                    <PlusIcon size="24" />
-                </button>
+            <div class="flex flex-col gap-2 lg:flex-row lg:items-center justify-center">
+                <input
+                    id="custom-timer-input"
+                    type="text"
+                    bind:value={inputValue}
+                    onkeydown={handleKeydown}
+                    placeholder="e.g. 5m"
+                    class="min-w-0 flex-1 h-12 rounded-2xl bg-gray-900/60 border border-gray-700/60 px-4 text-[clamp(0.9rem,1.2vw,1.25rem)] text-white text-center outline-none focus:border-green-500/70 transition-colors font-mono placeholder:text-gray-500"
+                />
+                <div class="flex items-center gap-2">
+                    <button
+                        type="button"
+                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors disabled:opacity-40"
+                        onclick={startCustomTimer}
+                        disabled={creating}
+                        title="Start"
+                    >
+                        <PlayIcon size="24" class="h-5 w-5" />
+                    </button>
+                    <button
+                        type="button"
+                        class="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors disabled:opacity-40"
+                        onclick={saveCustomTimer}
+                        disabled={creating}
+                        title="Save Template"
+                    >
+                        <PlusIcon size="24" class="h-5 w-5" />
+                    </button>
+                </div>
             </div>
         {/if}
     </div>
