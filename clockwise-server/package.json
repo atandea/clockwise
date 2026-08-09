@@ -96,8 +96,8 @@
   },
   "allowScripts": {
     "@nestjs/core@11.1.24": true,
-    "esbuild@0.27.7": true,
     "unrs-resolver@1.12.2": true,
-    "@swc/core@1.15.43": true
+    "@swc/core@1.15.47": true,
+    "esbuild@0.28.2": true
   }
 }
