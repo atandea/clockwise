@@ -184,10 +184,10 @@
 
         {#if isLoading}
             <div class="flex flex-row items-center gap-2">
-                <div class="min-w-0 flex-1 h-10 sm:h-12 rounded-2xl bg-white/5 animate-pulse"></div>
+                <div class="min-w-0 flex-1 h-12 sm:h-14 rounded-2xl bg-white/5 animate-pulse"></div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-2xl bg-white/5 animate-pulse"></div>
-                    <div class="h-10 sm:h-12 w-10 sm:w-12 rounded-2xl bg-white/5 animate-pulse"></div>
+                    <div class="h-12 sm:h-14 w-12 sm:w-14 rounded-2xl bg-white/5 animate-pulse"></div>
+                    <div class="h-12 sm:h-14 w-12 sm:w-14 rounded-2xl bg-white/5 animate-pulse"></div>
                 </div>
             </div>
         {:else}
@@ -198,26 +198,26 @@
                     bind:value={inputValue}
                     onkeydown={handleKeydown}
                     placeholder="e.g. 5m"
-                    class="min-w-0 flex-1 h-10 sm:h-12 rounded-2xl bg-gray-900/60 border border-gray-700/60 px-3 sm:px-4 text-sm sm:text-base text-white text-center outline-none focus:border-green-500/70 transition-colors font-mono placeholder:text-gray-500"
+                    class="min-w-0 flex-1 h-12 sm:h-14 rounded-2xl bg-gray-900/60 border border-gray-700/60 px-4 sm:px-5 text-lg sm:text-xl font-bold text-white text-center outline-none focus:border-green-500/70 transition-colors font-mono placeholder:text-gray-500 placeholder:font-normal"
                 />
                 <div class="flex items-center gap-2 shrink-0">
                     <button
                         type="button"
-                        class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors disabled:opacity-40"
+                        class="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/20 transition-colors disabled:opacity-40"
                         onclick={startCustomTimer}
                         disabled={creating}
                         title="Start"
                     >
-                        <PlayIcon size="24" class="h-4 w-4 sm:h-5 sm:w-5" />
+                        <PlayIcon size="24" class="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
                     <button
                         type="button"
-                        class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors disabled:opacity-40"
+                        class="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors disabled:opacity-40"
                         onclick={saveCustomTimer}
                         disabled={creating}
                         title="Save Template"
                     >
-                        <PlusIcon size="24" class="h-4 w-4 sm:h-5 sm:w-5" />
+                        <PlusIcon size="24" class="h-5 w-5 sm:h-6 sm:w-6" />
                     </button>
                 </div>
             </div>
