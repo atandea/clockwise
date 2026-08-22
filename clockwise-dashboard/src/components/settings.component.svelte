@@ -202,9 +202,7 @@
             {:else if activeTab === "appearance"}
                 <SettingsAppearance {settings} />
             {:else if activeTab === "about"}
-                <div class="w-full h-full p-3 lg:p-4">
-                    <About />
-                </div>
+                <About />
             {/if}
         </div>
     </section>
