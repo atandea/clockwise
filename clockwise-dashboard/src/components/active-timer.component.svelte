@@ -88,6 +88,9 @@
     async function sendCommand(action: "stop" | "pause" | "resume") {
         try {
             await fetchWithPin(`${apiBase}/timers/${action}`, { method: "POST" });
+            if (action === "stop") {
+                inputValue = "";
+            }
         } catch (err: any) {
             console.error(err);
         }
@@ -96,6 +99,14 @@
     // Custom timer logic for idle state
     let inputValue = $state("");
     let creating = $state(false);
+
+    let previousActive = false;
+    $effect(() => {
+        if (previousActive && !isTimerActive) {
+            inputValue = "";
+        }
+        previousActive = isTimerActive;
+    });
 
     function formatDurationName(
         n: number,
@@ -205,6 +216,7 @@
             );
             if (!startRes.ok)
                 throw new Error(`Start failed: ${startRes.status}`);
+            inputValue = "";
         } catch (err: any) {
             toast.error(err?.message ?? String(err));
         } finally {
