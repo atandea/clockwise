@@ -1,7 +1,6 @@
 <script lang="ts">
   import Control from "./control.component.svelte";
   import Viewer from "./viewer.component.svelte";
-  import CustomTimer from "./custom-timer.component.svelte";
   import ActiveTimer from "./active-timer.component.svelte";
   import DisplaySelector from "./display-selector.component.svelte";
   import UpdateModal from "./update-modal.component.svelte";
@@ -135,16 +134,10 @@
               />
             </div>
 
-            <ActiveTimer {apiBase} isLoading={status !== "running"} />
-          </div>
-
-          <div
-            class="rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg"
-          >
-            <CustomTimer
+            <ActiveTimer
               {apiBase}
-              onTimerCreated={() => controlComponent?.fetchTimers()}
               isLoading={status !== "running"}
+              onTimerCreated={() => controlComponent?.fetchTimers()}
             />
           </div>
         </div>
