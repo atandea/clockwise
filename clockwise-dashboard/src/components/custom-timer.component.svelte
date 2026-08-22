@@ -125,6 +125,7 @@
             );
             if (!startRes.ok)
                 throw new Error(`Start failed: ${startRes.status}`);
+            inputValue = "";
         } catch (err: any) {
             toast.error(err?.message ?? String(err));
         } finally {

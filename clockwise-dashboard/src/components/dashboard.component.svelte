@@ -111,12 +111,12 @@
       <div
         class="flex-1 flex flex-col lg:flex-row gap-2 overflow-hidden min-h-0"
       >
-        <div class="flex-1 flex flex-col gap-2 overflow-hidden flex-shrink-0">
+        <div class="shrink-0 lg:flex-1 flex flex-col gap-2 overflow-hidden min-h-0">
           <div
-            class="flex-1 flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg min-h-0"
+            class="flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg lg:flex-1 lg:min-h-0 justify-between"
           >
             <div
-              class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video"
+              class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video lg:flex-1 lg:min-h-0"
             >
               <Viewer
                 allowFullscreen={false}
@@ -134,11 +134,13 @@
               />
             </div>
 
-            <ActiveTimer
-              {apiBase}
-              isLoading={status !== "running"}
-              onTimerCreated={() => controlComponent?.fetchTimers()}
-            />
+            <div class="shrink-0">
+              <ActiveTimer
+                {apiBase}
+                isLoading={status !== "running"}
+                onTimerCreated={() => controlComponent?.fetchTimers()}
+              />
+            </div>
           </div>
         </div>
 
