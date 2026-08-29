@@ -131,7 +131,7 @@
             }
         } catch (err) {
             console.error("Failed to update preferred monitor:", err);
-            globalToast.error(`Error: ${err}`);
+            globalToast.error(err);
         }
     }
 
@@ -158,7 +158,7 @@
             }
         } catch (err) {
             console.error("Failed to update preferred main monitor:", err);
-            globalToast.error(`Error: ${err}`);
+            globalToast.error(err);
         }
     }
 

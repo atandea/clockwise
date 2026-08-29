@@ -7,10 +7,27 @@ export interface Toast {
     duration: number; // in milliseconds
 }
 
+function formatMessage(msg: unknown): string {
+    if (typeof msg === 'string') return msg;
+    if (msg instanceof Error) return msg.message;
+    if (msg && typeof msg === 'object') {
+        if ('message' in msg && typeof (msg as any).message === 'string') {
+            return (msg as any).message;
+        }
+        try {
+            return JSON.stringify(msg);
+        } catch {
+            return String(msg);
+        }
+    }
+    return String(msg ?? '');
+}
+
 class ToastState {
     toasts = $state<Toast[]>([]);
 
-    add(type: ToastType, message: string, duration = 3000) {
+    add(type: ToastType, rawMessage: unknown, duration = 3000) {
+        const message = formatMessage(rawMessage);
         const id = crypto.randomUUID();
         console.log(`Adding toast: [${type}] ${message}`);
         this.toasts.push({ id, type, message, duration });
@@ -25,19 +42,19 @@ class ToastState {
         this.toasts = this.toasts.filter(t => t.id !== id);
     }
 
-    success(message: string, duration?: number) {
+    success(message: unknown, duration?: number) {
         this.add('success', message, duration);
     }
 
-    error(message: string, duration?: number) {
+    error(message: unknown, duration?: number) {
         this.add('error', message, duration);
     }
 
-    info(message: string, duration?: number) {
+    info(message: unknown, duration?: number) {
         this.add('info', message, duration);
     }
 
-    warning(message: string, duration?: number) {
+    warning(message: unknown, duration?: number) {
         this.add('warning', message, duration);
     }
 }

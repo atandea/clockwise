@@ -8,6 +8,7 @@
         autoLaunchAttempted,
     } from "../lib/api";
     import { get } from "svelte/store";
+    import { toast } from "../lib/toast.svelte";
  
 	let { isLoading = false }: { isLoading?: boolean } = $props();
 
@@ -25,12 +26,12 @@
     let isWindowOpen = $state(false);
     const unsubscribeOpen = timerWindowOpen.subscribe(v => isWindowOpen = v);
     let loading = $state(true);
-    let toast = $state("");
     let pollInterval: ReturnType<typeof setInterval> | null = null;
+    let monitorsLoaded = $state(false);
     let preferenceLoaded = false;
 
     $effect(() => {
-        if (!isLoading && !preferenceLoaded) {
+        if (!isLoading && monitorsLoaded && !preferenceLoaded) {
             preferenceLoaded = true;
             loadPreference();
         }
@@ -41,6 +42,8 @@
             monitors = await invoke<MonitorInfo[]>("get_monitors");
         } catch (err) {
             console.error("Failed to get monitors:", err);
+        } finally {
+            monitorsLoaded = true;
         }
     }
 
@@ -50,14 +53,15 @@
             if (response.ok) {
                 const settings = await response.json();
                 const pref = settings.preferred_monitor;
-                if (pref && monitors.some((m) => m.name === pref)) {
+                const isPrefOnline = pref ? monitors.some((m) => m.name === pref) : false;
+
+                if (pref && isPrefOnline) {
                     selectedMonitor = pref;
                 } else if (monitors.length > 0) {
                     selectedMonitor = monitors[0].name;
                 }
                 
-                // Automatically launch if required and not open and monitors exist.
-                // We do it here since it runs when dashboard loads and connects to the server
+                // Automatically launch if required and not already open
                 const launchOnStartup = !!settings.launch_fullscreen_on_startup;
                 if (
                     launchOnStartup &&
@@ -65,10 +69,9 @@
                     !get(autoLaunchAttempted)
                 ) {
                     autoLaunchAttempted.set(true);
-                    // Check if explicitly preferred monitor is missing
-                    if (pref && monitors.some((m) => m.name === pref)) {
-                        await toggleFullscreenWindow();
-                    } else if (!pref) {
+                    if (pref && !isPrefOnline) {
+                        toast.info(`Preferred display '${pref}' is not available`);
+                    } else if (monitors.length > 0) {
                         await toggleFullscreenWindow();
                     }
                 }
@@ -121,8 +124,7 @@
                 timerWindowOpen.set(true);
             } catch (err) {
                 console.error("Failed to open timer window:", err);
-                toast = String(err);
-                setTimeout(() => toast = "", 5000);
+                toast.info(String(err));
             }
         }
     }
@@ -246,16 +248,6 @@
             {/if}
         </button>
     </div>
- 
-    {#if toast}
-        <div class="fixed bottom-10 inset-x-0 z-[100] flex justify-center pointer-events-none">
-            <div
-                class="rounded-2xl bg-red-500/90 text-white px-6 py-3 text-sm font-semibold shadow-2xl backdrop-blur-md ring-1 ring-white/20 whitespace-nowrap pointer-events-auto animate-toast"
-            >
-                {toast}
-            </div>
-        </div>
-    {/if}
 {:else}
     <div class="h-[50px] w-full rounded bg-gray-800/60 border border-gray-700/50 animate-pulse relative overflow-hidden flex items-center px-4">
         <div class="h-4 w-4 rounded bg-white/10 shrink-0"></div>

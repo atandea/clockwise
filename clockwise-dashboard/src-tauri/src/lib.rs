@@ -101,18 +101,29 @@ fn log_available_monitors(monitors: &[tauri::Monitor]) {
 }
 
 /// Returns the monitor matching `monitor_name`, or the first available monitor
-/// when no name is provided.
+/// when no specific name is provided. Returns an error if the requested monitor is not found.
 fn select_monitor<'a>(
     monitors: &'a [tauri::Monitor],
     monitor_name: &Option<String>,
 ) -> Result<&'a tauri::Monitor, String> {
-    let name = monitor_name
-        .as_ref().map(|s| s.as_str())
-        .unwrap_or("unknown");
-    return monitors
-        .iter()
-        .find(|m| m.name().map(|n| n == name).unwrap_or(false))
-        .ok_or_else(|| format!("Monitor '{}' not found", name))
+    if monitors.is_empty() {
+        return Err("No displays detected".to_string());
+    }
+
+    if let Some(name) = monitor_name.as_deref() {
+        let trimmed = name.trim();
+        if !trimmed.is_empty() && trimmed != "unknown" {
+            for (i, m) in monitors.iter().enumerate() {
+                let synth_name = m.name().cloned().unwrap_or_else(|| format!("Display {}", i + 1));
+                if synth_name == trimmed || m.name().map(|n| n == trimmed).unwrap_or(false) {
+                    return Ok(m);
+                }
+            }
+            return Err(format!("Display '{}' is not available", trimmed));
+        }
+    }
+
+    Ok(&monitors[0])
 }
 
 /// Creates the timer webview window on the requested monitor.
@@ -450,7 +461,10 @@ pub fn run() {
 
                         if let Some(pref) = main_pref {
                             if let Ok(monitors) = app.available_monitors() {
-                                if let Some(m) = monitors.iter().find(|m| m.name().map(|n| n == pref).unwrap_or(false)) {
+                                if let Some(m) = monitors.iter().enumerate().find(|(i, m)| {
+                                    let synth = m.name().cloned().unwrap_or_else(|| format!("Display {}", i + 1));
+                                    synth == pref || m.name().map(|n| n == pref).unwrap_or(false)
+                                }).map(|(_, m)| m) {
                                     if let Some(win) = app.get_webview_window("main") {
                                         let pos = m.position();
                                         let _ = win.set_position(*pos);
