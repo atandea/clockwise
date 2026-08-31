@@ -1,16 +1,24 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { SecurityService } from './security.service';
 
 @Injectable()
 export class SecurityGuard implements CanActivate {
-  constructor(private readonly securityService: SecurityService) { }
+  constructor(private readonly securityService: SecurityService) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const ip = request.ip;
 
     // Allow localhost access without PIN
-    if (this.securityService.isLocal(ip) || !this.securityService.isPinEnabled()) {
+    if (
+      this.securityService.isLocal(ip) ||
+      !this.securityService.isPinEnabled()
+    ) {
       return true;
     }
 

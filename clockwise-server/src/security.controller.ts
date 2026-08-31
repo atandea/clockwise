@@ -1,21 +1,33 @@
-import { Controller, Get, Post, Body, Req, Ip, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  Ip,
+  ForbiddenException,
+} from '@nestjs/common';
 import { SecurityService } from './security.service';
 import { Request } from 'express';
 
 @Controller('security')
 export class SecurityController {
-  constructor(private readonly securityService: SecurityService) { }
- 
+  constructor(private readonly securityService: SecurityService) {}
+
   @Get('status')
   getStatus(@Ip() ip: string, @Req() req: Request) {
     const local = this.securityService.isLocal(ip);
     const pinEnabled = this.securityService.isPinEnabled();
     const authHeader = req.headers['authorization'];
-    
+
     let authorized = true;
     if (!local && pinEnabled) {
       authorized = false;
-      if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('PIN ')) {
+      if (
+        authHeader &&
+        typeof authHeader === 'string' &&
+        authHeader.startsWith('PIN ')
+      ) {
         const providedPin = authHeader.substring(4);
         if (this.securityService.verifyPin(providedPin)) {
           authorized = true;
@@ -28,14 +40,16 @@ export class SecurityController {
       requiresPin: !local && pinEnabled && !authorized,
       pinEnabled: pinEnabled,
       pinLockAtStartup: this.securityService.getPinLockAtStartup(),
-      local: local
+      local: local,
     };
   }
 
   @Post('toggle')
   togglePin(@Body('enabled') enabled: boolean, @Ip() ip: string) {
     if (!this.securityService.isLocal(ip)) {
-      throw new ForbiddenException('PIN security can only be toggled from the host machine.');
+      throw new ForbiddenException(
+        'PIN security can only be toggled from the host machine.',
+      );
     }
     this.securityService.setPinEnabled(enabled);
     return { pinEnabled: this.securityService.isPinEnabled() };
@@ -50,14 +64,20 @@ export class SecurityController {
       return { pin: this.securityService.getPin() };
     }
 
-    if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('PIN ')) {
+    if (
+      authHeader &&
+      typeof authHeader === 'string' &&
+      authHeader.startsWith('PIN ')
+    ) {
       const providedPin = authHeader.substring(4);
       if (this.securityService.verifyPin(providedPin)) {
         return { pin: this.securityService.getPin() };
       }
     }
 
-    throw new ForbiddenException('PIN can only be retrieved from the host machine or with valid PIN authorization.');
+    throw new ForbiddenException(
+      'PIN can only be retrieved from the host machine or with valid PIN authorization.',
+    );
   }
 
   @Post('verify')

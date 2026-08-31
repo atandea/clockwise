@@ -62,24 +62,28 @@ describe('SecurityService', () => {
 
   describe('settings integration', () => {
     it('should initialize pinLockAtStartup from settings', async () => {
-        mockSettingsService.getSettings.mockReturnValue({ pin_lock_at_startup: false });
-        
-        // We need to re-initialize to test constructor logic
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-              SecurityService,
-              { provide: SettingsService, useValue: mockSettingsService },
-            ],
-          }).compile();
-        const newService = module.get<SecurityService>(SecurityService);
-        
-        expect(newService.getPinLockAtStartup()).toBe(false);
+      mockSettingsService.getSettings.mockReturnValue({
+        pin_lock_at_startup: false,
+      });
+
+      // We need to re-initialize to test constructor logic
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          SecurityService,
+          { provide: SettingsService, useValue: mockSettingsService },
+        ],
+      }).compile();
+      const newService = module.get<SecurityService>(SecurityService);
+
+      expect(newService.getPinLockAtStartup()).toBe(false);
     });
 
     it('should update settings when toggling PIN', () => {
-        service.setPinEnabled(false);
-        expect(settingsService.updateSettings).toHaveBeenCalledWith({ pin_lock_enabled: false });
-        expect(service.isPinEnabled()).toBe(false);
+      service.setPinEnabled(false);
+      expect(settingsService.updateSettings).toHaveBeenCalledWith({
+        pin_lock_enabled: false,
+      });
+      expect(service.isPinEnabled()).toBe(false);
     });
   });
 });

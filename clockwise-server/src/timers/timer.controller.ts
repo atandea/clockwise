@@ -1,14 +1,25 @@
-import { Body, Controller, Delete, Get, MessageEvent, NotFoundException, Param, Post, Sse, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  MessageEvent,
+  NotFoundException,
+  Param,
+  Post,
+  Sse,
+  UseGuards,
+} from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { SecurityGuard } from '../security.guard';
 import { Timer } from './timer';
 import { TimerEvent } from './timer-event';
 import { TimerService } from './timer.service';
 
-@Controller("/timers")
+@Controller('/timers')
 @UseGuards(SecurityGuard)
 export class TimerController {
-  constructor(private readonly timerService: TimerService) { }
+  constructor(private readonly timerService: TimerService) {}
 
   @Get()
   getTimers(): Timer[] {
@@ -62,10 +73,10 @@ export class TimerController {
         data: {
           ...event,
           subscribedAt: new Date().toISOString(),
-          subscription: true
+          subscription: true,
         },
-        type: 'timer-tick'
-      }))
+        type: 'timer-tick',
+      })),
     );
   }
 }

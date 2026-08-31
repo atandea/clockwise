@@ -9,6 +9,11 @@ import { SettingsService } from './settings.service';
 
 @Module({
   controllers: [TimerController, SecurityController, SettingsController],
-  providers: [TimerService, FileStorageService, SecurityService, SettingsService],
+  providers: [
+    TimerService,
+    FileStorageService,
+    SecurityService,
+    SettingsService,
+  ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -8,29 +8,38 @@ import { TimerInstance } from './timer-instance';
 
 @Injectable()
 export class TimerService {
-  constructor(private readonly fileStorageService: FileStorageService) { }
+  constructor(private readonly fileStorageService: FileStorageService) {}
 
   private activeTimerInstance: TimerInstance | null = null;
   private overtime = 0;
   private activeSubscription: any;
   private readonly ephemeralTimers = new Map<string, Timer>();
-  private readonly activeTimerSubject = new BehaviorSubject<any>({ status: 'idle', remainingSeconds: 0 });
+  private readonly activeTimerSubject = new BehaviorSubject<any>({
+    status: 'idle',
+    remainingSeconds: 0,
+  });
   private readonly countdown$ = interval(1000).pipe(
     map(() => {
-      if (this.activeTimerInstance?.status === 'stopped' || !this.activeTimerInstance) {
+      if (
+        this.activeTimerInstance?.status === 'stopped' ||
+        !this.activeTimerInstance
+      ) {
         return {
-          status: "stopped",
-          remainingSeconds: 0
-        }
-      } else if (this.activeTimerInstance.status === 'overtime' || this.activeTimerInstance.remainingSeconds <= 0) {
+          status: 'stopped',
+          remainingSeconds: 0,
+        };
+      } else if (
+        this.activeTimerInstance.status === 'overtime' ||
+        this.activeTimerInstance.remainingSeconds <= 0
+      ) {
         this.activeTimerInstance.status = 'overtime';
         const event = {
           status: 'overtime',
           timerId: this.activeTimerInstance.id,
-          remainingSeconds: this.overtime
+          remainingSeconds: this.overtime,
         };
         this.overtime++;
-        return event
+        return event;
       } else {
         const event: TimerEvent = {
           status: 'running',
@@ -42,10 +51,15 @@ export class TimerService {
           message: `${this.activeTimerInstance.name}: ${this.formatTime(this.activeTimerInstance.remainingSeconds, this.activeTimerInstance.unit)} remaining`,
         };
         this.activeTimerInstance.remainingSeconds--;
-        this.activeTimerInstance.progressPercent = Math.round(((this.activeTimerInstance.duration - this.activeTimerInstance.remainingSeconds) / this.activeTimerInstance.duration) * 100);
+        this.activeTimerInstance.progressPercent = Math.round(
+          ((this.activeTimerInstance.duration -
+            this.activeTimerInstance.remainingSeconds) /
+            this.activeTimerInstance.duration) *
+            100,
+        );
         return event;
       }
-    })
+    }),
   );
 
   startTimer(timer: Timer) {
@@ -61,7 +75,7 @@ export class TimerService {
       unit: timer.unit,
       remainingSeconds: this.convertToSeconds(timer.duration, timer.unit),
       progressPercent: 0,
-      status: 'running'
+      status: 'running',
     };
 
     // Emit initial state immediately
@@ -78,12 +92,11 @@ export class TimerService {
 
     this.activeSubscription = this.countdown$.subscribe({
       next: (event) => this.activeTimerSubject.next(event),
-      error: (err) => this.activeTimerSubject.error(err)
+      error: (err) => this.activeTimerSubject.error(err),
     });
 
     return this.activeTimerInstance;
   }
-
 
   stopActiveTimer() {
     if (this.activeTimerInstance) {
@@ -97,7 +110,7 @@ export class TimerService {
       this.activeTimerSubject.next({
         status: 'stopped',
         timerId: this.activeTimerInstance.id,
-        remainingSeconds: 0
+        remainingSeconds: 0,
       });
     }
   }
@@ -115,7 +128,7 @@ export class TimerService {
         name: this.activeTimerInstance.name,
         remainingSeconds: this.activeTimerInstance.remainingSeconds,
         totalSeconds: this.activeTimerInstance.duration,
-        progressPercent: this.activeTimerInstance.progressPercent
+        progressPercent: this.activeTimerInstance.progressPercent,
       });
     }
   }
@@ -125,7 +138,7 @@ export class TimerService {
       this.activeTimerInstance.status = 'running';
       this.activeSubscription = this.countdown$.subscribe({
         next: (event) => this.activeTimerSubject.next(event),
-        error: (err) => this.activeTimerSubject.error(err)
+        error: (err) => this.activeTimerSubject.error(err),
       });
     }
   }
@@ -140,7 +153,7 @@ export class TimerService {
 
   emitSettingsUpdated() {
     this.activeTimerSubject.next({
-      status: 'settings-updated'
+      status: 'settings-updated',
     });
   }
 
@@ -153,10 +166,13 @@ export class TimerService {
       return this.ephemeralTimers.get(timerId);
     }
     const timers = this.fileStorageService.readData();
-    return timers.find(timer => timer.id === timerId);
+    return timers.find((timer) => timer.id === timerId);
   }
 
-  private convertToSeconds(duration: number, unit: 'seconds' | 'minutes' | 'hours'): number {
+  private convertToSeconds(
+    duration: number,
+    unit: 'seconds' | 'minutes' | 'hours',
+  ): number {
     switch (unit) {
       case 'seconds':
         return duration;
@@ -169,7 +185,10 @@ export class TimerService {
     }
   }
 
-  private formatTime(seconds: number, originalUnit: 'seconds' | 'minutes' | 'hours'): string {
+  private formatTime(
+    seconds: number,
+    originalUnit: 'seconds' | 'minutes' | 'hours',
+  ): string {
     if (originalUnit === 'hours') {
       const hours = Math.floor(seconds / 3600);
       const minutes = Math.floor((seconds % 3600) / 60);
@@ -183,7 +202,6 @@ export class TimerService {
       return `${seconds}s`;
     }
   }
-
 
   createTimer(timer: Timer, temporary: boolean = false): Timer {
     console.log('Creating timer:', timer, 'temporary:', temporary);
@@ -211,7 +229,6 @@ export class TimerService {
     this.fileStorageService.writeData(updatedTimers);
   }
 
-
   getTimers(): Timer[] {
     const timers = this.fileStorageService.readData().map((timer: any) => {
       return {
@@ -220,7 +237,7 @@ export class TimerService {
         duration: timer.duration,
         unit: timer.unit,
         createdAt: timer.createdAt,
-      } as Timer;
+      };
     });
 
     return timers.sort((a, b) => {

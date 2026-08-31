@@ -5,7 +5,7 @@ import { SettingsService } from './settings.service';
 @Injectable()
 export class SecurityService {
   private readonly logger = new Logger(SecurityService.name);
-  private pin: string;
+  private pin!: string;
   private pinEnabled: boolean = true;
   private readonly pinLockAtStartup: boolean = true;
 
@@ -14,13 +14,16 @@ export class SecurityService {
     const settings = this.settingsService.getSettings();
 
     // This captures the state recorded at the previous startup
-    this.pinLockAtStartup = settings.pin_lock_at_startup ?? (settings.pin_lock_enabled ?? true);
+    this.pinLockAtStartup =
+      settings.pin_lock_at_startup ?? settings.pin_lock_enabled ?? true;
 
     // Load current PIN security state
     this.pinEnabled = settings.pin_lock_enabled ?? true;
 
     // Record current state as the 'startup' state for the NEXT run
-    this.settingsService.updateSettings({ pin_lock_at_startup: this.pinEnabled });
+    this.settingsService.updateSettings({
+      pin_lock_at_startup: this.pinEnabled,
+    });
   }
 
   isPinEnabled(): boolean {
@@ -56,6 +59,8 @@ export class SecurityService {
 
   isLocal(ip: string | undefined): boolean {
     if (!ip) return false;
-    return ip.startsWith('127.') || ip === '::1' || ip.startsWith('::ffff:127.');
+    return (
+      ip.startsWith('127.') || ip === '::1' || ip.startsWith('::ffff:127.')
+    );
   }
 }

@@ -28,9 +28,9 @@ describe('SettingsController', () => {
         { provide: TimerService, useValue: mockTimerService },
       ],
     })
-    .overrideGuard(SecurityGuard)
-    .useValue({ canActivate: () => true })
-    .compile();
+      .overrideGuard(SecurityGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<SettingsController>(SettingsController);
     service = module.get<SettingsService>(SettingsService);
@@ -47,8 +47,12 @@ describe('SettingsController', () => {
 
   it('should update network access setting', () => {
     const updates = { network_access_enabled: false };
-    mockSettingsService.updateSettings.mockReturnValueOnce({ network_access_enabled: false });
-    expect(controller.updateSettings(updates)).toEqual({ network_access_enabled: false });
+    mockSettingsService.updateSettings.mockReturnValueOnce({
+      network_access_enabled: false,
+    });
+    expect(controller.updateSettings(updates)).toEqual({
+      network_access_enabled: false,
+    });
     expect(service.updateSettings).toHaveBeenCalledWith(updates);
   });
 });

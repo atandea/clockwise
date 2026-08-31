@@ -51,8 +51,8 @@ execSync("npm run build", { cwd: serverDir, stdio: "inherit" });
 // Build the binary using pkg
 console.log("Generating server binary...");
 // Map node version to pkg target
-// node 24 -> node24
-const pkgTarget = "node24-linux-x64"; // Might need to be more dynamic if we want to support other OSs
+// node 26 -> node26
+const pkgTarget = "node26-linux-x64"; // Might need to be more dynamic if we want to support other OSs
 execSync(`npx @yao-pkg/pkg . -t ${pkgTarget} --output ${outputPath}`, { cwd: serverDir, stdio: "inherit" });
 
 console.log(`Sidecar binary generated at: ${outputPath}`);

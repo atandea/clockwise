@@ -12,7 +12,7 @@ describe('API (e2e)', () => {
 
   beforeAll(async () => {
     process.env.APP_DATA_FILE = testDataFile;
-    
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -28,12 +28,11 @@ describe('API (e2e)', () => {
     if (existsSync(testSettingsFile)) unlinkSync(testSettingsFile);
   });
 
-
   it('/api/v1/security/status (GET)', () => {
     return request(app.getHttpServer())
       .get('/api/v1/security/status')
       .expect(200)
-      .then(response => {
+      .then((response) => {
         expect(response.body).toHaveProperty('pinEnabled');
         expect(response.body).toHaveProperty('authorized');
       });
@@ -43,7 +42,7 @@ describe('API (e2e)', () => {
     const newTimer = {
       name: 'E2E Timer',
       duration: 10,
-      unit: 'seconds'
+      unit: 'seconds',
     };
 
     // Create timer

@@ -33,9 +33,9 @@ describe('TimerController', () => {
         { provide: SecurityService, useValue: mockSecurityService },
       ],
     })
-    .overrideGuard(SecurityGuard)
-    .useValue({ canActivate: () => true })
-    .compile();
+      .overrideGuard(SecurityGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<TimerController>(TimerController);
     service = module.get<TimerService>(TimerService);
@@ -55,11 +55,16 @@ describe('TimerController', () => {
 
   describe('createTimer', () => {
     it('should call timerService.createTimer with body and temporary flag', () => {
-      const body = { name: 'Test', duration: 10, unit: 'seconds', temporary: true };
+      const body = {
+        name: 'Test',
+        duration: 10,
+        unit: 'seconds',
+        temporary: true,
+      };
       controller.createTimer(body);
       expect(service.createTimer).toHaveBeenCalledWith(
         { name: 'Test', duration: 10, unit: 'seconds' },
-        true
+        true,
       );
     });
   });
@@ -71,10 +76,10 @@ describe('TimerController', () => {
     });
 
     it('should call startTimer if timer exists', () => {
-        const timer = { id: '1', name: 'T1' };
-        mockTimerService.getTimerById.mockReturnValue(timer);
-        controller.startTimer('1');
-        expect(service.startTimer).toHaveBeenCalledWith(timer);
+      const timer = { id: '1', name: 'T1' };
+      mockTimerService.getTimerById.mockReturnValue(timer);
+      controller.startTimer('1');
+      expect(service.startTimer).toHaveBeenCalledWith(timer);
     });
   });
 
@@ -108,7 +113,9 @@ describe('TimerController', () => {
 
   describe('subscribeToStream', () => {
     it('should call timerService.subscribeToStream', () => {
-      mockTimerService.subscribeToStream.mockReturnValue({ pipe: jest.fn().mockReturnValue({}) });
+      mockTimerService.subscribeToStream.mockReturnValue({
+        pipe: jest.fn().mockReturnValue({}),
+      });
       controller.subscribeToStream();
       expect(service.subscribeToStream).toHaveBeenCalled();
     });

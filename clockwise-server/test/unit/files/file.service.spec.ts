@@ -29,34 +29,34 @@ describe('FileStorageService', () => {
     it('should return parsed data if file exists', () => {
       (fs.existsSync as jest.Mock).mockReturnValue(true);
       (fs.readFileSync as jest.Mock).mockReturnValue('[{"id": "1"}]');
-      
+
       const data = service.readData();
-      expect(data).toEqual([{ id: "1" }]);
+      expect(data).toEqual([{ id: '1' }]);
     });
 
     it('should use cache on subsequent reads', () => {
-        (fs.existsSync as jest.Mock).mockReturnValue(true);
-        (fs.readFileSync as jest.Mock).mockReturnValue('[{"id": "1"}]');
-        
-        service.readData();
-        service.readData();
-        
-        expect(fs.readFileSync).toHaveBeenCalledTimes(1);
+      (fs.existsSync as jest.Mock).mockReturnValue(true);
+      (fs.readFileSync as jest.Mock).mockReturnValue('[{"id": "1"}]');
+
+      service.readData();
+      service.readData();
+
+      expect(fs.readFileSync).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('writeData', () => {
     it('should write data to file and create directory if missing', () => {
-        const data = [{ id: "2" }];
-        (fs.existsSync as jest.Mock).mockReturnValue(false); // directory doesn't exist
-        
-        service.writeData(data);
-        
-        expect(fs.mkdirSync).toHaveBeenCalled();
-        expect(fs.writeFileSync).toHaveBeenCalledWith(
-            expect.any(String),
-            JSON.stringify(data, null, 2)
-        );
+      const data = [{ id: '2' }];
+      (fs.existsSync as jest.Mock).mockReturnValue(false); // directory doesn't exist
+
+      service.writeData(data);
+
+      expect(fs.mkdirSync).toHaveBeenCalled();
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        expect.any(String),
+        JSON.stringify(data, null, 2),
+      );
     });
   });
 });

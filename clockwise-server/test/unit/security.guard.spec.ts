@@ -13,7 +13,11 @@ describe('SecurityGuard', () => {
     verifyPin: jest.fn(),
   };
 
-  const createMockContext = (ip: string, headers: any = {}, query: any = {}) => {
+  const createMockContext = (
+    ip: string,
+    headers: any = {},
+    query: any = {},
+  ) => {
     return {
       switchToHttp: () => ({
         getRequest: () => ({
@@ -35,7 +39,7 @@ describe('SecurityGuard', () => {
 
     guard = module.get<SecurityGuard>(SecurityGuard);
     securityService = module.get<SecurityService>(SecurityService);
-    
+
     // Clear mocks before each test
     jest.clearAllMocks();
   });
@@ -48,7 +52,7 @@ describe('SecurityGuard', () => {
     it('should allow local requests', () => {
       mockSecurityService.isLocal.mockReturnValue(true);
       const context = createMockContext('127.0.0.1');
-      
+
       expect(guard.canActivate(context)).toBe(true);
       expect(mockSecurityService.isLocal).toHaveBeenCalledWith('127.0.0.1');
     });
@@ -57,7 +61,7 @@ describe('SecurityGuard', () => {
       mockSecurityService.isLocal.mockReturnValue(false);
       mockSecurityService.isPinEnabled.mockReturnValue(false);
       const context = createMockContext('1.2.3.4');
-      
+
       expect(guard.canActivate(context)).toBe(true);
       expect(mockSecurityService.isPinEnabled).toHaveBeenCalled();
     });
@@ -66,17 +70,21 @@ describe('SecurityGuard', () => {
       mockSecurityService.isLocal.mockReturnValue(false);
       mockSecurityService.isPinEnabled.mockReturnValue(true);
       const context = createMockContext('1.2.3.4');
-      
+
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
-      expect(() => guard.canActivate(context)).toThrow('Network access requires a PIN.');
+      expect(() => guard.canActivate(context)).toThrow(
+        'Network access requires a PIN.',
+      );
     });
 
     it('should allow if valid PIN is provided in Authorization header', () => {
       mockSecurityService.isLocal.mockReturnValue(false);
       mockSecurityService.isPinEnabled.mockReturnValue(true);
       mockSecurityService.verifyPin.mockReturnValue(true);
-      const context = createMockContext('1.2.3.4', { authorization: 'PIN 1234' });
-      
+      const context = createMockContext('1.2.3.4', {
+        authorization: 'PIN 1234',
+      });
+
       expect(guard.canActivate(context)).toBe(true);
       expect(mockSecurityService.verifyPin).toHaveBeenCalledWith('1234');
     });
@@ -86,7 +94,7 @@ describe('SecurityGuard', () => {
       mockSecurityService.isPinEnabled.mockReturnValue(true);
       mockSecurityService.verifyPin.mockReturnValue(true);
       const context = createMockContext('1.2.3.4', {}, { pin: '1234' });
-      
+
       expect(guard.canActivate(context)).toBe(true);
       expect(mockSecurityService.verifyPin).toHaveBeenCalledWith('1234');
     });
@@ -95,8 +103,10 @@ describe('SecurityGuard', () => {
       mockSecurityService.isLocal.mockReturnValue(false);
       mockSecurityService.isPinEnabled.mockReturnValue(true);
       mockSecurityService.verifyPin.mockReturnValue(false);
-      const context = createMockContext('1.2.3.4', { authorization: 'PIN 0000' });
-      
+      const context = createMockContext('1.2.3.4', {
+        authorization: 'PIN 0000',
+      });
+
       expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
       expect(() => guard.canActivate(context)).toThrow('Invalid PIN.');
     });

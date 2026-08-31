@@ -90,13 +90,13 @@ jobs:
         include:
           - platform: 'ubuntu-latest'
             args: '--bundles deb'
-            sidecar_target: 'node24-linux-x64'
+            sidecar_target: 'node26-linux-x64'
             sidecar_ext: ''
             sidecar_triple: 'x86_64-unknown-linux-gnu'
             artifact_pattern: 'target/release/bundle/deb/*.deb'
           - platform: 'windows-latest'
             args: '--bundles msi'
-            sidecar_target: 'node24-win-x64'
+            sidecar_target: 'node26-win-x64'
             sidecar_ext: '.exe'
             sidecar_triple: 'x86_64-pc-windows-msvc'
             artifact_pattern: 'target/release/bundle/msi/*.msi'
@@ -108,7 +108,7 @@ jobs:
       - name: setup node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 26
 
       - name: install system dependencies (linux only)
         if: matrix.platform == 'ubuntu-latest'

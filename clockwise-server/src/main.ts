@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
+import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import compression from 'compression';
 import { SettingsService } from './settings.service';
 import { existsSync } from 'node:fs';
@@ -8,7 +8,10 @@ import { join } from 'node:path';
 import http from 'node:http';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    new ExpressAdapter(),
+  );
   app.setGlobalPrefix('api/v1');
   app.use(compression());
 
@@ -41,7 +44,8 @@ async function bootstrap() {
     origin: (origin, callback) => {
       // Allow all origins for development to ensure Tauri connectivity
       return callback(null, true);
-    }, methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
       'Content-Type',
       'Authorization',
@@ -67,7 +71,10 @@ async function bootstrap() {
     if (req.method === 'OPTIONS') {
       res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
       res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-      res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Access-Control-Allow-Private-Network');
+      res.header(
+        'Access-Control-Allow-Headers',
+        'Content-Type, Authorization, Access-Control-Allow-Private-Network',
+      );
       return res.sendStatus(204);
     }
     next();
@@ -115,7 +122,9 @@ async function bootstrap() {
       });
 
       proxyReq.on('error', () => {
-        res.status(502).json({ error: 'Vite dev server not available on port ' + VITE_PORT });
+        res.status(502).json({
+          error: 'Vite dev server not available on port ' + VITE_PORT,
+        });
       });
 
       req.pipe(proxyReq, { end: true });

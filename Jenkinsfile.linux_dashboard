@@ -60,7 +60,7 @@ pipeline {
                     sh '''
                         set -ex
                         echo '--- Building Server Sidecar Binary (Linux) ---'
-                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node24-linux-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-unknown-linux-gnu)
+                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node26-linux-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-unknown-linux-gnu)
                         
                         echo '--- Building Tauri App (.deb) ---'
                         (cd clockwise-dashboard && npm run tauri build -- --bundles deb)
@@ -75,7 +75,7 @@ pipeline {
                     sh '''
                         set -ex
                         echo '--- Building Server Sidecar Binary (Windows) ---'
-                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node24-win-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-pc-windows-gnu.exe)
+                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node26-win-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-pc-windows-gnu.exe)
                 
                         echo '--- Building Tauri App (.exe) ---'
                         export PKG_CONFIG_ALLOW_CROSS=1
