@@ -23,6 +23,7 @@ export interface AuthStatus {
   pinEnabled: boolean;
   pinLockAtStartup: boolean;
   local: boolean;
+  lockoutRemainingMs?: number;
 }
 
 export function getApiBaseUrl(): string {

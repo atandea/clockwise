@@ -19,6 +19,7 @@ describe('API (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api/v1');
+    app.getHttpAdapter().getInstance().set('trust proxy', true);
     await app.init();
   });
 
@@ -62,5 +63,27 @@ describe('API (e2e)', () => {
     const found = getRes.body.find((t: any) => t.id === timerId);
     expect(found).toBeDefined();
     expect(found.name).toBe('E2E Timer');
+  });
+
+  it('limits repeated PIN verification attempts', async () => {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await request(app.getHttpServer())
+        .post('/api/v1/security/verify')
+        .set('X-Forwarded-For', '192.168.1.100')
+        .send({ pin: '0000' })
+        .expect(403);
+    }
+
+    await request(app.getHttpServer())
+      .post('/api/v1/security/verify')
+      .set('X-Forwarded-For', '192.168.1.100')
+      .send({ pin: '0000' })
+      .expect(429)
+      .expect(({ body }) => {
+        expect(body.message).toBe(
+          'Too many security attempts. Please wait a minute before trying again.',
+        );
+        expect(body.disabled).toBe(true);
+      });
   });
 });

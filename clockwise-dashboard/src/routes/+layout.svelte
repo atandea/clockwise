@@ -86,7 +86,11 @@
             <Loading />
         </div>
     {:else if authStatus?.requiresPin}
-        <PinScreen apiBase={getApiBaseUrl()} onSuccess={handlePinSuccess} />
+        <PinScreen
+            apiBase={getApiBaseUrl()}
+            initialLockoutMs={authStatus?.lockoutRemainingMs ?? 0}
+            onSuccess={handlePinSuccess}
+        />
     {:else}
         {@render children?.()}
     {/if}

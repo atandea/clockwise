@@ -2,12 +2,17 @@ import { randomInt } from 'node:crypto';
 import { Injectable, Logger } from '@nestjs/common';
 import { SettingsService } from './settings.service';
 
+interface IpLockState {
+  until: number;
+}
+
 @Injectable()
 export class SecurityService {
   private readonly logger = new Logger(SecurityService.name);
   private pin!: string;
   private pinEnabled: boolean = true;
   private readonly pinLockAtStartup: boolean = true;
+  private readonly ipLockouts = new Map<string, IpLockState>();
 
   constructor(private readonly settingsService: SettingsService) {
     this.generatePin();
@@ -55,6 +60,46 @@ export class SecurityService {
 
   verifyPin(providedPin: string): boolean {
     return this.pin === providedPin;
+  }
+
+  setIpLockout(ip: string, durationMs: number): void {
+    const normalizedIp = this.normalizeIp(ip);
+    if (!normalizedIp) return;
+
+    const until = Date.now() + durationMs;
+    this.ipLockouts.set(normalizedIp, { until });
+  }
+
+  getLockoutRemainingMs(ip: string | undefined): number {
+    const normalizedIp = this.normalizeIp(ip);
+    if (!normalizedIp) return 0;
+
+    const lockout = this.ipLockouts.get(normalizedIp);
+    if (!lockout) return 0;
+
+    const remainingMs = lockout.until - Date.now();
+    if (remainingMs <= 0) {
+      this.ipLockouts.delete(normalizedIp);
+      return 0;
+    }
+
+    return remainingMs;
+  }
+
+  isIpLocked(ip: string | undefined): boolean {
+    return this.getLockoutRemainingMs(ip) > 0;
+  }
+
+  normalizeIp(ip: string | undefined): string | null {
+    if (!ip) return null;
+
+    const normalized = ip.trim();
+    if (!normalized) return null;
+
+    return normalized
+      .replace(/^::ffff:/, '')
+      .replace(/\s+/g, '')
+      .toLowerCase();
   }
 
   isLocal(ip: string | undefined): boolean {

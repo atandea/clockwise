@@ -1,13 +1,84 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
+    const PIN_LOCK_STORAGE_KEY = "clockwise_pin_lock_until";
+    const PIN_LOCK_DURATION_MS = 60_000;
+
     interface Props {
         apiBase: string;
+        initialLockoutMs?: number;
         onSuccess: (pin: string) => void;
     }
-    let { apiBase, onSuccess }: Props = $props();
+    let { apiBase, initialLockoutMs = 0, onSuccess }: Props = $props();
 
     let pinInput = $state("");
+    let pinDigits = $state<string[]>(["", "", "", ""]);
     let error = $state("");
     let loading = $state(false);
+    let lockUntil = $state(0);
+    let remainingSeconds = $state(0);
+    let pinRefs: HTMLInputElement[] = [];
+
+    function applyLockUntil(nextLockUntil: number) {
+        lockUntil = nextLockUntil;
+        const remainingMs = Math.max(0, nextLockUntil - Date.now());
+        remainingSeconds = Math.ceil(remainingMs / 1000);
+
+        if (remainingMs === 0) {
+            lockUntil = 0;
+            localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
+        } else {
+            localStorage.setItem(PIN_LOCK_STORAGE_KEY, nextLockUntil.toString());
+        }
+    }
+
+    function updateLockout() {
+        const storedLockUntil = Number(localStorage.getItem(PIN_LOCK_STORAGE_KEY));
+        if (storedLockUntil > Date.now()) {
+            applyLockUntil(storedLockUntil);
+            return;
+        }
+
+        lockUntil = 0;
+        remainingSeconds = 0;
+        localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
+    }
+
+    function startLockout(durationMs = PIN_LOCK_DURATION_MS) {
+        const now = Date.now();
+        const storedLockUntil = Number(localStorage.getItem(PIN_LOCK_STORAGE_KEY) ?? 0);
+        const nextLockUntil = Math.max(storedLockUntil, now + durationMs);
+        applyLockUntil(nextLockUntil);
+    }
+
+    onMount(() => {
+        const startFromServer = Number(initialLockoutMs ?? 0);
+        if (startFromServer > 0) {
+            startLockout(startFromServer);
+        } else {
+            const storedLockUntil = Number(
+                localStorage.getItem(PIN_LOCK_STORAGE_KEY),
+            );
+            if (storedLockUntil > Date.now()) {
+                applyLockUntil(storedLockUntil);
+            } else {
+                localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
+            }
+        }
+
+        const handleStorage = (event: StorageEvent) => {
+            if (event.key !== PIN_LOCK_STORAGE_KEY) return;
+            updateLockout();
+        };
+
+        const interval = window.setInterval(updateLockout, 1000);
+        window.addEventListener("storage", handleStorage);
+
+        return () => {
+            window.clearInterval(interval);
+            window.removeEventListener("storage", handleStorage);
+        };
+    });
 
     async function handleSubmit(e: Event) {
         e.preventDefault();
@@ -28,6 +99,18 @@
             if (res.ok) {
                 onSuccess(pinInput);
             } else {
+                const body = await res.json().catch(() => null);
+                const retryAfterMs =
+                    typeof body?.retryAfterMs === "number" &&
+                    body.retryAfterMs > 0
+                        ? body.retryAfterMs
+                        : null;
+
+                if (res.status === 429 || (res.status === 403 && body?.disabled)) {
+                    startLockout(retryAfterMs ?? PIN_LOCK_DURATION_MS);
+                    return;
+                }
+
                 error = "Access Denied: Invalid PIN";
             }
         } catch (err) {
@@ -37,10 +120,37 @@
         }
     }
 
-    function handleInput(e: Event) {
+    function updatePinValue() {
+        pinInput = pinDigits.join("");
+    }
+
+    function handleDigitInput(index: number, e: Event) {
         const target = e.target as HTMLInputElement;
-        target.value = target.value.replace(/\D/g, "").slice(0, 4);
-        pinInput = target.value;
+        const value = target.value.replace(/\D/g, "").slice(0, 1);
+        pinDigits[index] = value;
+        target.value = value;
+        updatePinValue();
+
+        if (value && index < pinDigits.length - 1) {
+            pinRefs[index + 1]?.focus();
+        }
+    }
+
+    function handleDigitKeydown(index: number, e: KeyboardEvent) {
+        if (e.key === "Backspace" && !pinDigits[index] && index > 0) {
+            pinRefs[index - 1]?.focus();
+            return;
+        }
+
+        if (e.key === "ArrowLeft" && index > 0) {
+            e.preventDefault();
+            pinRefs[index - 1]?.focus();
+        }
+
+        if (e.key === "ArrowRight" && index < pinDigits.length - 1) {
+            e.preventDefault();
+            pinRefs[index + 1]?.focus();
+        }
     }
 </script>
 
@@ -73,30 +183,52 @@
             </p>
         </div>
 
-        <form onsubmit={handleSubmit} class="space-y-6">
+        <form onsubmit={handleSubmit} class="space-y-8">
             <div class="relative">
-                <input
-                    type="text"
-                    inputmode="numeric"
-                    autocomplete="one-time-code"
-                    value={pinInput}
-                    oninput={handleInput}
-                    placeholder="0000"
-                    class="block w-full rounded-lg border border-gray-700 bg-gray-800/50 py-4 text-center text-4xl font-black font-mono tracking-[0.75em] pl-[0.75em] text-white outline-none ring-blue-500/50 transition-all placeholder:opacity-20 focus:border-blue-500 focus:ring-4"
-                    disabled={loading}
-                />
+                <div class="grid grid-cols-4 gap-3">
+                    {#each pinDigits as digit, index}
+                        <input
+                            bind:this={pinRefs[index]}
+                            type="text"
+                            inputmode="numeric"
+                            autocomplete="one-time-code"
+                            maxlength="1"
+                            value={digit}
+                            oninput={(e) => handleDigitInput(index, e)}
+                            onkeydown={(e) => handleDigitKeydown(index, e)}
+                            placeholder="0"
+                            aria-label={`PIN digit ${index + 1}`}
+                            aria-invalid={Boolean(error)}
+                            class:border-red-500={Boolean(error)}
+                            class="h-16 w-full rounded-lg border border-gray-700 bg-gray-800/50 text-center text-4xl font-black font-mono text-white outline-none ring-blue-500/50 transition-all placeholder:text-slate-600 focus:border-blue-500 focus:ring-4 caret-transparent"
+                            disabled={loading || remainingSeconds > 0}
+                        />
+                    {/each}
+                </div>
+                {#if error}
+                    <p
+                        class="absolute left-1/2 top-full z-10 -translate-x-1/2 translate-y-2 whitespace-nowrap text-center text-sm font-medium text-red-400"
+                        role="alert"
+                    >
+                        {error}
+                    </p>
+                {/if}
+                {#if remainingSeconds > 0}
+                    <div
+                        class="absolute inset-0 flex items-center justify-center rounded-lg bg-gray-950/95 text-center text-sm font-semibold text-amber-300"
+                        aria-live="polite"
+                    >
+                        Try again in {remainingSeconds}s
+                    </div>
+                {/if}
             </div>
-
-            {#if error}
-                <p class="text-center text-sm font-medium text-red-400">
-                    {error}
-                </p>
-            {/if}
 
             <button
                 type="submit"
                 class="flex w-full items-center justify-center rounded-lg bg-blue-600 py-3 font-bold text-white transition-all hover:bg-blue-500 active:scale-[0.98] disabled:opacity-50"
-                disabled={loading || pinInput.length !== 4}
+                disabled={
+                    loading || remainingSeconds > 0 || pinInput.length !== 4
+                }
             >
                 {#if loading}
                     <div

@@ -6,19 +6,25 @@ import {
   Req,
   Ip,
   ForbiddenException,
+  UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { SecurityService } from './security.service';
 import { Request } from 'express';
+import { AppThrottlerGuard } from './throttler.guard';
 
 @Controller('security')
 export class SecurityController {
   constructor(private readonly securityService: SecurityService) {}
 
   @Get('status')
+  @UseGuards(AppThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   getStatus(@Ip() ip: string, @Req() req: Request) {
     const local = this.securityService.isLocal(ip);
     const pinEnabled = this.securityService.isPinEnabled();
     const authHeader = req.headers['authorization'];
+    const lockedRemainingMs = this.securityService.getLockoutRemainingMs(ip);
 
     let authorized = true;
     if (!local && pinEnabled) {
@@ -41,6 +47,7 @@ export class SecurityController {
       pinEnabled: pinEnabled,
       pinLockAtStartup: this.securityService.getPinLockAtStartup(),
       local: local,
+      lockoutRemainingMs: lockedRemainingMs,
     };
   }
 
@@ -56,6 +63,8 @@ export class SecurityController {
   }
 
   @Get('pin')
+  @UseGuards(AppThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   getPin(@Req() req: Request, @Ip() ip: string) {
     const local = this.securityService.isLocal(ip);
     const authHeader = req.headers['authorization'];
@@ -81,14 +90,27 @@ export class SecurityController {
   }
 
   @Post('verify')
+  @UseGuards(AppThrottlerGuard)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   verify(@Body('pin') pin: string, @Ip() ip: string) {
     // Allow localhost access without PIN
     if (this.securityService.isLocal(ip)) {
       return { success: true };
     }
+
+    const remainingMs = this.securityService.getLockoutRemainingMs(ip);
+    if (remainingMs > 0) {
+      throw new ForbiddenException({
+        message: 'PIN temporarily disabled for this IP.',
+        disabled: true,
+        retryAfterMs: remainingMs,
+      });
+    }
+
     if (this.securityService.verifyPin(pin)) {
       return { success: true };
     }
+
     throw new ForbiddenException('Invalid PIN');
   }
 }

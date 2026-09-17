@@ -60,6 +60,17 @@ describe('SecurityService', () => {
     });
   });
 
+  it('should maintain a server-side lockout by IP', () => {
+    const ip = '192.168.1.50';
+    const lockoutMs = 60_000;
+
+    service.setIpLockout(ip, lockoutMs);
+
+    expect(service.isIpLocked(ip)).toBe(true);
+    expect(service.getLockoutRemainingMs(ip)).toBeGreaterThan(0);
+    expect(service.getLockoutRemainingMs('192.168.1.51')).toBe(0);
+  });
+
   describe('settings integration', () => {
     it('should initialize pinLockAtStartup from settings', async () => {
       mockSettingsService.getSettings.mockReturnValue({
