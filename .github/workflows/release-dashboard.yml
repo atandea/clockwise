@@ -1,0 +1,50 @@
+name: release-dashboard
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Semantic version to release, for example 1.2.3
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: clockwise-release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set version
+        id: version
+        run: |
+          VERSION=$(node scripts/set-version.mjs '${{ inputs.version }}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Commit release version
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add clockwise-dashboard/package.json clockwise-dashboard/package-lock.json \
+            clockwise-dashboard/src-tauri/tauri.conf.json clockwise-dashboard/src-tauri/Cargo.toml \
+            clockwise-server/package.json clockwise-server/package-lock.json
+          git commit -m "chore: release v${{ steps.version.outputs.version }}"
+          git push
+
+  publish:
+    needs: prepare
+    uses: ./.github/workflows/build-dashboard.yml
+    with:
+      publish: true
+      version: ${{ needs.prepare.outputs.version }}
+    secrets: inherit
