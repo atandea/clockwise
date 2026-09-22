@@ -24,6 +24,38 @@ export class AppThrottlerGuard extends ThrottlerGuard {
     super(options, storageService, reflector);
   }
 
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const ip = request.ip;
+
+    if (
+      this.securityService.isLocal(ip) ||
+      !this.securityService.isPinEnabled() ||
+      this.hasValidPin(request)
+    ) {
+      return true;
+    }
+
+    return super.canActivate(context);
+  }
+
+  private hasValidPin(request: any): boolean {
+    const authHeader = request.headers?.authorization;
+    const headerPin =
+      typeof authHeader === 'string' && authHeader.startsWith('PIN ')
+        ? authHeader.substring(4)
+        : '';
+    const queryPin =
+      typeof request.query?.pin === 'string' ? request.query.pin : '';
+    const bodyPin = typeof request.body?.pin === 'string' ? request.body.pin : '';
+    const isVerifyEndpoint = request.path?.endsWith('/security/verify');
+    const candidatePins = isVerifyEndpoint
+      ? [bodyPin]
+      : [headerPin, queryPin];
+
+    return candidatePins.some((pin) => this.securityService.verifyPin(pin));
+  }
+
   protected async throwThrottlingException(
     context: ExecutionContext,
     throttlerLimitDetail: ThrottlerLimitDetail,

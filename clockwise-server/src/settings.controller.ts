@@ -1,11 +1,11 @@
 import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
-import { ThrottlerGuard } from '@nestjs/throttler';
+import { AppThrottlerGuard } from './throttler.guard';
 import { SettingsService, DashboardSettings } from './settings.service';
 import { SecurityGuard } from './security.guard';
 import { TimerService } from './timers/timer.service';
 
 @Controller('settings')
-@UseGuards(ThrottlerGuard, SecurityGuard)
+@UseGuards(AppThrottlerGuard, SecurityGuard)
 export class SettingsController {
   constructor(
     private readonly settingsService: SettingsService,

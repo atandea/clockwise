@@ -18,8 +18,6 @@ export class SecurityController {
   constructor(private readonly securityService: SecurityService) {}
 
   @Get('status')
-  @UseGuards(AppThrottlerGuard)
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
   getStatus(@Ip() ip: string, @Req() req: Request) {
     const local = this.securityService.isLocal(ip);
     const pinEnabled = this.securityService.isPinEnabled();

@@ -86,4 +86,28 @@ describe('API (e2e)', () => {
         expect(body.disabled).toBe(true);
       });
   });
+
+  it('limits PIN guesses made through protected settings endpoints', async () => {
+    const ip = '192.168.1.101';
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await request(app.getHttpServer())
+        .get('/api/v1/settings')
+        .set('X-Forwarded-For', ip)
+        .set('Authorization', 'PIN 0000')
+        .expect(403);
+    }
+
+    await request(app.getHttpServer())
+      .get('/api/v1/settings')
+      .set('X-Forwarded-For', ip)
+      .set('Authorization', 'PIN 0000')
+      .expect(429)
+      .expect(({ body }) => {
+        expect(body.message).toBe(
+          'Too many security attempts. Please wait a minute before trying again.',
+        );
+        expect(body.disabled).toBe(true);
+      });
+  });
 });

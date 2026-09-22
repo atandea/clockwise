@@ -22,6 +22,10 @@ export class SecurityGuard implements CanActivate {
       return true;
     }
 
+    if (this.securityService.isIpLocked(ip)) {
+      throw new ForbiddenException('PIN temporarily disabled for this IP.');
+    }
+
     // Network request: check for PIN in headers or query params (for SSE)
     const authHeader = request.headers['authorization'];
     let pin = '';
