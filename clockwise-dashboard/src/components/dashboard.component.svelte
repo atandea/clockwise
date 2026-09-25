@@ -138,7 +138,6 @@
               <ActiveTimer
                 {apiBase}
                 isLoading={status !== "running"}
-                onTimerCreated={() => controlComponent?.fetchTimers()}
               />
             </div>
           </div>

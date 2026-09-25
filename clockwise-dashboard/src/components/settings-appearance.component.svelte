@@ -11,7 +11,10 @@
     let previewTime = $state(10);
     let previewTotalTime = $state(10);
     let previewProgress = $state(0);
-    let previewStatus = $state("running");
+    let previewState = $state<"running" | "paused" | "overtime" | "stopped">(
+        "paused",
+    );
+    let previewStatus = $derived(previewState);
     let previewInterval = $state<any>(null);
 
     function resetPreview(duration: number = 60) {
@@ -20,15 +23,22 @@
         previewTime = duration;
         previewTotalTime = duration;
         previewProgress = 0;
-        previewStatus = "running";
+        previewState = "running";
 
         previewInterval = setInterval(() => {
-            if (previewTime > 0) {
+            if (previewState === "overtime") {
+                previewTime += 1;
+                previewProgress = 100;
+            } else if (previewTime > 0) {
                 previewTime -= 1;
                 previewProgress =
                     ((previewTotalTime - previewTime) / previewTotalTime) * 100;
+            } else if (settings.timerAllowOvertime) {
+                previewTime = 1;
+                previewProgress = 100;
+                previewState = "overtime";
             } else {
-                previewStatus = "stopped";
+                previewState = "stopped";
                 clearInterval(previewInterval);
                 previewInterval = null;
                 // Wait 2 seconds at 0 then reset to frozen
@@ -41,7 +51,7 @@
         }, 1000);
     }
 
-    function freezeTimerPreview(duration: number = 60) {
+    function freezeTimerPreview(duration: number = 75) {
         if (previewInterval) {
             clearInterval(previewInterval);
             previewInterval = null;
@@ -50,7 +60,7 @@
         previewTime = duration;
         previewTotalTime = duration;
         previewProgress = 25;
-        previewStatus = "running";
+        previewState = "paused";
     }
 
     let mounted = false;
@@ -95,26 +105,13 @@
         if (previewInterval) clearInterval(previewInterval);
         previewInterval = null;
         previewMode = "clock";
-        previewStatus = "running";
+        previewState = "running";
     }
 
-    function showOvertimePreview() {
-        if (previewInterval) clearInterval(previewInterval);
-        previewMode = "timer";
-        previewTime = 5;
-        previewTotalTime = 60;
-        previewProgress = 100;
-        previewStatus = "overtime";
-
-        previewInterval = setInterval(() => {
-            previewTime += 1;
-        }, 1000);
+    function stopPreview() {
+        freezeTimerPreview();
     }
 
-    const TEST_DURATIONS = [
-        { label: "10s", value: 10 },
-        { label: "1m", value: 60 },
-    ];
 </script>
 
 <div
@@ -123,10 +120,10 @@
     <!-- Left side: Preview — mirrors dashboard viewer layout -->
     <div class="flex flex-col lg:h-full h-auto gap-2 min-h-fit">
         <div
-            class="flex-1 flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg min-h-0"
+                class="flex flex-col gap-2 rounded border border-gray-700/60 bg-gray-800/60 p-2 shadow-lg lg:flex-1 lg:min-h-0 justify-between"
         >
             <div
-                class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video"
+                class="relative w-full overflow-hidden rounded shadow-inner bg-black/20 aspect-video lg:flex-1 lg:min-h-0"
             >
                 {#if previewMode === "timer"}
                     <PreviewTimer
@@ -150,42 +147,45 @@
                 {/if}
             </div>
 
-            <!-- Preview controls row — mirrors ActiveTimer position -->
-            <div class="flex flex-col gap-2 mt-2 pt-2 border-t border-gray-700/30">
-                <span class="shrink-0 text-[10px] font-bold uppercase tracking-widest text-gray-500">Preview:</span>
-                <div class="grid grid-cols-4 gap-2">
-                    {#each TEST_DURATIONS as duration}
-                        <button
-                            class="px-1 py-2 @lg:py-3 rounded-lg text-[clamp(0.625rem,2cqi,0.75rem)] font-bold transition-all {previewMode ===
-                                'timer' &&
-                            previewStatus === 'running' &&
-                            previewTotalTime === duration.value &&
-                            previewInterval
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                : 'bg-black/40 text-gray-400 hover:text-white hover:bg-white/5 border border-white/5'}"
-                            onclick={() => resetPreview(duration.value)}
-                        >
-                            {duration.label}
-                        </button>
-                    {/each}
-                    <button
-                        class="px-1 py-2 @lg:py-3 rounded-lg text-[clamp(0.625rem,2cqi,0.75rem)] font-bold transition-all {previewMode ===
-                        'clock'
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                            : 'bg-black/40 text-gray-400 hover:text-white hover:bg-white/5 border border-white/5'}"
-                        onclick={() => showClockPreview()}
-                    >
-                        Clock
-                    </button>
-                    <button
-                        class="px-1 py-2 @lg:py-3 rounded-lg text-[clamp(0.625rem,2cqi,0.75rem)] font-bold transition-all {previewMode ===
-                            'timer' && previewStatus === 'overtime'
-                            ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
-                            : 'bg-black/40 text-gray-400 hover:text-white hover:bg-white/5 border border-white/5'}"
-                        onclick={() => showOvertimePreview()}
-                    >
-                        Overtime
-                    </button>
+            <div class="mt-2 pt-2 border-t border-gray-700/30">
+                <div class="relative h-[64px] sm:h-[76px] rounded-2xl border border-gray-700/30 bg-gray-900/40 overflow-hidden transition-all duration-300">
+                    {#if previewMode === "timer" && (previewState === "running" || previewState === "overtime")}
+                        <div class="flex items-center h-full px-3 sm:px-4">
+                            <button
+                                type="button"
+                                class="w-full h-10 sm:h-11 rounded-xl border border-red-500/20 bg-red-500/10 font-mono text-sm sm:text-base font-bold text-red-400 transition-all duration-200 enabled:hover:bg-red-500/25 enabled:active:bg-red-500/30"
+                                onclick={stopPreview}
+                                title="Stop preview and return to the frozen timer"
+                            >Stop</button>
+                        </div>
+                    {:else}
+                        <div class="flex items-center h-full gap-2 px-3 sm:px-4">
+                            <button
+                                type="button"
+                                class="flex-1 h-10 sm:h-11 rounded-xl border border-blue-500/20 bg-blue-500/10 font-mono text-sm sm:text-base font-bold text-blue-400 transition-all duration-200 enabled:hover:bg-blue-500/25 enabled:active:bg-blue-500/30 {previewMode === 'timer' && previewTotalTime === 10 ? 'ring-1 ring-blue-400/50' : ''}"
+                                onclick={() => resetPreview(10)}
+                                title="Preview a 10 second timer"
+                            >10s</button>
+                            <button
+                                type="button"
+                                class="flex-1 h-10 sm:h-11 rounded-xl border border-blue-500/20 bg-blue-500/10 font-mono text-sm sm:text-base font-bold text-blue-400 transition-all duration-200 enabled:hover:bg-blue-500/25 enabled:active:bg-blue-500/30 {previewMode === 'timer' && previewTotalTime === 60 ? 'ring-1 ring-blue-400/50' : ''}"
+                                onclick={() => resetPreview(60)}
+                                title="Preview a 1 minute timer"
+                            >1m</button>
+                            <button
+                                type="button"
+                                class="flex-1 h-10 sm:h-11 rounded-xl border border-blue-500/20 bg-blue-500/10 font-mono text-sm sm:text-base font-bold text-blue-400 transition-all duration-200 enabled:hover:bg-blue-500/25 enabled:active:bg-blue-500/30 {previewMode === 'timer' && previewTotalTime === 300 ? 'ring-1 ring-blue-400/50' : ''}"
+                                onclick={() => resetPreview(300)}
+                                title="Preview a 5 minute timer"
+                            >5m</button>
+                            <button
+                                type="button"
+                                class="flex-1 h-10 sm:h-11 rounded-xl border border-gray-600/40 bg-gray-700/20 font-mono text-sm sm:text-base font-bold text-gray-300 transition-all duration-200 enabled:hover:bg-gray-600/35 enabled:active:bg-gray-600/45 {previewMode === 'clock' ? 'ring-1 ring-gray-300/50' : ''}"
+                                onclick={showClockPreview}
+                                title="Preview the clock"
+                            >Clock</button>
+                        </div>
+                    {/if}
                 </div>
             </div>
         </div>

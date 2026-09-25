@@ -6,11 +6,9 @@
 
     let {
         apiBase = "",
-        onTimerCreated,
         isLoading = false,
     }: {
         apiBase?: string;
-        onTimerCreated?: () => void;
         isLoading?: boolean;
     } = $props();
 
@@ -105,23 +103,14 @@
             const createRes = await fetchWithPin(`${apiBase}/timers`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: parsed.name,
-                    duration: parsed.duration,
-                    unit: parsed.unit,
-                    temporary: true,
-                }),
+                body: JSON.stringify({ ...parsed, temporary: true }),
             });
-
             if (!createRes.ok)
                 throw new Error(`Create failed: ${createRes.status}`);
             const newTimer = await createRes.json();
-
             const startRes = await fetchWithPin(
                 `${apiBase}/timers/${encodeURIComponent(newTimer.id)}/start`,
-                {
-                    method: "POST",
-                },
+                { method: "POST" },
             );
             if (!startRes.ok)
                 throw new Error(`Start failed: ${startRes.status}`);
@@ -134,31 +123,22 @@
     }
 
     async function saveCustomTimer() {
-        if (!inputValue) return;
         if (!parsed || parsed.duration <= 0) {
             toast.error("Invalid format. Try '5' (min), '30s', or '1:30'.");
             return;
         }
+
         creating = true;
         try {
-            const res = await fetchWithPin(`${apiBase}/timers`, {
+            const response = await fetchWithPin(`${apiBase}/timers`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    name: parsed.name,
-                    duration: parsed.duration,
-                    unit: parsed.unit,
-                }),
+                body: JSON.stringify(parsed),
             });
-            if (res.ok) {
-                inputValue = "";
-                onTimerCreated?.();
-            } else {
-                const data = await res.json();
-                toast.error(data.message || "Failed to save timer");
-            }
+            if (!response.ok) throw new Error(`Save failed: ${response.status}`);
+            inputValue = "";
         } catch (err: any) {
-            toast.error("Connection failed");
+            toast.error(err?.message ?? String(err));
         } finally {
             creating = false;
         }
@@ -201,33 +181,26 @@
                         </div>
                     {/if}
 
-                    <!-- Action buttons -->
-                    <div class="flex items-center gap-1.5 shrink-0 ml-1">
                         <button
-                            type="button"
-                            class="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500/25 active:bg-green-500/30 transition-all duration-200 disabled:opacity-40"
-                            onclick={startCustomTimer}
-                            disabled={creating}
-                            title="Start"
-                        >
-                            {#if creating}
-                                <span class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                            {:else}
+                                type="button"
+                                class="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-green-500/10 text-green-400 border border-green-500/20 enabled:hover:bg-green-500/25 enabled:active:bg-green-500/30 enabled:transition-all enabled:duration-200 disabled:opacity-40"
+                                onclick={startCustomTimer}
+                                disabled={creating || !inputValue.trim()}
+                                title="Start"
+                            >
                                 <PlayIcon size="20" class="h-4 w-4 sm:h-5 sm:w-5" />
-                            {/if}
                         </button>
                         <button
-                            type="button"
-                            class="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/25 active:bg-blue-500/30 transition-all duration-200 disabled:opacity-40"
-                            onclick={saveCustomTimer}
-                            disabled={creating}
-                            title="Save Template"
-                        >
-                            <PlusIcon size="18" class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                type="button"
+                                class="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 enabled:hover:bg-blue-500/25 enabled:active:bg-blue-500/30 enabled:transition-all enabled:duration-200 disabled:opacity-40"
+                                onclick={saveCustomTimer}
+                                disabled={creating || !inputValue.trim()}
+                                title="Save Template"
+                            >
+                                <PlusIcon size="18" class="h-3.5 w-3.5 sm:w-4 sm:h-4" />
                         </button>
                     </div>
                 </div>
-            </div>
         {/if}
     </div>
 </div>
