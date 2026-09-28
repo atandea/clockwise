@@ -9,6 +9,10 @@
     } from "../lib/api";
     import { get } from "svelte/store";
     import { toast } from "../lib/toast.svelte";
+    import RefreshIcon from "./icons/RefreshIcon.svelte";
+    import MonitorIcon from "./icons/MonitorIcon.svelte";
+    import FullscreenIcon from "./icons/FullscreenIcon.svelte";
+    import ExitFullscreenIcon from "./icons/ExitFullscreenIcon.svelte";
  
 	let { isLoading = false }: { isLoading?: boolean } = $props();
 
@@ -160,16 +164,7 @@
         class="flex items-center gap-3 rounded bg-gray-800/60 border border-gray-700/50 p-2 px-3"
     >
         <!-- Monitor icon -->
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            class="w-4 h-4 text-gray-400 shrink-0"
-        >
-            <path
-                d="M3 5a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm6 14h6v1a1 1 0 01-1 1h-4a1 1 0 01-1-1v-1z"
-            />
-        </svg>
+        <MonitorIcon class="w-4 h-4 text-gray-400 shrink-0" />
  
         <!-- Monitor selector -->
         <select
@@ -193,18 +188,7 @@
             onclick={refreshMonitors}
             title="Refresh displays"
         >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                class="w-4 h-4"
-            >
-                <path
-                    fill-rule="evenodd"
-                    d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H4.598a.75.75 0 00-.75.75v3.634a.75.75 0 001.5 0v-2.127l.208.208a7 7 0 0011.675-3.12.75.75 0 00-1.42-.48zM4.688 8.576a5.5 5.5 0 019.201-2.466l.312.311H11.77a.75.75 0 000 1.5h3.634a.75.75 0 00.75-.75V3.537a.75.75 0 00-1.5 0v2.128l-.208-.208A7 7 0 002.77 8.576a.75.75 0 001.42.48z"
-                    clip-rule="evenodd"
-                />
-            </svg>
+            <RefreshIcon width="16" height="16" strokeWidth="2.5" />
         </button>
  
         <!-- Divider -->
@@ -222,28 +206,10 @@
             disabled={monitors.length === 0}
         >
             {#if isWindowOpen}
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="w-4 h-4"
-                >
-                    <path
-                        d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
-                    />
-                </svg>
+                <ExitFullscreenIcon class="w-4 h-4" />
                 Close Fullscreen
             {:else}
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="w-4 h-4"
-                >
-                    <path
-                        d="M13.28 7.78l3.22-3.22v2.69a.75.75 0 001.5 0v-4.5a.75.75 0 00-.75-.75h-4.5a.75.75 0 000 1.5h2.69l-3.22 3.22a.75.75 0 001.06 1.06zM2 17.25v-4.5a.75.75 0 011.5 0v2.69l3.22-3.22a.75.75 0 011.06 1.06L4.56 16.5h2.69a.75.75 0 010 1.5h-4.5a.75.75 0 01-.75-.75z"
-                    />
-                </svg>
+                <FullscreenIcon class="w-4 h-4" />
                 Launch Fullscreen
             {/if}
         </button>

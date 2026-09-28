@@ -88,22 +88,7 @@
         }
     }
 
-    async function fetchMonitors() {
-        if (
-            typeof window === "undefined" ||
-            !("__TAURI_INTERNALS__" in window)
-        ) {
-            return;
-        }
 
-        try {
-            const { invoke } = await import("@tauri-apps/api/core");
-            const res = await invoke<any[]>("get_monitors");
-            settings.monitors = res;
-        } catch (err) {
-            console.error("Failed to fetch monitors:", err);
-        }
-    }
 
     async function checkAutostart() {
         try {
@@ -127,7 +112,7 @@
         fetchSettings();
         fetchServerPin();
         if (settings.isTauri) {
-            fetchMonitors();
+            settings.fetchMonitors();
             checkAutostart();
         }
 

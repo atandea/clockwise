@@ -3,6 +3,7 @@
     import PreviewTimer from "./preview-timer.component.svelte";
     import Clock from "./clock.component.svelte";
     import ChevronDownIcon from "./icons/ChevronDownIcon.svelte";
+    import ToggleSwitch from "./toggle-switch.component.svelte";
     import type { SettingsState } from "../lib/settings.state.svelte";
 
     let { settings }: { settings: SettingsState } = $props();
@@ -288,19 +289,11 @@
                     <span class="text-sm font-bold text-gray-300"
                         >Allow Overtime</span
                     >
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.timerAllowOvertime
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleTimerAllowOvertime()}
-                        aria-label="Toggle Allow Overtime"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.timerAllowOvertime
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
+                    <ToggleSwitch
+                        checked={settings.timerAllowOvertime}
+                        onToggle={() => settings.toggleTimerAllowOvertime()}
+                        label="Toggle Allow Overtime"
+                    />
                 </div>
 
                 <!-- Progress Bar -->
@@ -310,19 +303,11 @@
                     <span class="text-sm font-bold text-gray-300"
                         >Progress Bar</span
                     >
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showProgressBar
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleProgressBar()}
-                        aria-label="Toggle Progress Bar"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showProgressBar
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
+                    <ToggleSwitch
+                        checked={settings.showProgressBar}
+                        onToggle={() => settings.toggleProgressBar()}
+                        label="Toggle Progress Bar"
+                    />
                 </div>
 
                 <!-- Current Time -->
@@ -332,19 +317,11 @@
                     <span class="text-sm font-bold text-gray-300"
                         >Current Time</span
                     >
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showSecondaryClock
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleSecondaryClock()}
-                        aria-label="Toggle Current Time"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showSecondaryClock
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
+                    <ToggleSwitch
+                        checked={settings.showSecondaryClock}
+                        onToggle={() => settings.toggleSecondaryClock()}
+                        label="Toggle Current Time"
+                    />
                 </div>
             </div>
         </div>
@@ -362,19 +339,11 @@
                     <span class="text-sm font-bold text-gray-300"
                         >Show Seconds</span
                     >
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showClockSeconds
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleClockSeconds()}
-                        aria-label="Toggle Clock Seconds"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showClockSeconds
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
+                    <ToggleSwitch
+                        checked={settings.showClockSeconds}
+                        onToggle={() => settings.toggleClockSeconds()}
+                        label="Toggle Clock Seconds"
+                    />
                 </div>
 
                 <!-- Show Date -->
@@ -384,19 +353,11 @@
                     <span class="text-sm font-bold text-gray-300"
                         >Show Date</span
                     >
-                    <button
-                        class="relative flex h-7 w-12 shrink-0 items-center rounded-full transition-all duration-300 {settings.showClockDate
-                            ? 'bg-blue-600 shadow-[0_0_15px_rgba(37,99,235,0.4)]'
-                            : 'bg-gray-800'}"
-                        onclick={() => settings.toggleClockDate()}
-                        aria-label="Toggle Clock Date"
-                    >
-                        <span
-                            class="inline-block h-5 w-5 transform rounded-full bg-white transition duration-200 {settings.showClockDate
-                                ? 'translate-x-6'
-                                : 'translate-x-1'} shadow-sm"
-                        ></span>
-                    </button>
+                    <ToggleSwitch
+                        checked={settings.showClockDate}
+                        onToggle={() => settings.toggleClockDate()}
+                        label="Toggle Clock Date"
+                    />
                 </div>
 
                 <!-- Date Format -->

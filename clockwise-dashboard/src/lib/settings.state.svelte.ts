@@ -106,7 +106,7 @@ export class SettingsState {
         if (data.timer_allow_overtime !== undefined) this.timerAllowOvertime = data.timer_allow_overtime;
     }
 
-    async updateBackendSetting(key: string, value: any) {
+    async updateBackendSetting(key: string, value: any, successMessage = "Setting updated") {
         try {
             const apiBase = getApiBaseUrl();
             const res = await fetchWithPin(`${apiBase}/settings`, {
@@ -115,9 +115,9 @@ export class SettingsState {
                 body: JSON.stringify({ [key]: value }),
             });
             if (res.ok) {
-                toast.success("Appearance updated");
+                toast.success(successMessage);
             } else {
-                toast.error("Failed to save appearance");
+                toast.error("Failed to save setting");
             }
         } catch (err) {
             console.error(`Failed to save ${key} to backend:`, err);
@@ -234,12 +234,111 @@ export class SettingsState {
         return this.selectedMainMonitorCandidate !== this.preferredMainMonitor;
     }
 
+    get hasValidPin(): boolean {
+        return !!this.serverPin && !this.serverPin.startsWith("(");
+    }
+
+    async toggleNetworkAccess() {
+        const newValue = !this.networkAccessEnabled;
+        this.networkAccessEnabled = newValue;
+        await this.updateBackendSetting(
+            "network_access_enabled",
+            newValue,
+            `Network access ${newValue ? "enabled" : "disabled"}`,
+        );
+    }
+
+    async togglePin() {
+        try {
+            const apiBase = getApiBaseUrl();
+            const res = await fetch(`${apiBase}/security/toggle`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ enabled: !this.pinEnabled }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                this.pinEnabled = data.pinEnabled;
+                toast.success(
+                    `PIN security ${this.pinEnabled ? "enabled" : "disabled"}`,
+                );
+            }
+        } catch (err) {
+            console.error("Failed to toggle PIN security:", err);
+            toast.error("Failed to toggle PIN security");
+        }
+    }
+
+    async toggleAutoLaunch() {
+        const newValue = !this.autoLaunch;
+        this.autoLaunch = newValue;
+        await this.updateBackendSetting(
+            "launch_fullscreen_on_startup",
+            newValue,
+            `Auto-launch ${newValue ? "enabled" : "disabled"}`,
+        );
+    }
+
+    async toggleStartAtLogin() {
+        try {
+            const { enable, disable, isEnabled } = await import(
+                "@tauri-apps/plugin-autostart"
+            );
+            if (this.startAtLogin) {
+                await disable();
+            } else {
+                await enable();
+            }
+            this.startAtLogin = await isEnabled();
+            toast.success(
+                `Launch at startup ${this.startAtLogin ? "enabled" : "disabled"}`,
+            );
+        } catch (err) {
+            console.error("Failed to toggle autostart:", err);
+            toast.error("Failed to toggle autostart");
+        }
+    }
+
+    async fetchMonitors() {
+        if (
+            typeof window === "undefined" ||
+            !("__TAURI_INTERNALS__" in window)
+        ) {
+            return;
+        }
+
+        try {
+            const { invoke } = await import("@tauri-apps/api/core");
+            const res = await invoke<any[]>("get_monitors");
+            this.monitors = res;
+        } catch (err) {
+            console.error("Failed to fetch monitors:", err);
+        }
+    }
+
+    async setPreferredMonitor(monitorName: string) {
+        this.preferredMonitor = monitorName;
+        this.selectedMonitorCandidate = monitorName;
+        await this.updateBackendSetting(
+            "preferred_monitor",
+            monitorName,
+            "Auto-fullscreen display updated",
+        );
+    }
+
     async setPreferredMainMonitor(monitorName: string) {
         this.preferredMainMonitor = monitorName;
+        this.selectedMainMonitorCandidate = monitorName;
+        await this.updateBackendSetting(
+            "preferred_main_monitor",
+            monitorName,
+            "Main window display updated",
+        );
         try {
-            await this.updateBackendSetting("preferred_main_monitor", monitorName);
+            const { invoke } = await import("@tauri-apps/api/core");
+            await invoke("set_main_window_monitor", { monitor_name: monitorName });
         } catch (err) {
-            console.error("Failed to save preferred_main_monitor:", err);
+            console.error("Failed to move main window via invoke:", err);
         }
     }
 }

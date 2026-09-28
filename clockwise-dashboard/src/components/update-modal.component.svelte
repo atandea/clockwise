@@ -7,6 +7,8 @@
         type ChangelogEntry,
     } from "../lib/update-checker.svelte.ts";
     import { versionInfo } from "../lib/version";
+    import CloseIcon from "./icons/CloseIcon.svelte";
+    import DownloadIcon from "./icons/DownloadIcon.svelte";
 
     let { open = $bindable(false) }: { open: boolean } = $props();
 
@@ -105,20 +107,7 @@
                         class="rounded-lg p-2 text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
                         aria-label="Close modal"
                     >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
+                        <CloseIcon width="18" height="18" />
                     </button>
                 </div>
             </div>
@@ -200,22 +189,7 @@
                     onclick={openDownload}
                     class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white transition-all shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
-                        ></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
+                    <DownloadIcon width="16" height="16" />
                     Download Update
                 </button>
                 <button
