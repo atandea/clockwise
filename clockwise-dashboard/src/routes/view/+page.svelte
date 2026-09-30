@@ -1,7 +1,8 @@
 <script lang="ts">
-    import Viewer from "../../components/viewer.component.svelte";
-    import { getApiBaseUrl } from "$lib/api";
-    import { SettingsState } from "$lib/settings.state.svelte";
+    import Viewer from "$features/viewer/viewer.component.svelte";
+    import { getApiBaseUrl } from "$shared/api/api";
+    import { SettingsState } from "$features/settings/settings.state.svelte";
+    import { isTauriEnvironment } from "$shared/platform/tauri";
     import { onMount } from "svelte";
     
     const settings = new SettingsState();
@@ -12,7 +13,7 @@
 
     onMount(async () => {
         // If running inside a Tauri window, provide a close handler
-        if ("__TAURI_INTERNALS__" in window) {
+        if (isTauriEnvironment()) {
             try {
                 const { getCurrentWindow } = await import(
                     "@tauri-apps/api/window"
