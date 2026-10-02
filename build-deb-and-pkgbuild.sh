@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_DIR="$REPO_ROOT/clockwise-dashboard"
+APP_DIR="$REPO_ROOT/clockwise-ui"
 PKGBUILD_DIR="$REPO_ROOT/pkgbuild"
 
 command -v makepkg >/dev/null 2>&1 || {
@@ -20,8 +20,8 @@ if [[ ! -d "$APP_DIR" ]]; then
   exit 1
 fi
 
-PACKAGE_VERSION="$(node -p "require('./clockwise-dashboard/package.json').version")"
-PACKAGE_NAME="clockwise-dashboard"
+PACKAGE_VERSION="$(node -p "require('./clockwise-ui/package.json').version")"
+PACKAGE_NAME="clockwise"
 
 ARCH="$(uname -m)"
 case "$ARCH" in
@@ -40,13 +40,13 @@ DEB_OUTPUT_DIR="$APP_DIR/src-tauri/target/release/bundle/deb"
 echo "==> Syncing version $PACKAGE_VERSION to Tauri configs"
 node -e "
 const fs = require('fs');
-const tauriConfPath = './clockwise-dashboard/src-tauri/tauri.conf.json';
+const tauriConfPath = './clockwise-ui/src-tauri/tauri.conf.json';
 if (fs.existsSync(tauriConfPath)) {
     const tauriConf = JSON.parse(fs.readFileSync(tauriConfPath, 'utf8'));
     tauriConf.version = process.argv[1];
     fs.writeFileSync(tauriConfPath, JSON.stringify(tauriConf, null, 2) + '\n');
 }
-const cargoPath = './clockwise-dashboard/src-tauri/Cargo.toml';
+const cargoPath = './clockwise-ui/src-tauri/Cargo.toml';
 if (fs.existsSync(cargoPath)) {
     let cargo = fs.readFileSync(cargoPath, 'utf8');
     cargo = cargo.replace(/^version = \".*\"/m, 'version = \"' + process.argv[1] + '\"');
@@ -60,7 +60,7 @@ echo "==> Building server and frontend assets"
 npm install --include=dev
 
 if [[ ! -x "./node_modules/.bin/vite" ]]; then
-  echo "Error: Vite is not installed in clockwise-dashboard/node_modules/.bin." >&2
+  echo "Error: Vite is not installed in clockwise-ui/node_modules/.bin." >&2
   echo "Run 'cd $APP_DIR && npm install --include=dev' and verify the install output." >&2
   exit 1
 fi

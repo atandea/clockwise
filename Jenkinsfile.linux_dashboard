@@ -25,12 +25,12 @@ pipeline {
                     set -ex
                     echo '--- Installing Dependencies & Building Frontend ---'
                     (cd clockwise-server && rm -rf node_modules && npm ci && npm run build)
-                    (cd clockwise-dashboard && rm -rf node_modules && npm ci && npm run build)
+                    (cd clockwise-ui && rm -rf node_modules && npm ci && npm run build)
                 
                     echo '--- Preparing Sidecar Directories ---'
                     mkdir -p clockwise-server/client
-                    cp -r clockwise-dashboard/build/* clockwise-server/client/
-                    mkdir -p clockwise-dashboard/src-tauri/bin
+                    cp -r clockwise-ui/build/* clockwise-server/client/
+                    mkdir -p clockwise-ui/src-tauri/bin
                 '''
             }
         }
@@ -48,7 +48,7 @@ pipeline {
                         (cd clockwise-server && npm run test:e2e)
 
                         echo '--- Running Frontend Unit Tests with Coverage ---'
-                        (cd clockwise-dashboard && npm run test:cov)
+                        (cd clockwise-ui && npm run test:cov)
                     '''
                 }
             }
@@ -60,10 +60,10 @@ pipeline {
                     sh '''
                         set -ex
                         echo '--- Building Server Sidecar Binary (Linux) ---'
-                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node26-linux-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-unknown-linux-gnu)
+                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node26-linux-x64 --output ../clockwise-ui/src-tauri/bin/clockwise-server-x86_64-unknown-linux-gnu)
                         
                         echo '--- Building Tauri App (.deb) ---'
-                        (cd clockwise-dashboard && npm run tauri build -- --bundles deb)
+                        (cd clockwise-ui && npm run tauri build -- --bundles deb)
                     '''
                 }
             }
@@ -75,12 +75,12 @@ pipeline {
                     sh '''
                         set -ex
                         echo '--- Building Server Sidecar Binary (Windows) ---'
-                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node26-win-x64 --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-x86_64-pc-windows-gnu.exe)
+                        (cd clockwise-server && npx @yao-pkg/pkg@latest . -t node26-win-x64 --output ../clockwise-ui/src-tauri/bin/clockwise-server-x86_64-pc-windows-gnu.exe)
                 
                         echo '--- Building Tauri App (.exe) ---'
                         export PKG_CONFIG_ALLOW_CROSS=1
                         export PKG_CONFIG=/usr/bin/x86_64-w64-mingw32-pkg-config || true
-                        (cd clockwise-dashboard && npm run tauri build -- --target x86_64-pc-windows-gnu)
+                        (cd clockwise-ui && npm run tauri build -- --target x86_64-pc-windows-gnu)
                     '''
                 }
             }
@@ -90,7 +90,7 @@ pipeline {
                 dir('/home/jenkins/agent/workspace/clockwise-local') {
                     sh '''
                         echo '--- Running Clippy for Rust analysis ---'
-                        (cd clockwise-dashboard/src-tauri && cargo clippy --message-format=json > clippy-report.json || true)
+                        (cd clockwise-ui/src-tauri && cargo clippy --message-format=json > clippy-report.json || true)
                     '''
                     withSonarQubeEnv('SonarQube') {
                         sh 'sonar-scanner'
@@ -103,7 +103,7 @@ pipeline {
     post {
         always {
             dir('/home/jenkins/agent/workspace/clockwise-local') {
-                archiveArtifacts artifacts: 'clockwise-dashboard/src-tauri/target/release/bundle/deb/*.deb, clockwise-dashboard/src-tauri/target/release/bundle/appimage/*.AppImage, clockwise-dashboard/src-tauri/target/x86_64-pc-windows-gnu/release/bundle/nsis/*.exe', allowEmptyArchive: true
+                archiveArtifacts artifacts: 'clockwise-ui/src-tauri/target/release/bundle/deb/*.deb, clockwise-ui/src-tauri/target/release/bundle/appimage/*.AppImage, clockwise-ui/src-tauri/target/x86_64-pc-windows-gnu/release/bundle/nsis/*.exe', allowEmptyArchive: true
             }
         }
     }

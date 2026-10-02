@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "clockwise-dashboard",
+  "productName": "Clockwise",
   "version": "1.1.5",
   "identifier": "com.clockwise.dashboard",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Clockwise Dashboard",
+        "title": "Clockwise",
         "width": 1024,
         "height": 768,
         "resizable": true,

@@ -11,9 +11,9 @@ if (!version || !/^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$/.test(version)) {
 }
 
 const jsonFiles = [
-  "clockwise-dashboard/package.json",
-  "clockwise-dashboard/package-lock.json",
-  "clockwise-dashboard/src-tauri/tauri.conf.json",
+  "clockwise-ui/package.json",
+  "clockwise-ui/package-lock.json",
+  "clockwise-ui/src-tauri/tauri.conf.json",
   "clockwise-server/package.json",
   "clockwise-server/package-lock.json",
 ];
@@ -26,7 +26,7 @@ for (const relativePath of jsonFiles) {
   await writeFile(filePath, `${JSON.stringify(json, null, 2)}\n`);
 }
 
-const cargoPath = path.join(rootDir, "clockwise-dashboard/src-tauri/Cargo.toml");
+const cargoPath = path.join(rootDir, "clockwise-ui/src-tauri/Cargo.toml");
 const cargo = await readFile(cargoPath, "utf8");
 await writeFile(cargoPath, cargo.replace(/^version\s*=\s*".*?"/m, `version = "${version}"`));
 

@@ -169,7 +169,7 @@
             </div>
             <h2 class="text-xl font-bold text-white">Security Required</h2>
             <p class="mt-2 text-sm text-gray-400">
-                Network access requires a 4-digit PIN. Look at the Clockwise Dashboard on the host machine to reveal it.
+                Network access requires a 4-digit PIN. Look at Clockwise on the host machine to reveal it.
             </p>
         </div>
 

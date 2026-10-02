@@ -3,8 +3,8 @@
 # Exit on error
 set -e
 
-# Navigate to the project root (clockwise-dashboard)
-cd "$(dirname "$0")/../clockwise-dashboard"
+# Navigate to the project root (clockwise-ui)
+cd "$(dirname "$0")/../clockwise-ui"
 
 ICON_PATH="src-tauri/icons/app-icon.png"
 TEMP_ICON="src-tauri/icons/temp-square-icon.png"

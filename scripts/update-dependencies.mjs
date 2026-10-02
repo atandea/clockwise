@@ -17,15 +17,15 @@ const locations = [
     lockfile: "package-lock.json"
   },
   {
-    name: "clockwise-dashboard",
-    path: "clockwise-dashboard",
+    name: "clockwise-ui",
+    path: "clockwise-ui",
     type: "npm",
     updateCmd: "npm update",
     lockfile: "package-lock.json"
   },
   {
-    name: "clockwise-dashboard/src-tauri",
-    path: "clockwise-dashboard/src-tauri",
+    name: "clockwise-ui/src-tauri",
+    path: "clockwise-ui/src-tauri",
     type: "cargo",
     updateCmd: "cargo update",
     lockfile: "Cargo.lock"

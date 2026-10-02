@@ -7,13 +7,13 @@ on:
   push:
     branches: [main]
     paths:
-      - 'clockwise-dashboard/**'
+      - 'clockwise-ui/**'
       - 'clockwise-server/**'
       - 'scripts/**'
       - '.github/workflows/**'
   pull_request:
     paths:
-      - 'clockwise-dashboard/**'
+      - 'clockwise-ui/**'
       - 'clockwise-server/**'
       - 'scripts/**'
       - '.github/workflows/**'
@@ -72,24 +72,24 @@ jobs:
       - name: install dependencies
         run: |
           cd clockwise-server && npm ci
-          cd ../clockwise-dashboard && npm ci
+          cd ../clockwise-ui && npm ci
 
       - name: Build Server Sidecar
         working-directory: ./clockwise-server
         shell: bash
         run: |
           npm run build
-          cd ../clockwise-dashboard && npm run build
+          cd ../clockwise-ui && npm run build
           cd ../clockwise-server
-          mkdir -p ../clockwise-dashboard/src-tauri/bin
-          npx @yao-pkg/pkg@latest . -t ${{ matrix.sidecar_target }} --output ../clockwise-dashboard/src-tauri/bin/clockwise-server-${{ matrix.sidecar_triple }}${{ matrix.sidecar_ext }}
+          mkdir -p ../clockwise-ui/src-tauri/bin
+          npx @yao-pkg/pkg@latest . -t ${{ matrix.sidecar_target }} --output ../clockwise-ui/src-tauri/bin/clockwise-server-${{ matrix.sidecar_triple }}${{ matrix.sidecar_ext }}
 
       - name: Build Dashboard (verify)
         if: ${{ !inputs.publish }}
         uses: tauri-apps/tauri-action@v0
         with:
           args: ${{ matrix.args }}
-          projectPath: ./clockwise-dashboard
+          projectPath: ./clockwise-ui
 
       - name: Build Dashboard (release)
         if: inputs.publish
@@ -98,21 +98,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: app-v${{ inputs.version }}
-          releaseName: Clockwise Dashboard v${{ inputs.version }}
+          releaseName: Clockwise v${{ inputs.version }}
           releaseBody: Release ${{ inputs.version }}
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
-          projectPath: ./clockwise-dashboard
+          projectPath: ./clockwise-ui
 
       - name: Build Arch Linux Package
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          VERSION=$(node -p "require('./clockwise-dashboard/package.json').version")
+          VERSION=$(node -p "require('./clockwise-ui/package.json').version")
           mkdir -p pkgbuild
           cp PKGBUILD pkgbuild/PKGBUILD
-          cp clockwise-dashboard/src-tauri/target/release/bundle/deb/clockwise-dashboard_${VERSION}_amd64.deb pkgbuild/
-          docker run --rm -v "$PWD:/workspace" -w /workspace/pkgbuild archlinux:latest bash -c "pacman -Sy --noconfirm --needed fakeroot binutils nodejs debugedit && useradd -m builder && chown -R builder:builder /workspace/pkgbuild /workspace/clockwise-dashboard && su builder -c 'makepkg -df'"
+          cp clockwise-ui/src-tauri/target/release/bundle/deb/clockwise_${VERSION}_amd64.deb pkgbuild/
+          docker run --rm -v "$PWD:/workspace" -w /workspace/pkgbuild archlinux:latest bash -c "pacman -Sy --noconfirm --needed fakeroot binutils nodejs debugedit && useradd -m builder && chown -R builder:builder /workspace/pkgbuild /workspace/clockwise-ui && su builder -c 'makepkg -df'"
 
       - name: Upload Arch Linux Package to Release
         if: matrix.platform == 'ubuntu-latest' && inputs.publish
@@ -129,8 +129,8 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: clockwise-dashboard-${{ matrix.platform }}
+          name: clockwise-${{ matrix.platform }}
           path: |
-            clockwise-dashboard/src-tauri/${{ matrix.artifact_pattern }}
+            clockwise-ui/src-tauri/${{ matrix.artifact_pattern }}
             pkgbuild/*.pkg.tar.zst
           if-no-files-found: warn

@@ -152,7 +152,7 @@ const version = (() => {
   }
   // Read from package.json for unreleased
   try {
-    const pkgPath = path.join(repoRoot, "clockwise-dashboard", "package.json");
+    const pkgPath = path.join(repoRoot, "clockwise-ui", "package.json");
     const pkg = JSON.parse(
       execSync(`cat "${pkgPath}"`, { encoding: "utf8" })
     );
