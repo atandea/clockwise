@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
-	import { timerEvents } from "$shared/api/api";
+	import { timerEvents } from "#shared/api/api";
 
 	let {
 		onStatusChange = () => {},

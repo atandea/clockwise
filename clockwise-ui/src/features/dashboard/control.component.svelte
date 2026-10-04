@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
-	import ConfirmModal from "$shared/ui/confirm-modal.svelte";
-	import PlayIcon from "$shared/ui/icons/PlayIcon.svelte";
-	import StopIcon from "$shared/ui/icons/StopIcon.svelte";
-	import TrashIcon from "$shared/ui/icons/TrashIcon.svelte";
+	import ConfirmModal from "#shared/ui/confirm-modal.svelte";
+	import PlayIcon from "#shared/ui/icons/PlayIcon.svelte";
+	import StopIcon from "#shared/ui/icons/StopIcon.svelte";
+	import TrashIcon from "#shared/ui/icons/TrashIcon.svelte";
 	import { get, writable } from "svelte/store";
-	import { fetchWithPin, timerEvents, type TimerEventData } from "$shared/api/api";
+	import { fetchWithPin, timerEvents, type TimerEventData } from "#shared/api/api";
 
 	interface Timer {
 		id: string;

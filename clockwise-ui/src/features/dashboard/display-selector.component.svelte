@@ -6,13 +6,13 @@
         getApiBaseUrl,
         timerWindowOpen,
         autoLaunchAttempted,
-    } from "$shared/api/api";
+    } from "#shared/api/api";
     import { get } from "svelte/store";
-    import { toast } from "$shared/ui/toast.svelte";
-    import RefreshIcon from "$shared/ui/icons/RefreshIcon.svelte";
-    import MonitorIcon from "$shared/ui/icons/MonitorIcon.svelte";
-    import FullscreenIcon from "$shared/ui/icons/FullscreenIcon.svelte";
-    import ExitFullscreenIcon from "$shared/ui/icons/ExitFullscreenIcon.svelte";
+    import { toast } from "#shared/ui/toast.svelte";
+    import RefreshIcon from "#shared/ui/icons/RefreshIcon.svelte";
+    import MonitorIcon from "#shared/ui/icons/MonitorIcon.svelte";
+    import FullscreenIcon from "#shared/ui/icons/FullscreenIcon.svelte";
+    import ExitFullscreenIcon from "#shared/ui/icons/ExitFullscreenIcon.svelte";
  
 	let { isLoading = false }: { isLoading?: boolean } = $props();
 

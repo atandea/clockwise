@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Control from "$features/dashboard/control.component.svelte";
-  import Viewer from "$features/viewer/viewer.component.svelte";
-  import ActiveTimer from "$features/dashboard/active-timer.component.svelte";
-  import DisplaySelector from "$features/dashboard/display-selector.component.svelte";
-  import UpdateModal from "$shared/ui/update-modal.component.svelte";
+  import Control from "#features/dashboard/control.component.svelte";
+  import Viewer from "#features/viewer/viewer.component.svelte";
+  import ActiveTimer from "#features/dashboard/active-timer.component.svelte";
+  import DisplaySelector from "#features/dashboard/display-selector.component.svelte";
+  import UpdateModal from "#shared/ui/update-modal.component.svelte";
   import { onMount } from "svelte";
-  import { getApiBaseUrl, serverStatus } from "$shared/api/api";
-  import { SettingsState } from "$features/settings/settings.state.svelte";
-  import { isTauriEnvironment } from "$shared/platform/tauri";
+  import { getApiBaseUrl, serverStatus } from "#shared/api/api";
+  import { SettingsState } from "#features/settings/settings.state.svelte";
+  import { isTauriEnvironment } from "#shared/platform/tauri";
   import { updateChecker } from "./update-checker.svelte";
 
   const settings = new SettingsState();

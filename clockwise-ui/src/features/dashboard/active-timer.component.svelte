@@ -1,11 +1,11 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
     import { fade } from "svelte/transition";
-    import { fetchWithPin, timerEvents, type TimerEventData } from "$shared/api/api";
-    import CustomTimer from "$features/dashboard/custom-timer.component.svelte";
-    import PlayIcon from "$shared/ui/icons/PlayIcon.svelte";
-    import PauseIcon from "$shared/ui/icons/PauseIcon.svelte";
-    import StopIcon from "$shared/ui/icons/StopIcon.svelte";
+    import { fetchWithPin, timerEvents, type TimerEventData } from "#shared/api/api";
+    import CustomTimer from "#features/dashboard/custom-timer.component.svelte";
+    import PlayIcon from "#shared/ui/icons/PlayIcon.svelte";
+    import PauseIcon from "#shared/ui/icons/PauseIcon.svelte";
+    import StopIcon from "#shared/ui/icons/StopIcon.svelte";
 
     let {
         apiBase = "",

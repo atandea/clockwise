@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { fetchWithPin } from "$shared/api/api";
-    import { toast } from "$shared/ui/toast.svelte.ts";
-    import PlayIcon from "$shared/ui/icons/PlayIcon.svelte";
-    import PlusIcon from "$shared/ui/icons/PlusIcon.svelte";
+    import { fetchWithPin } from "#shared/api/api";
+    import { toast } from "#shared/ui/toast.svelte.ts";
+    import PlayIcon from "#shared/ui/icons/PlayIcon.svelte";
+    import PlusIcon from "#shared/ui/icons/PlusIcon.svelte";
 
     let {
         apiBase = "",

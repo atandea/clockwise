@@ -5,10 +5,10 @@
         groupChangelog,
         TYPE_LABELS,
         type ChangelogEntry,
-    } from "$features/dashboard/update-checker.svelte";
-    import { versionInfo } from "$features/dashboard/version";
+    } from "#features/dashboard/update-checker.svelte";
+    import { versionInfo } from "#features/dashboard/version";
     import CloseIcon from "./icons/CloseIcon.svelte";
-    import DownloadIcon from "$shared/ui/icons/DownloadIcon.svelte";
+    import DownloadIcon from "#shared/ui/icons/DownloadIcon.svelte";
 
     let { open = $bindable(false) }: { open: boolean } = $props();
 

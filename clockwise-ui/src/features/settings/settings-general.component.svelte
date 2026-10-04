@@ -1,8 +1,8 @@
 <script lang="ts">
-    import LockIcon from "$shared/ui/icons/LockIcon.svelte";
-    import QrCodeIcon from "$shared/ui/icons/QrCodeIcon.svelte";
-    import ToggleSwitch from "$shared/ui/toggle-switch.component.svelte";
-    import MonitorSelector from "$features/dashboard/monitor-selector.component.svelte";
+    import LockIcon from "#shared/ui/icons/LockIcon.svelte";
+    import QrCodeIcon from "#shared/ui/icons/QrCodeIcon.svelte";
+    import ToggleSwitch from "#shared/ui/toggle-switch.component.svelte";
+    import MonitorSelector from "#features/dashboard/monitor-selector.component.svelte";
     import QRCode from "qrcode";
     import type { SettingsState } from "./settings.state.svelte";
 

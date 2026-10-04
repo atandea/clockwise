@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Viewer from "$features/viewer/viewer.component.svelte";
-    import { getApiBaseUrl } from "$shared/api/api";
-    import { SettingsState } from "$features/settings/settings.state.svelte";
-    import { isTauriEnvironment } from "$shared/platform/tauri";
+    import Viewer from "#features/viewer/viewer.component.svelte";
+    import { getApiBaseUrl } from "#shared/api/api";
+    import { SettingsState } from "#features/settings/settings.state.svelte";
+    import { isTauriEnvironment } from "#shared/platform/tauri";
     import { onMount } from "svelte";
     
     const settings = new SettingsState();

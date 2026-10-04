@@ -1,6 +1,6 @@
 <script lang="ts">
-	import ProgressBar from "$features/viewer/progress-bar.component.svelte";
-	import SecondaryClock from "$features/viewer/secondary-clock.component.svelte";
+	import ProgressBar from "#features/viewer/progress-bar.component.svelte";
+	import SecondaryClock from "#features/viewer/secondary-clock.component.svelte";
 
 	let {
 		time = 60,

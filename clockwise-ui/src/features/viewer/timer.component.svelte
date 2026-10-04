@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
-	import ProgressBar from "$features/viewer/progress-bar.component.svelte";
-	import SecondaryClock from "$features/viewer/secondary-clock.component.svelte";
-	import { timerEvents, type TimerEventData } from "$shared/api/api";
+	import ProgressBar from "#features/viewer/progress-bar.component.svelte";
+	import SecondaryClock from "#features/viewer/secondary-clock.component.svelte";
+	import { timerEvents, type TimerEventData } from "#shared/api/api";
 
 	let {
 		onStatusChange = () => {},

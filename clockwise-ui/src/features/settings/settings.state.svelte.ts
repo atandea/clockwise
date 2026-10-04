@@ -7,9 +7,9 @@ import {
     appSettings,
     getApiBaseUrl,
     fetchWithPin,
-} from "$shared/api/api";
-import { toast } from "$shared/ui/toast.svelte";
-import { isTauriEnvironment } from "$shared/platform/tauri";
+} from "#shared/api/api";
+import { toast } from "#shared/ui/toast.svelte";
+import { isTauriEnvironment } from "#shared/platform/tauri";
 
 export interface ClockPreset {
     id: string;

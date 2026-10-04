@@ -2,6 +2,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { defineConfig } from "vite";
 import { sveltekit } from "@sveltejs/kit/vite";
+import adapter from "@sveltejs/adapter-static";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "@tailwindcss/vite";
 
 const host = process.env.TAURI_DEV_HOST;
@@ -9,7 +11,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
-    plugins: [sveltekit(), tailwindcss()],
+    plugins: [
+        sveltekit({
+            adapter: adapter({ fallback: "index.html" }),
+            preprocess: vitePreprocess(),
+        }),
+        tailwindcss(),
+    ],
     resolve: {
         conditions: ['browser', 'svelte']
     },

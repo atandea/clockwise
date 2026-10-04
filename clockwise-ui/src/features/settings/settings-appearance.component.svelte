@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount, onDestroy, untrack } from "svelte";
-    import PreviewTimer from "$features/viewer/preview-timer.component.svelte";
-    import Clock from "$features/viewer/clock.component.svelte";
-    import ChevronDownIcon from "$shared/ui/icons/ChevronDownIcon.svelte";
-    import ToggleSwitch from "$shared/ui/toggle-switch.component.svelte";
+    import PreviewTimer from "#features/viewer/preview-timer.component.svelte";
+    import Clock from "#features/viewer/clock.component.svelte";
+    import ChevronDownIcon from "#shared/ui/icons/ChevronDownIcon.svelte";
+    import ToggleSwitch from "#shared/ui/toggle-switch.component.svelte";
     import type { SettingsState } from "./settings.state.svelte";
 
     let { settings }: { settings: SettingsState } = $props();

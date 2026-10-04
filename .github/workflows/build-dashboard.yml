@@ -111,7 +111,12 @@ jobs:
           VERSION=$(node -p "require('./clockwise-ui/package.json').version")
           mkdir -p pkgbuild
           cp PKGBUILD pkgbuild/PKGBUILD
-          cp clockwise-ui/src-tauri/target/release/bundle/deb/clockwise_${VERSION}_amd64.deb pkgbuild/
+          DEB_FILE=$(find clockwise-ui/src-tauri/target/release/bundle/deb -maxdepth 1 -type f -name "*_${VERSION}_amd64.deb" -print -quit)
+          if [ -z "$DEB_FILE" ]; then
+            echo "No Debian bundle found in clockwise-ui/src-tauri/target/release/bundle/deb" >&2
+            exit 1
+          fi
+          cp "$DEB_FILE" "pkgbuild/clockwise_${VERSION}_amd64.deb"
           docker run --rm -v "$PWD:/workspace" -w /workspace/pkgbuild archlinux:latest bash -c "pacman -Sy --noconfirm --needed fakeroot binutils nodejs debugedit && useradd -m builder && chown -R builder:builder /workspace/pkgbuild /workspace/clockwise-ui && su builder -c 'makepkg -df'"
 
       - name: Upload Arch Linux Package to Release

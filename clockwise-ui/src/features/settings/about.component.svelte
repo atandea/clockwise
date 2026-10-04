@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { aboutItems } from "$features/dashboard/version";
+    import { aboutItems } from "#features/dashboard/version";
 </script>
 
 <div

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import RefreshIcon from "$shared/ui/icons/RefreshIcon.svelte";
-    import ChevronDownIcon from "$shared/ui/icons/ChevronDownIcon.svelte";
+    import RefreshIcon from "#shared/ui/icons/RefreshIcon.svelte";
+    import ChevronDownIcon from "#shared/ui/icons/ChevronDownIcon.svelte";
 
     let {
         label,

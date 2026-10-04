@@ -1,6 +1,6 @@
 <script lang="ts">
-	import TimerSubscriber from "$features/viewer/timer.component.svelte";
-	import Clock from "$features/viewer/clock.component.svelte";
+	import TimerSubscriber from "#features/viewer/timer.component.svelte";
+	import Clock from "#features/viewer/clock.component.svelte";
 	import { fade } from "svelte/transition";
 	import { onMount, onDestroy } from "svelte";
 

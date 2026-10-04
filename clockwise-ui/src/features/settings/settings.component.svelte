@@ -1,5 +1,5 @@
 <script lang="ts">
-    import BackIcon from "$shared/ui/icons/BackIcon.svelte";
+    import BackIcon from "#shared/ui/icons/BackIcon.svelte";
     import SettingsGeneral from "./settings-general.component.svelte";
     import SettingsAppearance from "./settings-appearance.component.svelte";
     import About from "./about.component.svelte";
@@ -12,9 +12,9 @@
         appAuthStatus,
         appServerPin,
         appSettings,
-    } from "$shared/api/api";
+    } from "#shared/api/api";
     import { SettingsState } from "./settings.state.svelte";
-    import { isTauriEnvironment } from "$shared/platform/tauri";
+    import { isTauriEnvironment } from "#shared/platform/tauri";
 
     let apiBase = getApiBaseUrl();
 
