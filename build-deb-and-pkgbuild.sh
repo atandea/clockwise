@@ -79,7 +79,7 @@ if [[ ! -d "$DEB_OUTPUT_DIR" ]]; then
   exit 1
 fi
 
-DEB_SOURCE="$(find "$DEB_OUTPUT_DIR" -maxdepth 1 -type f -name "${PACKAGE_NAME}_${PACKAGE_VERSION}_${DEB_ARCH}.deb" | head -n 1)"
+DEB_SOURCE="$(find "$DEB_OUTPUT_DIR" -maxdepth 1 -type f -iname "${PACKAGE_NAME}_${PACKAGE_VERSION}_${DEB_ARCH}.deb" | head -n 1)"
 if [[ -z "$DEB_SOURCE" ]]; then
   echo "Error: could not find generated deb named ${PACKAGE_NAME}_${PACKAGE_VERSION}_${DEB_ARCH}.deb in $DEB_OUTPUT_DIR" >&2
   find "$DEB_OUTPUT_DIR" -maxdepth 1 -type f -name "*.deb" -print

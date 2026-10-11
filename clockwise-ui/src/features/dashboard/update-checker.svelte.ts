@@ -1,4 +1,4 @@
-import { versionInfo } from "./version";
+import { versionInfo } from "../../lib/version";
 
 export interface ChangelogEntry {
   type: string;

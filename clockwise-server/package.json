@@ -1,7 +1,7 @@
 {
   "name": "clockwise-server",
   "engines": {
-    "node": "26"
+    "node": ">=26.9.0"
   },
   "version": "1.1.6",
   "description": "",
@@ -46,7 +46,6 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.19.1",
     "@types/supertest": "^6.0.3",
-    "@yao-pkg/pkg": "^6.23.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.6",
@@ -88,12 +87,6 @@
     "coverageDirectory": "./coverage",
     "coverageProvider": "v8",
     "testEnvironment": "node"
-  },
-  "pkg": {
-    "assets": [
-      "client/**/*",
-      "data/**/*"
-    ]
   },
   "allowScripts": {
     "@nestjs/core@11.1.24": true,
