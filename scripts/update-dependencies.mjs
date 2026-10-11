@@ -13,14 +13,14 @@ const locations = [
     name: "clockwise-server",
     path: "clockwise-server",
     type: "npm",
-    updateCmd: "npm update",
+    updateCmd: "npx npm-check-updates -u --target minor && npm install",
     lockfile: "package-lock.json"
   },
   {
     name: "clockwise-ui",
     path: "clockwise-ui",
     type: "npm",
-    updateCmd: "npm update",
+    updateCmd: "npx npm-check-updates -u --target minor && npm install",
     lockfile: "package-lock.json"
   },
   {
@@ -155,7 +155,10 @@ async function main() {
 
     console.log(`Running: ${loc.updateCmd} in ${loc.path}`);
     try {
-      const { stdout, stderr } = await execAsync(loc.updateCmd, { cwd: locFullPath });
+      const { stdout, stderr } = await execAsync(loc.updateCmd, {
+        cwd: locFullPath,
+        maxBuffer: 20 * 1024 * 1024
+      });
       if (stdout) console.log(stdout);
       if (stderr) console.error(stderr);
     } catch (e) {
