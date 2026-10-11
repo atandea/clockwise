@@ -27,6 +27,10 @@ on:
         required: false
         type: string
         default: ''
+      release_sha:
+        required: false
+        type: string
+        default: ''
 
 jobs:
   build-tauri:
@@ -44,6 +48,8 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_sha || github.sha }}
 
       - name: Set release version
         if: inputs.publish
@@ -88,6 +94,20 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
           projectPath: ./clockwise-ui
+
+      - name: Publish release notes and changelog asset
+        if: matrix.platform == 'ubuntu-latest' && inputs.publish
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const tag = `app-v${{ inputs.version }}`;
+            const { data: release } = await github.rest.repos.getReleaseByTag({ owner: context.repo.owner, repo: context.repo.repo, tag });
+            const body = fs.readFileSync('CHANGELOG.md', 'utf8');
+            await github.rest.repos.updateRelease({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.id, body });
+            const existingAsset = release.assets.find(asset => asset.name === 'changelog.json');
+            if (existingAsset) await github.rest.repos.deleteReleaseAsset({ owner: context.repo.owner, repo: context.repo.repo, asset_id: existingAsset.id });
+            await github.rest.repos.uploadReleaseAsset({ owner: context.repo.owner, repo: context.repo.repo, release_id: release.id, name: 'changelog.json', data: fs.readFileSync('changelog.json'), headers: { 'content-type': 'application/json' } });
 
       - name: Build Arch Linux Package
         if: matrix.platform == 'ubuntu-latest'

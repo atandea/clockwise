@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { fly, scale } from "svelte/transition";
     import {
         updateChecker,
         groupChangelog,
@@ -8,7 +7,6 @@
     } from "#features/dashboard/update-checker.svelte";
     import { versionInfo } from "../../lib/version";
     import CloseIcon from "./icons/CloseIcon.svelte";
-    import DownloadIcon from "#shared/ui/icons/DownloadIcon.svelte";
 
     let { open = $bindable(false) }: { open: boolean } = $props();
 
@@ -19,19 +17,6 @@
     function dismiss() {
         updateChecker.dismissUpdate();
         close();
-    }
-
-    async function openDownload() {
-        const url = updateChecker.downloadUrl || updateChecker.releaseUrl;
-        if (!url) return;
-
-        try {
-            const { openUrl } = await import("@tauri-apps/plugin-opener");
-            await openUrl(url);
-        } catch {
-            // Fallback for non-Tauri (e.g. dev browser)
-            window.open(url, "_blank");
-        }
     }
 
     async function openReleasePage() {
@@ -72,15 +57,12 @@
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
-        class="fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-        transition:fly={{ duration: 200 }}
+        class="fixed inset-0 z-[9998] bg-gray-950/80 backdrop-blur-sm flex items-center justify-center p-4"
         onclick={handleBackdropClick}
     >
         <!-- Modal -->
         <div
-            class="relative w-full max-w-lg max-h-[80vh] rounded-2xl border border-gray-700/50 bg-gray-900/95 backdrop-blur-xl shadow-2xl shadow-black/40 flex flex-col overflow-hidden"
-            in:scale={{ duration: 300, start: 0.95 }}
-            out:scale={{ duration: 200, start: 0.95 }}
+            class="relative w-full max-w-lg max-h-[80vh] rounded-2xl border border-gray-700/50 bg-gray-900 shadow-2xl shadow-black/40 flex flex-col overflow-hidden"
         >
             <!-- Header -->
             <div
@@ -186,21 +168,14 @@
                 class="shrink-0 px-6 py-4 border-t border-gray-700/40 bg-gray-950/50 flex items-center gap-3"
             >
                 <button
-                    onclick={openDownload}
-                    class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white transition-all shadow-lg shadow-emerald-900/30 flex items-center justify-center gap-2"
-                >
-                    <DownloadIcon width="16" height="16" />
-                    Download Update
-                </button>
-                <button
                     onclick={openReleasePage}
-                    class="py-2.5 px-4 rounded-xl text-sm font-bold bg-white/5 hover:bg-white/10 text-gray-300 transition-all ring-1 ring-white/10"
+                    class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-900/30"
                 >
-                    GitHub
+                    Download
                 </button>
                 <button
                     onclick={dismiss}
-                    class="py-2.5 px-4 rounded-xl text-sm font-bold text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-all"
+                    class="flex-1 py-2.5 px-4 rounded-xl text-sm font-bold text-gray-300 border border-gray-600 hover:bg-white/10 hover:border-gray-500 transition-all"
                 >
                     Dismiss
                 </button>

@@ -45,29 +45,8 @@ function compareSemver(a: string, b: string): number {
   return 0;
 }
 
-/**
- * Detect current platform for asset matching.
- */
-function detectPlatform(): "linux" | "windows" | "unknown" {
-  if (typeof navigator === "undefined") return "unknown";
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("linux")) return "linux";
-  if (ua.includes("win")) return "windows";
-  return "unknown";
-}
-
-/**
- * Find the best matching download asset for the current platform.
- */
-function findPlatformAsset(assets: ReleaseAsset[]): ReleaseAsset | null {
-  const platform = detectPlatform();
-  if (platform === "linux") {
-    return assets.find(a => a.name.endsWith(".deb")) || null;
-  }
-  if (platform === "windows") {
-    return assets.find(a => a.name.endsWith(".msi")) || null;
-  }
-  return null;
+export function isNewerVersion(remoteVersion: string | null | undefined): boolean {
+  return Boolean(remoteVersion) && compareSemver(remoteVersion!, versionInfo.appVersion) > 0;
 }
 
 /**
@@ -128,13 +107,11 @@ class UpdateCheckerState {
   checking = $state(false);
   lastChecked = $state<Date | null>(null);
   error = $state<string | null>(null);
-  downloadUrl = $state<string | null>(null);
-  downloadAssetName = $state<string | null>(null);
 
   private _dismissed = $state(false);
 
   get showBadge(): boolean {
-    return this.updateAvailable && !this._dismissed;
+    return isNewerVersion(this.latestVersion) && !this._dismissed;
   }
 
   async checkForUpdate(): Promise<void> {
@@ -172,25 +149,17 @@ class UpdateCheckerState {
 
       const release: ReleaseInfo = await res.json();
       const remoteVersion = release.tag_name.replace(/^app-v/, "");
-      const currentVersion = versionInfo.appVersion;
 
       this.latestVersion = remoteVersion;
       this.releaseUrl = release.html_url;
       this.releaseBody = release.body || null;
 
-      if (compareSemver(remoteVersion, currentVersion) > 0) {
+      if (isNewerVersion(remoteVersion)) {
         this.updateAvailable = true;
 
         // Check if this version was dismissed
         const dismissed = localStorage.getItem(DISMISSED_VERSION_KEY);
         this._dismissed = dismissed === remoteVersion;
-
-        // Find platform-specific download
-        const asset = findPlatformAsset(release.assets);
-        if (asset) {
-          this.downloadUrl = asset.browser_download_url;
-          this.downloadAssetName = asset.name;
-        }
 
         // Try to fetch structured changelog
         this.changelog = await fetchChangelog(release.assets);
@@ -230,8 +199,6 @@ class UpdateCheckerState {
         latestVersion: this.latestVersion,
         releaseUrl: this.releaseUrl,
         releaseBody: this.releaseBody,
-        downloadUrl: this.downloadUrl,
-        downloadAssetName: this.downloadAssetName,
       };
       localStorage.setItem("clockwise_update_cache", JSON.stringify(cache));
     } catch {
@@ -244,20 +211,18 @@ class UpdateCheckerState {
       const raw = localStorage.getItem("clockwise_update_cache");
       if (!raw) return;
       const cache = JSON.parse(raw);
-      this.updateAvailable = cache.updateAvailable ?? false;
       this.latestVersion = cache.latestVersion ?? null;
+      this.updateAvailable = isNewerVersion(this.latestVersion);
       this.releaseUrl = cache.releaseUrl ?? null;
       this.releaseBody = cache.releaseBody ?? null;
-      this.downloadUrl = cache.downloadUrl ?? null;
-      this.downloadAssetName = cache.downloadAssetName ?? null;
 
       if (this.latestVersion) {
-        if (compareSemver(this.latestVersion, versionInfo.appVersion) <= 0) {
-          this.updateAvailable = false;
-          this._saveToCache();
-        } else {
+        if (this.updateAvailable) {
           const dismissed = localStorage.getItem(DISMISSED_VERSION_KEY);
           this._dismissed = dismissed === this.latestVersion;
+        } else {
+          this._dismissed = false;
+          this._saveToCache();
         }
       }
     } catch {

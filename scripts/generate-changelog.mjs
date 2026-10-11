@@ -16,7 +16,7 @@
  */
 
 import { execSync } from "child_process";
-import { writeFileSync } from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -65,14 +65,10 @@ function getCommitsBetween(from, to) {
   const range = from ? `${from}..${to}` : to;
   const SEP = "<<SEP>>";
   const format = `--format=%H${SEP}%s${SEP}%an${SEP}%aI`;
-  try {
-    const raw = git(`git log "${format}" ${range}`);
-    return raw
-      ? raw.split("\n").filter(Boolean).map((line) => parseCommitLine(line, SEP))
-      : [];
-  } catch {
-    return [];
-  }
+  const raw = git(`git log "${format}" ${range}`);
+  return raw
+    ? raw.split("\n").filter(Boolean).map((line) => parseCommitLine(line, SEP))
+    : [];
 }
 
 function parseCommitLine(line, sep) {
@@ -180,7 +176,9 @@ console.log(
 // ---------------------------------------------------------------------------
 // Collect and categorize commits
 // ---------------------------------------------------------------------------
-const rawCommits = getCommitsBetween(fromRef, toRef);
+const rawCommits = getCommitsBetween(fromRef, toRef).filter(
+  (commit) => !/^chore: release v\d+\.\d+\.\d+(?:[-+].*)?$/i.test(commit.subject)
+);
 let entries = rawCommits.map(categorize);
 
 // Merge dependency update commits
@@ -288,6 +286,7 @@ const changelogJson = {
 // ---------------------------------------------------------------------------
 // Write outputs
 // ---------------------------------------------------------------------------
+mkdirSync(outputDir, { recursive: true });
 const mdPath = path.join(outputDir, "CHANGELOG.md");
 const jsonPath = path.join(outputDir, "changelog.json");
 

@@ -88,14 +88,15 @@
           {#if updateChecker.showBadge}
             <button
               onclick={() => (showUpdateModal = true)}
-              class="rounded px-2.5 py-1 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-900/30"
+              class="shrink-0 whitespace-nowrap rounded px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg shadow-emerald-900/30"
             >
-              New version available: v{updateChecker.latestVersion}
+              <span class="sm:hidden">Update v{updateChecker.latestVersion}</span>
+              <span class="hidden sm:inline">New version available: v{updateChecker.latestVersion}</span>
             </button>
           {/if}
           <a
             href="/settings"
-            class="ml-2 rounded px-2 py-1 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white"
+            class="ml-2 shrink-0 whitespace-nowrap rounded px-2 py-1 text-xs font-semibold bg-gray-700 hover:bg-gray-600 text-white"
           >
             Settings
           </a>
