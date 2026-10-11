@@ -1,15 +1,17 @@
 <script lang="ts">
 	export let progress: number = 0;
 	export let baseColor: string = "#ffffff";
+
+	$: clampedProgress = Math.min(Math.max(progress, 0), 100);
 </script>
 
 <div 
-	class="w-[92%] backdrop-blur-md rounded-full overflow-hidden"
+	class="w-[92%] rounded-full overflow-hidden"
 	style="height: 1.5cqh; background-color: {baseColor}1a;"
 >
 	<div
-		class="h-full transition-transform duration-500 ease-out will-change-transform"
-		style="transform: scaleX({Math.min(Math.max(progress, 0), 100) / 100}); transform-origin: left; background-color: {baseColor};"
+		class="h-full rounded-full transition-[width] duration-500 ease-out"
+		style="width: {clampedProgress}%; background-color: {baseColor};"
 	></div>
 </div>
 

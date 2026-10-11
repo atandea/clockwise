@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from "svelte";
-    import { fade } from "svelte/transition";
+    import { get } from "svelte/store";
     import { fetchWithPin, timerEvents, type TimerEventData } from "#shared/api/api";
     import CustomTimer from "#features/dashboard/custom-timer.component.svelte";
     import PlayIcon from "#shared/ui/icons/PlayIcon.svelte";
@@ -15,7 +15,7 @@
         isLoading?: boolean;
     } = $props();
 
-    let storeData = $state<TimerEventData | null>(null);
+    let storeData = $state<TimerEventData | null>(get(timerEvents));
     let unsubscribe: (() => void) | null = null;
 
     let status = $derived(storeData?.status ?? "stopped");
@@ -86,51 +86,19 @@
         return `${sign}${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
     }
 
-    // End time tracking for active timer
-    let stableEndTime = $state<Date | null>(null);
-    let lastTimerId = $state<string | null>(null);
-    let lastStatus = $state<string>("stopped");
-
-    $effect(() => {
-        const currentTimerId = storeData?.timerId ?? null;
-
-        if (!isTimerActive) {
-            stableEndTime = null;
-            lastTimerId = null;
-            lastStatus = status;
-            return;
-        }
-
+    // Synchronously derived end time for active timer
+    let formattedEndTime = $derived.by(() => {
+        if (!isTimerActive) return "";
+        let end: Date;
         if (status === "overtime") {
-            if (!stableEndTime) {
-                stableEndTime = new Date(Date.now() - remainingSeconds * 1000);
-            }
-        } else if (status === "paused") {
-            stableEndTime = new Date(Date.now() + remainingSeconds * 1000);
-        } else if (status === "running") {
-            const projected = Date.now() + remainingSeconds * 1000;
-            if (
-                !stableEndTime ||
-                currentTimerId !== lastTimerId ||
-                lastStatus === "paused" ||
-                Math.abs(stableEndTime.getTime() - projected) > 2500
-            ) {
-                stableEndTime = new Date(projected);
-            }
+            end = new Date(Date.now() - Math.abs(remainingSeconds) * 1000);
+        } else {
+            end = new Date(Date.now() + remainingSeconds * 1000);
         }
-
-        lastTimerId = currentTimerId;
-        lastStatus = status;
-    });
-
-    function formatEndTime(date: Date | null): string {
-        if (!date) return "";
-        const hours = date.getHours().toString().padStart(2, "0");
-        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const hours = end.getHours().toString().padStart(2, "0");
+        const minutes = end.getMinutes().toString().padStart(2, "0");
         return `${hours}:${minutes}`;
-    }
-
-    let formattedEndTime = $derived(formatEndTime(stableEndTime));
+    });
 
     async function sendCommand(action: "stop" | "pause" | "resume") {
         try {
@@ -160,23 +128,24 @@
             <div
                 class="h-[64px] sm:h-[76px] rounded-2xl bg-white/5 animate-pulse"
             ></div>
+            <div class="h-5 mt-2 mb-1 sm:my-0 sm:hidden" aria-hidden="true"></div>
         {:else}
             <!-- Unified container for both active running timer and custom timer entry -->
             <div
-                class="relative h-[64px] sm:h-[76px] rounded-2xl border overflow-hidden transition-all duration-500 {isTimerActive
+                class="relative h-[64px] sm:h-[76px] rounded-2xl border bg-gray-900/40 overflow-hidden transition-colors duration-200 {isTimerActive
                     ? cardBorderClass
-                    : 'bg-gray-900/40 border-gray-700/30 focus-within:border-blue-500/40 focus-within:bg-gray-900/60'}"
+                    : 'border-gray-700/30 focus-within:border-blue-500/40 focus-within:bg-gray-900/60'}"
             >
-                {#if isTimerActive}
-                    <!-- Active timer content -->
-                    <div
-                        class="absolute inset-0 w-full h-full"
-                        in:fade={{ duration: 300 }}
-                        out:fade={{ duration: 300 }}
-                    >
+                <!-- Active timer view -->
+                <div
+                    class="absolute inset-0 w-full h-full transition-opacity duration-300 ease-out {isTimerActive
+                        ? 'opacity-100 z-10'
+                        : 'opacity-0 pointer-events-none z-0'}"
+                    aria-hidden={!isTimerActive}
+                >
                         <!-- Background progress fill -->
                         <div
-                            class="absolute inset-0 w-full h-full transition-all duration-700 ease-out"
+                            class="absolute inset-0 h-full transition-[width] duration-500 ease-out pointer-events-none"
                             style="width: {bgFillPercent}%; background-color: {bgFillColor};"
                         ></div>
 
@@ -203,7 +172,7 @@
                                     </span>
                                     {#if formattedEndTime}
                                         <span
-                                            class="text-xs sm:text-base font-medium text-gray-400 shrink-0"
+                                            class="hidden sm:inline-block text-xs sm:text-sm font-medium text-gray-400 shrink-0"
                                         >
                                             ({isOvertime
                                                 ? `Ended at ${formattedEndTime}`
@@ -282,11 +251,34 @@
                             </div>
                         </div>
                     </div>
-                {:else}
+
+                <!-- Custom timer entry view -->
+                <div
+                    class="absolute inset-0 w-full h-full transition-opacity duration-300 ease-out {!isTimerActive
+                        ? 'opacity-100 z-10'
+                        : 'opacity-0 pointer-events-none z-0'}"
+                    aria-hidden={isTimerActive}
+                >
                     <CustomTimer
                         {apiBase}
                         {isLoading}
                     />
+                </div>
+            </div>
+
+            <!-- Reserved slot for end time label on mobile to prevent layout shift -->
+            <div
+                class="h-5 mt-2 mb-1 sm:my-0 sm:hidden flex items-center justify-center px-4 text-xs font-medium text-gray-400 text-center transition-opacity duration-300 {isTimerActive && formattedEndTime ? 'opacity-100' : 'opacity-0 pointer-events-none'}"
+                aria-live="polite"
+            >
+                {#if isTimerActive && formattedEndTime}
+                    <span class="truncate">
+                        {isOvertime
+                            ? `Ended at ${formattedEndTime}`
+                            : isPaused
+                              ? `Ends ~${formattedEndTime}`
+                              : `Ends at ${formattedEndTime}`}
+                    </span>
                 {/if}
             </div>
         {/if}

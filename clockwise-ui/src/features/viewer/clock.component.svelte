@@ -65,7 +65,7 @@
 	class="absolute inset-0 flex flex-col items-center justify-center text-white transition-colors duration-500 bg-[#020617] [container-type:size] px-4"
 >
 	<div
-		class="font-mono transition-all duration-500 leading-none"
+		class="font-mono transition-colors duration-300 leading-none"
 		class:text-[clamp(1rem,34cqw,42rem)]={!showSeconds}
 		class:text-[clamp(1rem,21cqw,40rem)]={showSeconds}
 	>

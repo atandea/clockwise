@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from "svelte";
+	import { get } from "svelte/store";
 	import ProgressBar from "#features/viewer/progress-bar.component.svelte";
 	import SecondaryClock from "#features/viewer/secondary-clock.component.svelte";
 	import { timerEvents, type TimerEventData } from "#shared/api/api";
@@ -26,7 +27,7 @@
 		allowOvertime?: boolean;
 	} = $props();
 
-	let storeData = $state<TimerEventData | null>(null);
+	let storeData = $state<TimerEventData | null>(get(timerEvents));
 	let unsubscribe: (() => void) | null = null;
 
 	let rawTime = $derived(storeData?.remainingSeconds ?? 0);
@@ -77,7 +78,7 @@
 	class="absolute inset-0 flex flex-col items-center justify-center text-white transition-colors duration-500 bg-[#020617] [container-type:size] px-4"
 >
 	<div
-		class="font-mono transition-all duration-500 leading-none"
+		class="font-mono transition-colors duration-300 leading-none"
 		class:text-[clamp(1rem,34cqw,42rem)]={Math.floor(time / 3600) === 0}
 		class:text-[clamp(1rem,21cqw,40rem)]={Math.floor(time / 3600) > 0}
 		style="color: {currentColor}"

@@ -1,8 +1,9 @@
 <script lang="ts">
 	import TimerSubscriber from "#features/viewer/timer.component.svelte";
 	import Clock from "#features/viewer/clock.component.svelte";
-	import { fade } from "svelte/transition";
 	import { onMount, onDestroy } from "svelte";
+	import { get } from "svelte/store";
+	import { timerEvents } from "#shared/api/api";
 
 	let {
 		allowFullscreen = true,
@@ -34,11 +35,17 @@
 		timerAllowOvertime?: boolean;
 	} = $props();
 
-	let showClock = $state(true);
+	const initialStatus = get(timerEvents)?.status;
+	let showClock = $state(
+		initialStatus !== "running" &&
+		initialStatus !== "overtime" &&
+		initialStatus !== "connecting"
+	);
 	let hasHours = $state(false);
 	let idleTimeout: any = null;
 	let isFullscreen = $state(false);
 	let rootEl: HTMLDivElement | null = null;
+	let unsubscribeTimer: (() => void) | null = null;
 
 	let userActive = $state(true);
 	let activityTimeout: any = null;
@@ -106,6 +113,9 @@
 			document.addEventListener("selectstart", preventSelect);
 			handleMouseMove();
 		}
+		unsubscribeTimer = timerEvents.subscribe((data) => {
+			handleTimerStatus(data.status);
+		});
 	});
 
 	onDestroy(() => {
@@ -115,6 +125,10 @@
 				handleFullscreenChange,
 			);
 			document.removeEventListener("selectstart", preventSelect);
+		}
+		if (unsubscribeTimer) {
+			unsubscribeTimer();
+			unsubscribeTimer = null;
 		}
 		if (idleTimeout) {
 			clearTimeout(idleTimeout);
@@ -138,7 +152,7 @@
 >
 	{#if onClose}
 		<div
-			class="z-10 fixed top-2 left-2 transition-opacity duration-500"
+			class="z-50 fixed top-2 left-2 transition-opacity duration-500"
 			class:opacity-0={!userActive}
 			class:pointer-events-none={!userActive}
 		>
@@ -151,7 +165,7 @@
 		</div>
 	{:else if allowFullscreen}
 		<div
-			class="z-10 top-2 left-2 transition-opacity duration-500"
+			class="z-50 top-2 left-2 transition-opacity duration-500"
 			class:absolute={!isFullscreen}
 			class:fixed={isFullscreen}
 			class:opacity-0={!userActive}
@@ -170,8 +184,12 @@
 		<div class="absolute inset-0 flex items-center justify-center">
 			<div class="h-1/3 w-1/2 rounded bg-white/5 animate-pulse"></div>
 		</div>
-	{:else if showClock}
-		<div class="absolute inset-0 z-0">
+	{:else}
+		<!-- Clock view -->
+		<div
+			class="absolute inset-0 transition-opacity duration-300 ease-out {showClock ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none z-0'}"
+			aria-hidden={!showClock}
+		>
 			<Clock
 				onStatusChange={handleTimerStatus}
 				showSeconds={showClockSeconds}
@@ -179,8 +197,12 @@
 				dateFormat={clockDateFormat}
 			/>
 		</div>
-	{:else}
-		<div in:fade={{ duration: 300 }} out:fade={{ duration: 300 }}>
+
+		<!-- Timer view -->
+		<div
+			class="absolute inset-0 transition-opacity duration-300 ease-out {!showClock ? 'opacity-100 z-[1]' : 'opacity-0 pointer-events-none z-0'}"
+			aria-hidden={showClock}
+		>
 			<TimerSubscriber
 				onStatusChange={handleTimerStatus}
 				onTick={(t) => (hasHours = t >= 3600)}
