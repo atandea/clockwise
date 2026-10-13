@@ -42,8 +42,8 @@ jobs:
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add clockwise-ui/package.json clockwise-ui/package-lock.json \
             clockwise-ui/src-tauri/tauri.conf.json clockwise-ui/src-tauri/Cargo.toml \
-            clockwise-server/package.json clockwise-server/package-lock.json \
-            CHANGELOG.md changelog.json
+            clockwise-server/package.json clockwise-server/package-lock.json
+          git add -f -- CHANGELOG.md changelog.json
           git commit -m "chore: release v${{ steps.version.outputs.version }}"
           git push
           echo "release_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
