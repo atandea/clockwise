@@ -1,0 +1,80 @@
+{
+  "version": "1.1.7",
+  "date": "2026-10-13",
+  "from": "app-v1.1.6",
+  "to": "HEAD",
+  "entries": [
+    {
+      "type": "ci",
+      "scope": null,
+      "message": "fix release workflow",
+      "hash": "2fa99ac",
+      "author": "Alin Tandea",
+      "date": "2026-10-13T15:56:27+03:00"
+    },
+    {
+      "type": "fix",
+      "scope": null,
+      "message": "remove loading icon for preset timer buttons",
+      "hash": "65b656b",
+      "author": "Alin Tandea",
+      "date": "2026-10-13T15:44:49+03:00"
+    },
+    {
+      "type": "chore",
+      "scope": null,
+      "message": "dependencies update",
+      "hash": "7c1a47d, cea7524, b3980dd",
+      "author": "Alin Tandea",
+      "date": "2026-10-13T14:14:39+03:00"
+    },
+    {
+      "type": "ci",
+      "scope": null,
+      "message": "use vitest for clockwise-server",
+      "hash": "9e9893e",
+      "author": "Alin Tandea",
+      "date": "2026-10-13T14:14:12+03:00"
+    },
+    {
+      "type": "ci",
+      "scope": null,
+      "message": "use npm-check-updates in dependencies script",
+      "hash": "3c3a737",
+      "author": "Alin Tandea",
+      "date": "2026-10-11T19:42:14+03:00"
+    },
+    {
+      "type": "fix",
+      "scope": null,
+      "message": "fix 'ends at' layout and transition flickering",
+      "hash": "4a1d3c9",
+      "author": "Alin Tandea",
+      "date": "2026-10-11T19:36:06+03:00"
+    },
+    {
+      "type": "fix",
+      "scope": null,
+      "message": "fix timer input having double border",
+      "hash": "069001e",
+      "author": "Alin Tandea",
+      "date": "2026-10-11T18:43:58+03:00"
+    },
+    {
+      "type": "fix",
+      "scope": null,
+      "message": "fix changelog generator not displaying changes",
+      "hash": "0afe9fe",
+      "author": "Alin Tandea",
+      "date": "2026-10-11T13:49:40+03:00"
+    },
+    {
+      "type": "chore",
+      "scope": null,
+      "message": "remove dependency to yao-pkg/pkg",
+      "hash": "5b07460",
+      "author": "Alin Tandea",
+      "date": "2026-10-11T13:38:01+03:00"
+    }
+  ]
+}
