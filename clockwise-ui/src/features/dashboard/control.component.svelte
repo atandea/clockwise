@@ -173,13 +173,17 @@
 		{#if isLoading || $loading}
 			<ul class="divide-y divide-gray-700/50">
 				{#each Array(5) as _}
-					<li class="flex items-center justify-between px-4 py-3">
-						<div class="h-2 w-2 rounded-full bg-gray-700 animate-pulse"></div>
-						<div class="flex-1 px-4 space-y-2">
+					<li class="flex items-center justify-between px-2.5 sm:px-4 py-2 sm:py-3">
+						<div class="h-2 w-2 shrink-0 rounded-full bg-gray-700 animate-pulse"></div>
+						<div class="flex-1 min-w-0 px-2.5 sm:px-4 space-y-2">
 							<div class="h-4 w-1/2 rounded bg-white/5 animate-pulse"></div>
 							<div class="h-3 w-1/4 rounded bg-white/5 animate-pulse"></div>
 						</div>
-						<div class="h-9 w-20 rounded-lg bg-white/5 animate-pulse"></div>
+						<div class="flex shrink-0 items-center gap-0.5 rounded-lg border border-gray-700/50 bg-gray-900/60 p-0.5 shadow-sm sm:gap-1 sm:p-1">
+							<div class="h-6 w-6 rounded bg-white/5 animate-pulse sm:h-8 sm:w-8"></div>
+							<div class="h-3 w-px bg-gray-700/50"></div>
+							<div class="h-6 w-6 rounded bg-white/5 animate-pulse sm:h-8 sm:w-8"></div>
+						</div>
 					</li>
 				{/each}
 			</ul>
@@ -193,23 +197,15 @@
 						</div>
 						<div class="flex items-center bg-gray-900/60 rounded-lg p-0.5 sm:p-1 border border-gray-700/50 shadow-sm gap-0.5 sm:gap-1 shrink-0">
 							<button class="p-1 sm:p-1.5 rounded hover:bg-white/10 transition-colors" class:text-red-500={timer.id === $activeTimerId} class:text-green-500={timer.id !== $activeTimerId} disabled={$globalPending || ($actionPending[timer.id] ?? false)} onclick={() => timer.id === $activeTimerId ? stopActiveTimer() : startTimer(timer.id)} title={timer.id === $activeTimerId ? "Stop" : "Start"}>
-								{#if $globalPending || ($actionPending[timer.id] ?? false)}
-									<span class="inline-block w-4 h-4 sm:w-5 sm:h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+								{#if timer.id === $activeTimerId}
+									<StopIcon class="w-4 h-4 sm:w-5 sm:h-5" />
 								{:else}
-									{#if timer.id === $activeTimerId}
-										<StopIcon class="w-4 h-4 sm:w-5 sm:h-5" />
-									{:else}
-										<PlayIcon class="w-4 h-4 sm:w-5 sm:h-5" />
-									{/if}
+									<PlayIcon class="w-4 h-4 sm:w-5 sm:h-5" />
 								{/if}
 							</button>
 							<div class="w-px h-3 bg-gray-700/50"></div>
 							<button class="p-1 sm:p-1.5 rounded text-gray-500 hover:text-red-500 hover:bg-white/10 transition-colors" disabled={$globalPending || ($actionPending[timer.id] ?? false)} onclick={() => { confirmTimerId = timer.id; confirmTimerName = timer.name; confirmVisible = true; }} title="Delete">
-								    {#if $globalPending || ($actionPending[timer.id] ?? false)}
-									    <span class="inline-block w-4 h-4 sm:w-5 sm:h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-								{:else}
-									    <TrashIcon class="w-4 h-4 sm:w-5 sm:h-5" />
-								{/if}
+								<TrashIcon class="w-4 h-4 sm:w-5 sm:h-5" />
 							</button>
 						</div>
 					</li>
