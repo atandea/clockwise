@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as path from 'node:path';
 
 export interface DashboardSettings {
@@ -52,7 +52,7 @@ export class SettingsService {
 
     const dir = path.dirname(this.settingsPath);
     if (!existsSync(dir)) {
-      require('node:fs').mkdirSync(dir, { recursive: true });
+      mkdirSync(dir, { recursive: true });
     }
 
     writeFileSync(this.settingsPath, JSON.stringify(merged, null, 2));

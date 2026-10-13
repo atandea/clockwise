@@ -8,9 +8,9 @@ describe('SecurityGuard', () => {
   let securityService: SecurityService;
 
   const mockSecurityService = {
-    isLocal: jest.fn(),
-    isPinEnabled: jest.fn(),
-    verifyPin: jest.fn(),
+    isLocal: vi.fn(),
+    isPinEnabled: vi.fn(),
+    verifyPin: vi.fn(),
   };
 
   const createMockContext = (
@@ -41,7 +41,7 @@ describe('SecurityGuard', () => {
     securityService = module.get<SecurityService>(SecurityService);
 
     // Clear mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

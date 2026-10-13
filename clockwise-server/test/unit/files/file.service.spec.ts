@@ -1,8 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FileStorageService } from 'src/files/file.service';
 import * as fs from 'node:fs';
+import type { Mock } from 'vitest';
 
-jest.mock('node:fs');
+vi.mock('node:fs', () => ({
+  existsSync: vi.fn(),
+  readFileSync: vi.fn(),
+  writeFileSync: vi.fn(),
+  mkdirSync: vi.fn(),
+}));
 
 describe('FileStorageService', () => {
   let service: FileStorageService;
@@ -13,7 +19,7 @@ describe('FileStorageService', () => {
     }).compile();
 
     service = module.get<FileStorageService>(FileStorageService);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -22,21 +28,21 @@ describe('FileStorageService', () => {
 
   describe('readData', () => {
     it('should return empty array if file does not exist', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(false);
+      (fs.existsSync as Mock).mockReturnValue(false);
       expect(service.readData()).toEqual([]);
     });
 
     it('should return parsed data if file exists', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fs.readFileSync as jest.Mock).mockReturnValue('[{"id": "1"}]');
+      (fs.existsSync as Mock).mockReturnValue(true);
+      (fs.readFileSync as Mock).mockReturnValue('[{"id": "1"}]');
 
       const data = service.readData();
       expect(data).toEqual([{ id: '1' }]);
     });
 
     it('should use cache on subsequent reads', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fs.readFileSync as jest.Mock).mockReturnValue('[{"id": "1"}]');
+      (fs.existsSync as Mock).mockReturnValue(true);
+      (fs.readFileSync as Mock).mockReturnValue('[{"id": "1"}]');
 
       service.readData();
       service.readData();
@@ -48,7 +54,7 @@ describe('FileStorageService', () => {
   describe('writeData', () => {
     it('should write data to file and create directory if missing', () => {
       const data = [{ id: '2' }];
-      (fs.existsSync as jest.Mock).mockReturnValue(false); // directory doesn't exist
+      (fs.existsSync as Mock).mockReturnValue(false); // directory doesn't exist
 
       service.writeData(data);
 

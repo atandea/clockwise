@@ -1,8 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SettingsService } from 'src/settings.service';
 import * as fs from 'node:fs';
+import type { Mock } from 'vitest';
 
-jest.mock('node:fs');
+vi.mock('node:fs', () => ({
+  existsSync: vi.fn(),
+  readFileSync: vi.fn(),
+  writeFileSync: vi.fn(),
+  mkdirSync: vi.fn(),
+}));
 
 describe('SettingsService', () => {
   let service: SettingsService;
@@ -13,8 +19,8 @@ describe('SettingsService', () => {
     }).compile();
 
     service = module.get<SettingsService>(SettingsService);
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   it('should be defined', () => {
@@ -23,13 +29,13 @@ describe('SettingsService', () => {
 
   describe('getSettings', () => {
     it('should return empty object if file does not exist', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(false);
+      (fs.existsSync as Mock).mockReturnValue(false);
       expect(service.getSettings()).toEqual({});
     });
 
     it('should return parsed settings if file exists', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fs.readFileSync as jest.Mock).mockReturnValue(
+      (fs.existsSync as Mock).mockReturnValue(true);
+      (fs.readFileSync as Mock).mockReturnValue(
         '{"pin_lock_enabled": true}',
       );
 
@@ -40,8 +46,8 @@ describe('SettingsService', () => {
 
   describe('updateSettings', () => {
     it('should merge updates and write to file', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fs.readFileSync as jest.Mock).mockReturnValue(
+      (fs.existsSync as Mock).mockReturnValue(true);
+      (fs.readFileSync as Mock).mockReturnValue(
         '{"launch_fullscreen_on_startup": true}',
       );
 
@@ -57,7 +63,7 @@ describe('SettingsService', () => {
     });
 
     it('should create directory if it does not exist', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(false);
+      (fs.existsSync as Mock).mockReturnValue(false);
 
       service.updateSettings({ network_access_enabled: false });
 
@@ -67,8 +73,8 @@ describe('SettingsService', () => {
 
   describe('error handling', () => {
     it('should handle JSON parse errors in getSettings', () => {
-      (fs.existsSync as jest.Mock).mockReturnValue(true);
-      (fs.readFileSync as jest.Mock).mockReturnValue('invalid json');
+      (fs.existsSync as Mock).mockReturnValue(true);
+      (fs.readFileSync as Mock).mockReturnValue('invalid json');
 
       const settings = service.getSettings();
       expect(settings).toEqual({});

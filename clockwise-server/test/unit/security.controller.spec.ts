@@ -8,12 +8,12 @@ describe('SecurityController', () => {
   let service: SecurityService;
 
   const mockSecurityService = {
-    isLocal: jest.fn(),
-    isPinEnabled: jest.fn(),
-    verifyPin: jest.fn(),
-    getPinLockAtStartup: jest.fn().mockReturnValue(true),
-    setPinEnabled: jest.fn(),
-    getPin: jest.fn().mockReturnValue('1234'),
+    isLocal: vi.fn(),
+    isPinEnabled: vi.fn(),
+    verifyPin: vi.fn(),
+    getPinLockAtStartup: vi.fn().mockReturnValue(true),
+    setPinEnabled: vi.fn(),
+    getPin: vi.fn().mockReturnValue('1234'),
   };
 
   beforeEach(async () => {
@@ -24,7 +24,7 @@ describe('SecurityController', () => {
 
     controller = module.get<SecurityController>(SecurityController);
     service = module.get<SecurityService>(SecurityService);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

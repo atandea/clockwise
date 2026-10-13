@@ -9,20 +9,20 @@ describe('TimerController', () => {
   let service: TimerService;
 
   const mockTimerService = {
-    getTimers: jest.fn().mockReturnValue([]),
-    createTimer: jest.fn(),
-    stopActiveTimer: jest.fn(),
-    getTimerById: jest.fn(),
-    startTimer: jest.fn(),
-    deleteTimer: jest.fn(),
-    subscribeToStream: jest.fn(),
-    pauseActiveTimer: jest.fn(),
-    resumeActiveTimer: jest.fn(),
+    getTimers: vi.fn().mockReturnValue([]),
+    createTimer: vi.fn(),
+    stopActiveTimer: vi.fn(),
+    getTimerById: vi.fn(),
+    startTimer: vi.fn(),
+    deleteTimer: vi.fn(),
+    subscribeToStream: vi.fn(),
+    pauseActiveTimer: vi.fn(),
+    resumeActiveTimer: vi.fn(),
   };
 
   const mockSecurityService = {
-    isLocal: jest.fn().mockReturnValue(true),
-    isPinEnabled: jest.fn().mockReturnValue(false),
+    isLocal: vi.fn().mockReturnValue(true),
+    isPinEnabled: vi.fn().mockReturnValue(false),
   };
 
   beforeEach(async () => {
@@ -39,7 +39,7 @@ describe('TimerController', () => {
 
     controller = module.get<TimerController>(TimerController);
     service = module.get<TimerService>(TimerService);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -114,7 +114,7 @@ describe('TimerController', () => {
   describe('subscribeToStream', () => {
     it('should call timerService.subscribeToStream', () => {
       mockTimerService.subscribeToStream.mockReturnValue({
-        pipe: jest.fn().mockReturnValue({}),
+        pipe: vi.fn().mockReturnValue({}),
       });
       controller.subscribeToStream();
       expect(service.subscribeToStream).toHaveBeenCalled();

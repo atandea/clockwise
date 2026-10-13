@@ -9,12 +9,12 @@ describe('TimerService', () => {
   let fileStorageService: FileStorageService;
 
   const mockFileStorageService = {
-    readData: jest.fn().mockReturnValue([]),
-    writeData: jest.fn(),
+    readData: vi.fn().mockReturnValue([]),
+    writeData: vi.fn(),
   };
 
   beforeEach(async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TimerService,
@@ -24,11 +24,11 @@ describe('TimerService', () => {
 
     service = module.get<TimerService>(TimerService);
     fileStorageService = module.get<FileStorageService>(FileStorageService);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should be defined', () => {
@@ -85,12 +85,12 @@ describe('TimerService', () => {
       expect(events[1].remainingSeconds).toBe(2);
 
       // Advance 1s - interval emits first value
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(events.length).toBe(3);
       expect(events[2].remainingSeconds).toBe(2); // Implementation returns current then decrements
 
       // Advance another 1s
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(events.length).toBe(4);
       expect(events[3].remainingSeconds).toBe(1);
     });
@@ -110,10 +110,10 @@ describe('TimerService', () => {
 
       // t=0 (initial)
       // t=1000: returns 1, decrements to 0
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       // t=2000: remaining is 0, status becomes overtime
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       expect(events[events.length - 1].status).toBe('overtime');
     });
@@ -152,7 +152,7 @@ describe('TimerService', () => {
       expect(events[events.length - 1].status).toBe('paused');
 
       service.resumeActiveTimer();
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(events[events.length - 1].status).toBe('running');
     });
 
@@ -232,11 +232,11 @@ describe('TimerService', () => {
       service.subscribeToStream()!.subscribe((e) => (lastEvent = e));
 
       service.startTimer(timerH);
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(lastEvent.message).toContain('01:00:00');
 
       service.startTimer(timerM);
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(lastEvent.message).toContain('01:00');
     });
 
@@ -255,7 +255,7 @@ describe('TimerService', () => {
 
       // Manually stop it in a way that triggers the branch
       service.stopActiveTimer();
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
       expect(lastEvent.status).toBe('stopped');
     });
   });

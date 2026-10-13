@@ -7,8 +7,8 @@ describe('SecurityService', () => {
   let settingsService: SettingsService;
 
   const mockSettingsService = {
-    getSettings: jest.fn().mockReturnValue({}),
-    updateSettings: jest.fn(),
+    getSettings: vi.fn().mockReturnValue({}),
+    updateSettings: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -21,7 +21,7 @@ describe('SecurityService', () => {
 
     service = module.get<SecurityService>(SecurityService);
     settingsService = module.get<SettingsService>(SettingsService);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be defined', () => {

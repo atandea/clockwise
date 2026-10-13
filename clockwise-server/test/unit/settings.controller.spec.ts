@@ -10,13 +10,13 @@ describe('SettingsController', () => {
   let service: SettingsService;
 
   const mockSettingsService = {
-    getSettings: jest.fn().mockReturnValue({ preferred_monitor: 'M1' }),
-    updateSettings: jest.fn().mockReturnValue({ preferred_monitor: 'M2' }),
+    getSettings: vi.fn().mockReturnValue({ preferred_monitor: 'M1' }),
+    updateSettings: vi.fn().mockReturnValue({ preferred_monitor: 'M2' }),
   };
 
   const mockSecurityService = {};
   const mockTimerService = {
-    emitSettingsUpdated: jest.fn(),
+    emitSettingsUpdated: vi.fn(),
   };
 
   beforeEach(async () => {
