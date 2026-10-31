@@ -4,6 +4,7 @@
     import Clock from "#features/viewer/clock.component.svelte";
     import ChevronDownIcon from "#shared/ui/icons/ChevronDownIcon.svelte";
     import ToggleSwitch from "#shared/ui/toggle-switch.component.svelte";
+    import ColorPicker from "#shared/ui/color-picker.component.svelte";
     import type { SettingsState } from "./settings.state.svelte";
 
     let { settings }: { settings: SettingsState } = $props();
@@ -91,6 +92,7 @@
             settings.showClockSeconds,
             settings.showClockDate,
             settings.clockDateFormat,
+            settings.clockColor,
         ];
         if (!mounted) return;
         untrack(() => {
@@ -144,6 +146,7 @@
                         showSeconds={settings.showClockSeconds}
                         showDate={settings.showClockDate}
                         dateFormat={settings.clockDateFormat}
+                        clockColor={settings.clockColor}
                     />
                 {/if}
             </div>
@@ -200,66 +203,6 @@
                 <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Timer Appearance</h3>
             </div>
             <div class="divide-y divide-gray-700/30">
-                <!-- Timer Colors -->
-                <div
-                    class="flex flex-col gap-2 py-3 px-4 transition-colors"
-                >
-                    <span
-                        class="text-sm font-bold text-gray-300 block"
-                        >Timer Colors</span
-                    >
-
-                    <div class="grid grid-cols-3 gap-2 mt-1">
-                        <div class="flex flex-col items-center gap-1">
-                            <label
-                                for="timer-normal-color"
-                                class="text-xs text-gray-400 font-medium">Normal</label
-                            >
-                            <input
-                                id="timer-normal-color"
-                                type="color"
-                                class="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0"
-                                value={settings.timerNormalColor}
-                                onchange={(e) =>
-                                    settings.setTimerNormalColor(e.currentTarget.value)}
-                            />
-                        </div>
-                        <div class="flex flex-col items-center gap-1">
-                            <label
-                                for="timer-warning-color"
-                                class="text-xs text-gray-400 font-medium">Warning</label
-                            >
-                            <input
-                                id="timer-warning-color"
-                                type="color"
-                                class="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0"
-                                value={settings.timerWarningColor}
-                                onchange={(e) =>
-                                    settings.setTimerWarningColor(
-                                        e.currentTarget.value,
-                                    )}
-                            />
-                        </div>
-                        <div class="flex flex-col items-center gap-1">
-                            <label
-                                for="timer-overtime-color"
-                                class="text-xs text-gray-400 font-medium"
-                                >Overtime</label
-                            >
-                            <input
-                                id="timer-overtime-color"
-                                type="color"
-                                class="w-8 h-8 rounded cursor-pointer bg-transparent border-0 p-0"
-                                value={settings.timerOvertimeColor}
-                                onchange={(e) =>
-                                    settings.setTimerOvertimeColor(
-                                        e.currentTarget.value,
-                                    )}
-                            />
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Warning Threshold -->
                 <div
                     class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
@@ -322,6 +265,60 @@
                         onToggle={() => settings.toggleSecondaryClock()}
                         label="Toggle Current Time"
                     />
+                </div>
+
+                <!-- Normal Color -->
+                <div
+                    class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
+                >
+                    <span class="text-sm font-bold text-gray-300">Normal Color</span>
+
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs text-gray-400">{settings.timerNormalColor.toUpperCase()}</span>
+                        <ColorPicker
+                            id="timer-normal-color"
+                            value={settings.timerNormalColor}
+                            label="Normal Color"
+                            onSelect={(color) =>
+                                settings.setTimerNormalColor(color)}
+                        />
+                    </div>
+                </div>
+
+                <!-- Warning Color -->
+                <div
+                    class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
+                >
+                    <span class="text-sm font-bold text-gray-300">Warning Color</span>
+
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs text-gray-400">{settings.timerWarningColor.toUpperCase()}</span>
+                        <ColorPicker
+                            id="timer-warning-color"
+                            value={settings.timerWarningColor}
+                            label="Warning Color"
+                            onSelect={(color) =>
+                                settings.setTimerWarningColor(color)}
+                        />
+                    </div>
+                </div>
+
+                <!-- Overtime Color -->
+                <div
+                    class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
+                >
+                    <span class="text-sm font-bold text-gray-300">Overtime Color</span>
+
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs text-gray-400">{settings.timerOvertimeColor.toUpperCase()}</span>
+                        <ColorPicker
+                            id="timer-overtime-color"
+                            value={settings.timerOvertimeColor}
+                            label="Overtime Color"
+                            onSelect={(color) =>
+                                settings.setTimerOvertimeColor(color)}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -400,6 +397,27 @@
                         >
                             <ChevronDownIcon width="14" height="14" strokeWidth="2.5" />
                         </div>
+                    </div>
+                </div>
+
+                <!-- Clock Color -->
+                <div
+                    class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
+                >
+                    <span
+                        class="text-sm font-bold text-gray-300"
+                        >Clock Color</span
+                    >
+
+                    <div class="flex items-center gap-2">
+                        <span class="font-mono text-xs text-gray-400">{settings.clockColor.toUpperCase()}</span>
+                        <ColorPicker
+                            id="clock-color"
+                            value={settings.clockColor}
+                            label="Clock Color"
+                            onSelect={(color) =>
+                                settings.setClockColor(color)}
+                        />
                     </div>
                 </div>
             </div>

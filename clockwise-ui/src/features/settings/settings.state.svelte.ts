@@ -69,6 +69,9 @@ export class SettingsState {
     showClockDate: boolean = $state(false);
     clockDateFormat: string = $state("DD/MM/YYYY");
     
+    // Clock specific appearance
+    clockColor: string = $state("#ffffff");
+
     // Timer specific appearance
     timerNormalColor: string = $state("#ffffff");
     timerWarningColor: string = $state("#eab308");
@@ -97,6 +100,7 @@ export class SettingsState {
         if (data.show_clock_seconds !== undefined) this.showClockSeconds = data.show_clock_seconds;
         if (data.show_clock_date !== undefined) this.showClockDate = data.show_clock_date;
         if (data.clock_date_format) this.clockDateFormat = data.clock_date_format;
+        if (data.clock_color) this.clockColor = data.clock_color;
         if (data.selected_preset_id) this.selectedPresetId = data.selected_preset_id;
         if (data.custom_presets) this.customPresets = data.custom_presets;
         
@@ -162,6 +166,11 @@ export class SettingsState {
     setClockDateFormat(format: string) {
         this.clockDateFormat = format;
         this.updateBackendSetting("clock_date_format", format);
+    }
+
+    setClockColor(color: string) {
+        this.clockColor = color;
+        this.updateBackendSetting("clock_color", color);
     }
 
     setTimerNormalColor(color: string) {

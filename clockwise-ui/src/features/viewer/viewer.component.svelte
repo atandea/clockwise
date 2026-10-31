@@ -14,6 +14,7 @@
 		showClockSeconds = false,
 		showClockDate = false,
 		clockDateFormat = "DD/MM/YYYY",
+		clockColor = "#ffffff",
 		timerNormalColor = "#ffffff",
 		timerWarningColor = "#eab308",
 		timerOvertimeColor = "#ef4444",
@@ -28,6 +29,7 @@
 		showClockSeconds?: boolean;
 		showClockDate?: boolean;
 		clockDateFormat?: string;
+		clockColor?: string;
 		timerNormalColor?: string;
 		timerWarningColor?: string;
 		timerOvertimeColor?: string;
@@ -195,6 +197,7 @@
 				showSeconds={showClockSeconds}
 				showDate={showClockDate}
 				dateFormat={clockDateFormat}
+				{clockColor}
 			/>
 		</div>
 

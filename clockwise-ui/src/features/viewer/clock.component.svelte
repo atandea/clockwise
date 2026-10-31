@@ -7,11 +7,13 @@
 		showSeconds = false,
 		showDate = false,
 		dateFormat = "DD/MM/YYYY",
+		clockColor = "#ffffff",
 	}: {
 		onStatusChange?: (status: string) => void;
 		showSeconds?: boolean;
 		showDate?: boolean;
 		dateFormat?: string;
+		clockColor?: string;
 	} = $props();
 
 	let now = $state(new Date());
@@ -62,7 +64,8 @@
 </script>
 
 <div
-	class="absolute inset-0 flex flex-col items-center justify-center text-white transition-colors duration-500 bg-[#020617] [container-type:size] px-4"
+	class="absolute inset-0 flex flex-col items-center justify-center transition-colors duration-500 bg-[#020617] [container-type:size] px-4"
+	style="color: {clockColor}"
 >
 	<div
 		class="font-mono transition-colors duration-300 leading-none"

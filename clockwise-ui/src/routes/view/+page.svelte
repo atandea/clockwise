@@ -38,6 +38,7 @@
         showClockSeconds={settings.showClockSeconds}
         showClockDate={settings.showClockDate}
         clockDateFormat={settings.clockDateFormat}
+        clockColor={settings.clockColor}
         timerNormalColor={settings.timerNormalColor}
         timerWarningColor={settings.timerWarningColor}
         timerOvertimeColor={settings.timerOvertimeColor}
