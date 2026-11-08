@@ -27,14 +27,14 @@
 
         if (remainingMs === 0) {
             lockUntil = 0;
-            localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
+            window.localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
         } else {
-            localStorage.setItem(PIN_LOCK_STORAGE_KEY, nextLockUntil.toString());
+            window.localStorage.setItem(PIN_LOCK_STORAGE_KEY, nextLockUntil.toString());
         }
     }
 
     function updateLockout() {
-        const storedLockUntil = Number(localStorage.getItem(PIN_LOCK_STORAGE_KEY));
+        const storedLockUntil = Number(window.localStorage.getItem(PIN_LOCK_STORAGE_KEY));
         if (storedLockUntil > Date.now()) {
             applyLockUntil(storedLockUntil);
             return;
@@ -42,12 +42,12 @@
 
         lockUntil = 0;
         remainingSeconds = 0;
-        localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
+        window.localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
     }
 
     function startLockout(durationMs = PIN_LOCK_DURATION_MS) {
         const now = Date.now();
-        const storedLockUntil = Number(localStorage.getItem(PIN_LOCK_STORAGE_KEY) ?? 0);
+        const storedLockUntil = Number(window.localStorage.getItem(PIN_LOCK_STORAGE_KEY) ?? 0);
         const nextLockUntil = Math.max(storedLockUntil, now + durationMs);
         applyLockUntil(nextLockUntil);
     }
@@ -58,12 +58,12 @@
             startLockout(startFromServer);
         } else {
             const storedLockUntil = Number(
-                localStorage.getItem(PIN_LOCK_STORAGE_KEY),
+                window.localStorage.getItem(PIN_LOCK_STORAGE_KEY),
             );
             if (storedLockUntil > Date.now()) {
                 applyLockUntil(storedLockUntil);
             } else {
-                localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
+                window.localStorage.removeItem(PIN_LOCK_STORAGE_KEY);
             }
         }
 

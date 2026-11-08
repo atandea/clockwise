@@ -3,20 +3,32 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import PinScreen from '../../../src/shared/ui/pin-screen.component.svelte';
 
 describe('PinScreen lockout', () => {
+  const storage = new Map<string, string>();
+  const pinStorage = {
+    clear: () => storage.clear(),
+    getItem: (key: string) => storage.get(key) ?? null,
+    removeItem: (key: string) => storage.delete(key),
+    setItem: (key: string, value: string) => storage.set(key, String(value)),
+  };
+
   beforeEach(() => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2024-01-01T00:00:00Z'));
-    localStorage.clear();
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: pinStorage,
+    });
+    pinStorage.clear();
   });
 
   afterEach(() => {
     vi.useRealTimers();
     vi.restoreAllMocks();
-    localStorage.clear();
+    pinStorage.clear();
   });
 
   it('preserves the remaining lock window instead of resetting it to the new retry duration', async () => {
-    localStorage.setItem('clockwise_pin_lock_until', String(Date.now() + 60_000));
+      pinStorage.setItem('clockwise_pin_lock_until', String(Date.now() + 60_000));
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
       ok: false,
       status: 429,

@@ -4,12 +4,12 @@
         width = size,
         height = size,
         class: className = ""
-    } = $props<{
+    }: {
         size?: string | number;
         width?: string | number;
         height?: string | number;
         class?: string;
-    }>();
+    } = $props();
 </script>
 
 <svg

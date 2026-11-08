@@ -5,7 +5,7 @@
   import DisplaySelector from "#features/dashboard/display-selector.component.svelte";
   import UpdateModal from "#shared/ui/update-modal.component.svelte";
   import { onMount } from "svelte";
-  import { getApiBaseUrl, serverStatus } from "#shared/api/api";
+  import { getApiBaseUrl, serverStatus, appSettings, fetchWithPin } from "#shared/api/api";
   import { SettingsState } from "#features/settings/settings.state.svelte";
   import { isTauriEnvironment } from "#shared/platform/tauri";
   import { updateChecker } from "./update-checker.svelte";
@@ -37,6 +37,14 @@
 
     // Check for updates once the app launches
     updateChecker.checkForUpdate();
+
+    fetchWithPin(`${apiBase}/settings`)
+      .then((response) => {
+        if (response.ok) return response.json();
+        throw new Error("Failed to fetch settings");
+      })
+      .then((data) => appSettings.set(data))
+      .catch((err) => console.error("Failed to refresh dashboard settings:", err));
 
     return () => {
       unsubscribe();

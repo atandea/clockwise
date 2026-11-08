@@ -2,10 +2,10 @@
     let {
         size = "24",
         class: className = ""
-    } = $props<{
+    }: {
         size?: string | number;
         class?: string;
-    }>();
+    } = $props();
 </script>
 
 <svg
