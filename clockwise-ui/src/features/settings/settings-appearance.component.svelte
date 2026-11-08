@@ -271,7 +271,7 @@
                 <div
                     class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
                 >
-                    <span class="text-sm font-bold text-gray-300">Normal Color</span>
+                    <span class="text-sm font-bold text-gray-300">Timer Normal Color</span>
 
                     <div class="flex items-center gap-2">
                         <span class="font-mono text-xs text-gray-400">{settings.timerNormalColor.toUpperCase()}</span>
@@ -289,7 +289,7 @@
                 <div
                     class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
                 >
-                    <span class="text-sm font-bold text-gray-300">Warning Color</span>
+                    <span class="text-sm font-bold text-gray-300">Timer Warning Color</span>
 
                     <div class="flex items-center gap-2">
                         <span class="font-mono text-xs text-gray-400">{settings.timerWarningColor.toUpperCase()}</span>
@@ -307,7 +307,7 @@
                 <div
                     class="flex items-center justify-between py-3 px-4 transition-colors hover:bg-white/[0.02]"
                 >
-                    <span class="text-sm font-bold text-gray-300">Overtime Color</span>
+                    <span class="text-sm font-bold text-gray-300">Timer Overtime Color</span>
 
                     <div class="flex items-center gap-2">
                         <span class="font-mono text-xs text-gray-400">{settings.timerOvertimeColor.toUpperCase()}</span>

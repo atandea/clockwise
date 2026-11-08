@@ -64,19 +64,22 @@
 </script>
 
 <div
-	class="absolute inset-0 flex flex-col items-center justify-center transition-colors duration-500 bg-[#020617] [container-type:size] px-4"
-	style="color: {clockColor}"
+	class="absolute inset-0 flex flex-col items-center justify-center bg-[#020617] [container-type:size] px-4"
 >
 	<div
 		class="font-mono transition-colors duration-300 leading-none"
 		class:text-[clamp(1rem,34cqw,42rem)]={!showSeconds}
 		class:text-[clamp(1rem,21cqw,40rem)]={showSeconds}
+		style="color: {clockColor}"
 	>
 		{formatTime(now)}
 	</div>
 
 	{#if showDate}
-		<div class="mt-[4%] font-mono text-[clamp(1rem,8cqw,10rem)] opacity-40 tracking-tighter">
+		<div
+			class="mt-[4%] font-mono text-[clamp(1rem,8cqw,10rem)] opacity-40 tracking-tighter transition-colors duration-300 delay-150"
+			style="color: {clockColor}"
+		>
 			{formatDate(now)}
 		</div>
 	{/if}
