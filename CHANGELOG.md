@@ -1,14 +1,16 @@
-## v1.1.7 — 2026-10-13
+## v1.1.8 — 2026-11-09
 
-### 🐛 Bug Fixes
+### 🚀 New Features
 
-- remove loading icon for preset timer buttons (`65b656b`)
-- fix 'ends at' layout and transition flickering (`4a1d3c9`)
-- fix timer input having double border (`069001e`)
-- fix changelog generator not displaying changes (`0afe9fe`)
+- countup and countdown mode for timer (`90e6dde`)
+- color setting for clock, rework color picker (`b12e1b2`)
+
+### 🔧 Improvements
+
+- improve timer settings refresh, update color setting labels (`eeeae53`)
+- adapt icon assets for svelte (`1191c92`)
 
 ### 🧹 Chores
 
-- dependencies update (`7c1a47d, cea7524, b3980dd`)
-- remove dependency to yao-pkg/pkg (`5b07460`)
+- dependencies update (`b140b3b, 7116d6e, 33afa3c, fc3b229, 318c6e9, 94d868c`)
 

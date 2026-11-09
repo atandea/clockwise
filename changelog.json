@@ -1,80 +1,56 @@
 {
-  "version": "1.1.7",
-  "date": "2026-10-13",
-  "from": "app-v1.1.6",
+  "version": "1.1.8",
+  "date": "2026-11-09",
+  "from": "app-v1.1.7",
   "to": "HEAD",
   "entries": [
-    {
-      "type": "ci",
-      "scope": null,
-      "message": "fix release workflow",
-      "hash": "2fa99ac",
-      "author": "Alin Tandea",
-      "date": "2026-10-13T15:56:27+03:00"
-    },
-    {
-      "type": "fix",
-      "scope": null,
-      "message": "remove loading icon for preset timer buttons",
-      "hash": "65b656b",
-      "author": "Alin Tandea",
-      "date": "2026-10-13T15:44:49+03:00"
-    },
     {
       "type": "chore",
       "scope": null,
       "message": "dependencies update",
-      "hash": "7c1a47d, cea7524, b3980dd",
+      "hash": "b140b3b, 7116d6e, 33afa3c, fc3b229, 318c6e9, 94d868c",
       "author": "Alin Tandea",
-      "date": "2026-10-13T14:14:39+03:00"
+      "date": "2026-11-09T21:14:25+02:00"
+    },
+    {
+      "type": "feat",
+      "scope": null,
+      "message": "countup and countdown mode for timer",
+      "hash": "90e6dde",
+      "author": "Alin Tandea",
+      "date": "2026-11-09T21:13:28+02:00"
+    },
+    {
+      "type": "refactor",
+      "scope": null,
+      "message": "improve timer settings refresh, update color setting labels",
+      "hash": "eeeae53",
+      "author": "Alin Tandea",
+      "date": "2026-11-08T16:55:48+02:00"
+    },
+    {
+      "type": "refactor",
+      "scope": null,
+      "message": "adapt icon assets for svelte",
+      "hash": "1191c92",
+      "author": "Alin Tandea",
+      "date": "2026-11-08T16:41:55+02:00"
+    },
+    {
+      "type": "feat",
+      "scope": null,
+      "message": "color setting for clock, rework color picker",
+      "hash": "b12e1b2",
+      "author": "Alin Tandea",
+      "date": "2026-10-31T14:26:11+02:00"
     },
     {
       "type": "ci",
       "scope": null,
-      "message": "use vitest for clockwise-server",
-      "hash": "9e9893e",
+      "message": "add cargo lock to release flow",
+      "hash": "499e304",
       "author": "Alin Tandea",
-      "date": "2026-10-13T14:14:12+03:00"
-    },
-    {
-      "type": "ci",
-      "scope": null,
-      "message": "use npm-check-updates in dependencies script",
-      "hash": "3c3a737",
-      "author": "Alin Tandea",
-      "date": "2026-10-11T19:42:14+03:00"
-    },
-    {
-      "type": "fix",
-      "scope": null,
-      "message": "fix 'ends at' layout and transition flickering",
-      "hash": "4a1d3c9",
-      "author": "Alin Tandea",
-      "date": "2026-10-11T19:36:06+03:00"
-    },
-    {
-      "type": "fix",
-      "scope": null,
-      "message": "fix timer input having double border",
-      "hash": "069001e",
-      "author": "Alin Tandea",
-      "date": "2026-10-11T18:43:58+03:00"
-    },
-    {
-      "type": "fix",
-      "scope": null,
-      "message": "fix changelog generator not displaying changes",
-      "hash": "0afe9fe",
-      "author": "Alin Tandea",
-      "date": "2026-10-11T13:49:40+03:00"
-    },
-    {
-      "type": "chore",
-      "scope": null,
-      "message": "remove dependency to yao-pkg/pkg",
-      "hash": "5b07460",
-      "author": "Alin Tandea",
-      "date": "2026-10-11T13:38:01+03:00"
+      "date": "2026-10-24T14:53:09+03:00"
     }
   ]
 }
