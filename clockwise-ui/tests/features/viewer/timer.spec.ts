@@ -1,4 +1,4 @@
-import { render, screen, cleanup } from '@testing-library/svelte';
+import { render, screen, cleanup, waitFor } from '@testing-library/svelte';
 import TimerComponent from '../../../src/features/viewer/timer.component.svelte';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { writable } from 'svelte/store';
@@ -70,6 +70,34 @@ describe('TimerComponent', () => {
 
     render(TimerComponent);
     expect(screen.getByText('01:01:01')).toBeInTheDocument();
+  });
+
+  it('should restart count-up display from zero in overtime', async () => {
+    mockTimerEvents.set({
+        status: 'overtime',
+        mode: 'countup',
+        remainingSeconds: 0,
+        elapsedSeconds: 300,
+        totalSeconds: 300,
+        name: 'Count-up Timer',
+        progressPercent: 100,
+        timerId: '4'
+    });
+
+    render(TimerComponent);
+    expect(screen.getByText('00:00')).toBeInTheDocument();
+
+    mockTimerEvents.set({
+        status: 'overtime',
+        mode: 'countup',
+        remainingSeconds: 1,
+        elapsedSeconds: 301,
+        totalSeconds: 300,
+        name: 'Count-up Timer',
+        progressPercent: 100,
+        timerId: '4'
+    });
+    await waitFor(() => expect(screen.getByText('00:01')).toBeInTheDocument());
   });
 
   it('should apply warning color when progress >= threshold (warning)', () => {

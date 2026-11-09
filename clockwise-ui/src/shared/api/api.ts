@@ -8,13 +8,17 @@ export const appAuthStatus = writable<AuthStatus | null>(null);
 export const appServerPin = writable<string>("");
 export const appSettings = writable<any>(null);
 
+export type TimerMode = "countdown" | "countup";
+
 export interface TimerEventData {
   status: "running" | "paused" | "stopped" | "overtime" | "idle" | "error" | "connecting";
   remainingSeconds: number;
+  elapsedSeconds?: number;
   totalSeconds: number;
   name: string;
   progressPercent: number;
   timerId: string | null;
+  mode?: TimerMode;
 }
 
 export interface AuthStatus {
@@ -84,10 +88,12 @@ export async function checkAuth(): Promise<AuthStatus | null> {
 const INITIAL_DATA: TimerEventData = {
   status: "idle",
   remainingSeconds: 0,
+  elapsedSeconds: 0,
   totalSeconds: 0,
   name: "Clockwise",
   progressPercent: 0,
-  timerId: null
+  timerId: null,
+  mode: "countdown"
 };
 
 const _timerEvents = writable<TimerEventData>(INITIAL_DATA);

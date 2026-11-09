@@ -4,6 +4,8 @@ import { SettingsService } from 'src/settings.service';
 import { SecurityService } from 'src/security.service';
 import { SecurityGuard } from 'src/security.guard';
 import { TimerService } from 'src/timers/timer.service';
+import { AppThrottlerGuard } from 'src/throttler.guard';
+import { beforeEach } from 'vitest';
 
 describe('SettingsController', () => {
   let controller: SettingsController;
@@ -17,7 +19,12 @@ describe('SettingsController', () => {
   const mockSecurityService = {};
   const mockTimerService = {
     emitSettingsUpdated: vi.fn(),
+    setTimerMode: vi.fn(),
   };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -29,6 +36,8 @@ describe('SettingsController', () => {
       ],
     })
       .overrideGuard(SecurityGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(AppThrottlerGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -54,5 +63,21 @@ describe('SettingsController', () => {
       network_access_enabled: false,
     });
     expect(service.updateSettings).toHaveBeenCalledWith(updates);
+  });
+
+  it('should update and apply the timer mode', () => {
+    const updates = { timer_mode: 'countup' as const };
+    mockSettingsService.updateSettings.mockReturnValueOnce(updates);
+
+    expect(controller.updateSettings(updates)).toEqual(updates);
+    expect(service.updateSettings).toHaveBeenCalledWith(updates);
+    expect(mockTimerService.setTimerMode).toHaveBeenCalledWith('countup');
+  });
+
+  it('should reject an unsupported timer mode', () => {
+    expect(() =>
+      controller.updateSettings({ timer_mode: 'sideways' } as any),
+    ).toThrow('timer_mode must be countdown or countup');
+    expect(service.updateSettings).not.toHaveBeenCalled();
   });
 });

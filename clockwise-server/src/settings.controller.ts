@@ -1,4 +1,11 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AppThrottlerGuard } from './throttler.guard';
 import { SettingsService, DashboardSettings } from './settings.service';
 import { SecurityGuard } from './security.guard';
@@ -19,8 +26,19 @@ export class SettingsController {
 
   @Post()
   updateSettings(@Body() body: Partial<DashboardSettings>): DashboardSettings {
+    if (
+      body.timer_mode !== undefined &&
+      body.timer_mode !== 'countdown' &&
+      body.timer_mode !== 'countup'
+    ) {
+      throw new BadRequestException('timer_mode must be countdown or countup');
+    }
+
     const result = this.settingsService.updateSettings(body);
     this.timerService.emitSettingsUpdated();
+    if (body.timer_mode !== undefined) {
+      this.timerService.setTimerMode(body.timer_mode);
+    }
     return result;
   }
 }

@@ -21,6 +21,8 @@
     let status = $derived(storeData?.status ?? "stopped");
     let timerName = $derived(storeData?.name ?? null);
     let remainingSeconds = $derived(storeData?.remainingSeconds ?? 0);
+    let elapsedSeconds = $derived(storeData?.elapsedSeconds ?? 0);
+    let timerMode = $derived(storeData?.mode ?? "countdown");
     let totalSeconds = $derived(storeData?.totalSeconds ?? 0);
     let progressPercent = $derived(storeData?.progressPercent ?? 0);
 
@@ -30,6 +32,9 @@
 
     let isOvertime = $derived(status === "overtime");
     let isPaused = $derived(status === "paused");
+    let displaySeconds = $derived(
+        timerMode === "countup" && !isOvertime ? elapsedSeconds : remainingSeconds,
+    );
 
     // Color scheme based on timer state
     let accentColor = $derived(
@@ -90,7 +95,11 @@
     let formattedEndTime = $derived.by(() => {
         if (!isTimerActive) return "";
         let end: Date;
-        if (status === "overtime") {
+        if (timerMode === "countup") {
+            end = isOvertime
+                ? new Date(Date.now() - Math.max(elapsedSeconds - totalSeconds, 0) * 1000)
+                : new Date(Date.now() + Math.max(totalSeconds - elapsedSeconds, 0) * 1000);
+        } else if (status === "overtime") {
             end = new Date(Date.now() - Math.abs(remainingSeconds) * 1000);
         } else {
             end = new Date(Date.now() + remainingSeconds * 1000);
@@ -189,19 +198,19 @@
                                 <div
                                     class="shrink-0 font-mono text-2xl sm:text-3xl font-bold tabular-nums tracking-tight transition-colors duration-500 {countdownColorClass}"
                                 >
-                                    {#if isOvertime}
+                                    {#if isOvertime && timerMode === "countdown"}
                                         <span
                                             class="inline-flex items-center gap-1 sm:gap-1.5 leading-none overtime-blink"
                                         >
                                             <span>+</span>
                                             <span
                                                 >{formatTime(
-                                                    remainingSeconds,
+                                                    displaySeconds,
                                                 )}</span
                                             >
                                         </span>
                                     {:else}
-                                        {formatTime(remainingSeconds)}
+                                        {formatTime(displaySeconds)}
                                     {/if}
                                 </div>
 

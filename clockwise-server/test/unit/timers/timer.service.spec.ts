@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TimerService } from 'src/timers/timer.service';
 import { FileStorageService } from 'src/files/file.service';
+import { SettingsService } from 'src/settings.service';
 import { Timer } from 'src/timers/timer';
 import { firstValueFrom, skip } from 'rxjs';
 
@@ -12,6 +13,9 @@ describe('TimerService', () => {
     readData: vi.fn().mockReturnValue([]),
     writeData: vi.fn(),
   };
+  const mockSettingsService = {
+    getSettings: vi.fn().mockReturnValue({}),
+  };
 
   beforeEach(async () => {
     vi.useFakeTimers();
@@ -19,12 +23,14 @@ describe('TimerService', () => {
       providers: [
         TimerService,
         { provide: FileStorageService, useValue: mockFileStorageService },
+        { provide: SettingsService, useValue: mockSettingsService },
       ],
     }).compile();
 
     service = module.get<TimerService>(TimerService);
     fileStorageService = module.get<FileStorageService>(FileStorageService);
     vi.clearAllMocks();
+    mockSettingsService.getSettings.mockReturnValue({});
   });
 
   afterEach(() => {
@@ -87,12 +93,85 @@ describe('TimerService', () => {
       // Advance 1s - interval emits first value
       vi.advanceTimersByTime(1000);
       expect(events.length).toBe(3);
-      expect(events[2].remainingSeconds).toBe(2); // Implementation returns current then decrements
+      expect(events[2].remainingSeconds).toBe(1);
 
       // Advance another 1s
       vi.advanceTimersByTime(1000);
       expect(events.length).toBe(4);
-      expect(events[3].remainingSeconds).toBe(1);
+      expect(events[3].remainingSeconds).toBe(0);
+      expect(events[3].status).toBe('overtime');
+    });
+
+    it('starts count-up timers at zero and enters overtime at allocation', () => {
+      mockSettingsService.getSettings.mockReturnValue({ timer_mode: 'countup' });
+      const timer: Timer = {
+        id: 'countup-id',
+        name: 'Count-up Timer',
+        duration: 2,
+        unit: 'seconds',
+      } as Timer;
+      const events: any[] = [];
+      service.subscribeToStream()!.subscribe((event) => events.push(event));
+
+      service.startTimer(timer);
+      expect(events.at(-1)).toMatchObject({
+        status: 'running',
+        mode: 'countup',
+        elapsedSeconds: 0,
+      });
+
+      vi.advanceTimersByTime(1000);
+      expect(events.at(-1)).toMatchObject({
+        status: 'running',
+        mode: 'countup',
+        elapsedSeconds: 1,
+        progressPercent: 50,
+      });
+
+      vi.advanceTimersByTime(1000);
+      expect(events.at(-1)).toMatchObject({
+        status: 'overtime',
+        elapsedSeconds: 2,
+        remainingSeconds: 0,
+        progressPercent: 100,
+      });
+
+      vi.advanceTimersByTime(1000);
+      expect(events.at(-1)).toMatchObject({
+        status: 'overtime',
+        elapsedSeconds: 3,
+        remainingSeconds: 1,
+        message: 'Count-up Timer: 00:01 overtime',
+      });
+    });
+
+    it('switches modes during a timer without changing elapsed time', () => {
+      const timer: Timer = {
+        id: 'switch-id',
+        name: 'Switch Timer',
+        duration: 10,
+        unit: 'seconds',
+      } as Timer;
+      const events: any[] = [];
+      service.subscribeToStream()!.subscribe((event) => events.push(event));
+
+      service.startTimer(timer);
+      vi.advanceTimersByTime(3000);
+      expect(events.at(-1).elapsedSeconds).toBe(3);
+
+      service.setTimerMode('countup');
+      expect(events.at(-1)).toMatchObject({
+        mode: 'countup',
+        elapsedSeconds: 3,
+        remainingSeconds: 3,
+      });
+
+      service.setTimerMode('countdown');
+      expect(events.at(-1)).toMatchObject({
+        mode: 'countdown',
+        elapsedSeconds: 3,
+        remainingSeconds: 7,
+      });
     });
 
     it('should enter overtime when timer reaches 0', () => {
@@ -233,11 +312,11 @@ describe('TimerService', () => {
 
       service.startTimer(timerH);
       vi.advanceTimersByTime(1000);
-      expect(lastEvent.message).toContain('01:00:00');
+      expect(lastEvent.message).toContain('00:59:59');
 
       service.startTimer(timerM);
       vi.advanceTimersByTime(1000);
-      expect(lastEvent.message).toContain('01:00');
+      expect(lastEvent.message).toContain('00:59');
     });
 
     it('should handle stopped or null instance in countdown$', () => {

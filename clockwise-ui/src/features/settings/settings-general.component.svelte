@@ -2,6 +2,8 @@
     import LockIcon from "#shared/ui/icons/LockIcon.svelte";
     import QrCodeIcon from "#shared/ui/icons/QrCodeIcon.svelte";
     import ToggleSwitch from "#shared/ui/toggle-switch.component.svelte";
+    import CountDownIcon from "#shared/ui/icons/CountDownIcon.svelte";
+    import CountUpIcon from "#shared/ui/icons/CountUpIcon.svelte";
     import MonitorSelector from "#features/dashboard/monitor-selector.component.svelte";
     import QRCode from "qrcode";
     import type { SettingsState } from "./settings.state.svelte";
@@ -43,6 +45,38 @@
 >
     <!-- Left Side: All Toggles & Preferences -->
     <div class="flex flex-col h-full gap-3 @lg:gap-4">
+        <div class="rounded border border-gray-700/60 bg-gray-800/80 shadow-lg overflow-hidden">
+            <div class="p-3 border-b border-gray-700/50 bg-gray-900/30">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400">Timer Mode</h3>
+            </div>
+            <div class="grid grid-cols-2 gap-2 p-3">
+                <button
+                    type="button"
+                    class="flex min-h-11 items-center justify-center gap-2 rounded border px-3 text-sm font-semibold transition-colors {settings.timerMode === 'countdown'
+                        ? 'border-blue-400/60 bg-blue-500/15 text-blue-200'
+                        : 'border-gray-700 bg-gray-900/40 text-gray-400 hover:bg-white/[0.04] hover:text-gray-200'}"
+                    aria-pressed={settings.timerMode === "countdown"}
+                    onclick={() => settings.setTimerMode("countdown")}
+                    title="Count down from the allocated time"
+                >
+                    <CountDownIcon width="18" height="18" />
+                    Countdown
+                </button>
+                <button
+                    type="button"
+                    class="flex min-h-11 items-center justify-center gap-2 rounded border px-3 text-sm font-semibold transition-colors {settings.timerMode === 'countup'
+                        ? 'border-blue-400/60 bg-blue-500/15 text-blue-200'
+                        : 'border-gray-700 bg-gray-900/40 text-gray-400 hover:bg-white/[0.04] hover:text-gray-200'}"
+                    aria-pressed={settings.timerMode === "countup"}
+                    onclick={() => settings.setTimerMode("countup")}
+                    title="Count up from zero toward the allocated time"
+                >
+                    <CountUpIcon width="18" height="18" />
+                    Count up
+                </button>
+            </div>
+        </div>
+
         <!-- Network & Security section -->
         <div class="rounded border border-gray-700/60 bg-gray-800/80 shadow-lg overflow-hidden">
             <div class="p-3 border-b border-gray-700/50 bg-gray-900/30">

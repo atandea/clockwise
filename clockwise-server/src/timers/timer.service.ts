@@ -2,78 +2,44 @@ import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { BehaviorSubject, interval, map, Observable } from 'rxjs';
 import { FileStorageService } from 'src/files/file.service';
+import { SettingsService } from 'src/settings.service';
 import { Timer } from './timer';
 import { TimerEvent } from './timer-event';
 import { TimerInstance } from './timer-instance';
+import type { TimerMode } from './timer-instance';
 
 @Injectable()
 export class TimerService {
-  constructor(private readonly fileStorageService: FileStorageService) {}
+  constructor(
+    private readonly fileStorageService: FileStorageService,
+    private readonly settingsService: SettingsService,
+  ) {}
 
   private activeTimerInstance: TimerInstance | null = null;
-  private overtime = 0;
   private activeSubscription: any;
   private readonly ephemeralTimers = new Map<string, Timer>();
   private readonly activeTimerSubject = new BehaviorSubject<any>({
     status: 'idle',
     remainingSeconds: 0,
   });
-  private readonly countdown$ = interval(1000).pipe(
-    map(() => {
-      if (
-        this.activeTimerInstance?.status === 'stopped' ||
-        !this.activeTimerInstance
-      ) {
-        return {
-          status: 'stopped',
-          remainingSeconds: 0,
-        };
-      } else if (
-        this.activeTimerInstance.status === 'overtime' ||
-        this.activeTimerInstance.remainingSeconds <= 0
-      ) {
-        this.activeTimerInstance.status = 'overtime';
-        const event = {
-          status: 'overtime',
-          timerId: this.activeTimerInstance.id,
-          remainingSeconds: this.overtime,
-        };
-        this.overtime++;
-        return event;
-      } else {
-        const event: TimerEvent = {
-          status: 'running',
-          timerId: this.activeTimerInstance.id,
-          name: this.activeTimerInstance.name,
-          remainingSeconds: this.activeTimerInstance.remainingSeconds,
-          totalSeconds: this.activeTimerInstance.duration,
-          progressPercent: this.activeTimerInstance.progressPercent,
-          message: `${this.activeTimerInstance.name}: ${this.formatTime(this.activeTimerInstance.remainingSeconds, this.activeTimerInstance.unit)} remaining`,
-        };
-        this.activeTimerInstance.remainingSeconds--;
-        this.activeTimerInstance.progressPercent = Math.round(
-          ((this.activeTimerInstance.duration -
-            this.activeTimerInstance.remainingSeconds) /
-            this.activeTimerInstance.duration) *
-            100,
-        );
-        return event;
-      }
-    }),
+  private readonly ticker$ = interval(1000).pipe(
+    map(() => this.advanceActiveTimer()),
   );
 
   startTimer(timer: Timer) {
     console.log('Starting timer:', timer.id, '(', timer.name, ')');
-    this.overtime = 0;
     if (this.activeSubscription) {
       this.activeSubscription.unsubscribe();
     }
+    const duration = this.convertToSeconds(timer.duration, timer.unit);
     this.activeTimerInstance = {
       id: timer.id,
       name: timer.name,
-      duration: this.convertToSeconds(timer.duration, timer.unit),
+      duration,
       unit: timer.unit,
-      remainingSeconds: this.convertToSeconds(timer.duration, timer.unit),
+      mode: this.getConfiguredMode(),
+      elapsedSeconds: 0,
+      remainingSeconds: duration,
       progressPercent: 0,
       status: 'running',
     };
@@ -84,13 +50,15 @@ export class TimerService {
       timerId: this.activeTimerInstance.id,
       name: this.activeTimerInstance.name,
       remainingSeconds: this.activeTimerInstance.remainingSeconds,
+      elapsedSeconds: 0,
       totalSeconds: this.activeTimerInstance.duration,
       progressPercent: 0,
+      mode: this.activeTimerInstance.mode,
       message: `${this.activeTimerInstance.name}: Starting...`,
     };
     this.activeTimerSubject.next(initialEvent);
 
-    this.activeSubscription = this.countdown$.subscribe({
+    this.activeSubscription = this.ticker$.subscribe({
       next: (event) => this.activeTimerSubject.next(event),
       error: (err) => this.activeTimerSubject.error(err),
     });
@@ -101,7 +69,6 @@ export class TimerService {
   stopActiveTimer() {
     if (this.activeTimerInstance) {
       this.activeTimerInstance.status = 'stopped';
-      this.overtime = 0;
       if (this.activeSubscription) {
         this.activeSubscription.unsubscribe();
         this.activeSubscription = undefined;
@@ -111,6 +78,10 @@ export class TimerService {
         status: 'stopped',
         timerId: this.activeTimerInstance.id,
         remainingSeconds: 0,
+        elapsedSeconds: this.activeTimerInstance.elapsedSeconds,
+        totalSeconds: this.activeTimerInstance.duration,
+        progressPercent: this.activeTimerInstance.progressPercent,
+        mode: this.activeTimerInstance.mode,
       });
     }
   }
@@ -127,8 +98,10 @@ export class TimerService {
         timerId: this.activeTimerInstance.id,
         name: this.activeTimerInstance.name,
         remainingSeconds: this.activeTimerInstance.remainingSeconds,
+        elapsedSeconds: this.activeTimerInstance.elapsedSeconds,
         totalSeconds: this.activeTimerInstance.duration,
         progressPercent: this.activeTimerInstance.progressPercent,
+        mode: this.activeTimerInstance.mode,
       });
     }
   }
@@ -136,11 +109,85 @@ export class TimerService {
   resumeActiveTimer() {
     if (this.activeTimerInstance?.status === 'paused') {
       this.activeTimerInstance.status = 'running';
-      this.activeSubscription = this.countdown$.subscribe({
+      this.activeSubscription = this.ticker$.subscribe({
         next: (event) => this.activeTimerSubject.next(event),
         error: (err) => this.activeTimerSubject.error(err),
       });
     }
+  }
+
+  setTimerMode(mode: TimerMode) {
+    if (!this.activeTimerInstance || this.activeTimerInstance.status === 'stopped') {
+      return;
+    }
+    if (this.activeTimerInstance.mode === mode) return;
+
+    this.activeTimerInstance.mode = mode;
+    this.activeTimerSubject.next(this.createActiveTimerEvent());
+  }
+
+  private getConfiguredMode(): TimerMode {
+    return this.settingsService.getSettings().timer_mode === 'countup'
+      ? 'countup'
+      : 'countdown';
+  }
+
+  private advanceActiveTimer(): TimerEvent {
+    if (!this.activeTimerInstance || this.activeTimerInstance.status === 'stopped') {
+      return { status: 'stopped', remainingSeconds: 0 };
+    }
+
+    this.activeTimerInstance.elapsedSeconds++;
+    this.activeTimerInstance.remainingSeconds = Math.max(
+      this.activeTimerInstance.duration - this.activeTimerInstance.elapsedSeconds,
+      0,
+    );
+    this.activeTimerInstance.progressPercent = Math.min(
+      Math.round(
+        (this.activeTimerInstance.elapsedSeconds /
+          this.activeTimerInstance.duration) *
+          100,
+      ),
+      100,
+    );
+    this.activeTimerInstance.status =
+      this.activeTimerInstance.elapsedSeconds >=
+      this.activeTimerInstance.duration
+        ? 'overtime'
+        : 'running';
+
+    return this.createActiveTimerEvent();
+  }
+
+  private createActiveTimerEvent(): TimerEvent {
+    const instance = this.activeTimerInstance!;
+    const overtimeSeconds = Math.max(
+      instance.elapsedSeconds - instance.duration,
+      0,
+    );
+    const displayedSeconds =
+      instance.status === 'overtime'
+        ? overtimeSeconds
+        : instance.mode === 'countup'
+          ? instance.elapsedSeconds
+          : instance.remainingSeconds;
+
+    return {
+      status: instance.status as TimerEvent['status'],
+      timerId: instance.id,
+      name: instance.name,
+      remainingSeconds: displayedSeconds,
+      elapsedSeconds: instance.elapsedSeconds,
+      totalSeconds: instance.duration,
+      progressPercent: instance.progressPercent,
+      mode: instance.mode,
+      message:
+        instance.status === 'overtime'
+          ? `${instance.name}: ${this.formatTime(overtimeSeconds, instance.unit)} overtime`
+          : instance.mode === 'countup'
+            ? `${instance.name}: ${this.formatTime(instance.elapsedSeconds, instance.unit)} elapsed`
+            : `${instance.name}: ${this.formatTime(instance.remainingSeconds, instance.unit)} remaining`,
+    };
   }
 
   subscribeToStream(): Observable<TimerEvent> | null {

@@ -30,11 +30,22 @@
 	let storeData = $state<TimerEventData | null>(get(timerEvents));
 	let unsubscribe: (() => void) | null = null;
 
-	let rawTime = $derived(storeData?.remainingSeconds ?? 0);
+	let timerMode = $derived(storeData?.mode ?? "countdown");
 	let rawStatus = $derived(storeData?.status ?? "idle");
+	let rawTime = $derived(
+		timerMode === "countup"
+			? (rawStatus === "overtime"
+				? (storeData?.remainingSeconds ?? 0)
+				: (storeData?.elapsedSeconds ?? 0))
+			: (storeData?.remainingSeconds ?? 0),
+	);
 	
 	let status = $derived(!allowOvertime && rawStatus === "overtime" ? "stopped" : rawStatus);
-	let time = $derived(!allowOvertime && rawStatus === "overtime" ? 0 : rawTime);
+	let time = $derived(
+		!allowOvertime && rawStatus === "overtime"
+			? (timerMode === "countup" ? (storeData?.totalSeconds ?? 0) : 0)
+			: rawTime,
+	);
 	
 	let progress = $derived(storeData?.progressPercent ?? 0);
 

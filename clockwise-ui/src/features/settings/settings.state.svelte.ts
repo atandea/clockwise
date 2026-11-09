@@ -5,6 +5,7 @@ import {
     getPin,
     appAuthStatus,
     appSettings,
+    type TimerMode,
     getApiBaseUrl,
     fetchWithPin,
 } from "#shared/api/api";
@@ -78,6 +79,7 @@ export class SettingsState {
     timerOvertimeColor: string = $state("#ef4444");
     timerWarningThreshold: number = $state(80);
     timerAllowOvertime: boolean = $state(true);
+    timerMode: TimerMode = $state("countdown");
 
     constructor() {
         appSettings.subscribe((data) => {
@@ -109,9 +111,10 @@ export class SettingsState {
         if (data.timer_overtime_color) this.timerOvertimeColor = data.timer_overtime_color;
         if (data.timer_warning_threshold !== undefined) this.timerWarningThreshold = data.timer_warning_threshold;
         if (data.timer_allow_overtime !== undefined) this.timerAllowOvertime = data.timer_allow_overtime;
+        if (data.timer_mode === "countdown" || data.timer_mode === "countup") this.timerMode = data.timer_mode;
     }
 
-    async updateBackendSetting(key: string, value: any, successMessage = "Setting updated") {
+    async updateBackendSetting(key: string, value: any, successMessage = "Setting updated"): Promise<boolean> {
         try {
             const apiBase = getApiBaseUrl();
             const res = await fetchWithPin(`${apiBase}/settings`, {
@@ -121,12 +124,15 @@ export class SettingsState {
             });
             if (res.ok) {
                 toast.success(successMessage);
+                return true;
             } else {
                 toast.error("Failed to save setting");
+                return false;
             }
         } catch (err) {
             console.error(`Failed to save ${key} to backend:`, err);
             toast.error("Connection error");
+            return false;
         }
     }
 
@@ -186,6 +192,13 @@ export class SettingsState {
     setTimerOvertimeColor(color: string) {
         this.timerOvertimeColor = color;
         this.updateBackendSetting("timer_overtime_color", color);
+    }
+
+    async setTimerMode(mode: TimerMode) {
+        const previousMode = this.timerMode;
+        this.timerMode = mode;
+        const saved = await this.updateBackendSetting("timer_mode", mode);
+        if (!saved) this.timerMode = previousMode;
     }
 
     setTimerWarningThreshold(threshold: number) {

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import * as path from 'node:path';
+import type { TimerMode } from './timers/timer-instance';
 
 export interface DashboardSettings {
   preferred_monitor?: string;
@@ -16,6 +17,7 @@ export interface DashboardSettings {
   selected_preset_id?: string;
   custom_presets?: any[];
   timer_progress_base_color?: string;
+  timer_mode?: TimerMode;
   [key: string]: any;
 }
 
